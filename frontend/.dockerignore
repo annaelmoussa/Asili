@@ -1,0 +1,13 @@
+node_modules
+dist
+*.log
+.git
+.gitignore
+Dockerfile
+.dockerignore
+README.md
+LICENSE
+.vscode
+public/*
+!public/favicon.ico
+src/assets/images

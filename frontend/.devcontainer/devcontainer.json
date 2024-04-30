@@ -1,0 +1,18 @@
+{
+  "name": "Asili Frontend Development Container",
+  "build": {
+    "context": "../",
+    "dockerfile": "../Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+      },
+      "extensions": ["octref.vetur", "esbenp.prettier-vscode"]
+    }
+  },
+  "forwardPorts": [8080],
+  "postCreateCommand": "npm install",
+  "remoteUser": "node"
+}

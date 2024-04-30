@@ -1,0 +1,10 @@
+services:
+  backend:
+    ports:
+      - "3000:3000"
+    environment:
+      - DEBUG=express:*
+
+  frontend:
+    environment:
+      - VUE_APP_DEBUG=true
