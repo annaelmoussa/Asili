@@ -6,7 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "generate-api": "openapi-generator-cli generate -i http://localhost:3000/swagger.json -g typescript-axios -o ./src/api --skip-validate-spec"
   },
   "dependencies": {
     "core-js": "^3.8.3",
