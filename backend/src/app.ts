@@ -2,9 +2,12 @@ import express from "express";
 import yaml from "js-yaml";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import { itemRoutes } from "./routes/itemRoutes";
+import { authRoutes } from "./routes/authRoutes";
+import { orderRoutes } from "./routes/orderRoutes";
+import { productRoutes } from "./routes/productRoutes";
+import { stockRoutes } from "./routes/stockRoutes";
+import { userRoutes } from "./routes/userRoutes";
 
-// Define the function to setup Swagger and routes
 export const setupRoutes = (app: express.Application): void => {
   const options = {
     definition: {
@@ -29,31 +32,31 @@ export const setupRoutes = (app: express.Application): void => {
         },
       ],
     },
-    apis: ["src/routes/*.ts"], // Make sure this path matches where your route files are
+    apis: ["src/routes/*.ts"],
   };
 
   const swaggerSpec = swaggerJsdoc(options);
 
-  // Swagger UI setup
   app.use(
     "/api-docs",
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec, { explorer: true })
   );
 
-  // Route to serve JSON format of the Swagger document
   app.get("/swagger.json", (req, res) => {
     res.setHeader("Content-Type", "application/json");
     res.send(swaggerSpec);
   });
 
-  // Route to serve YAML format of the Swagger document
   app.get("/swagger.yaml", (req, res) => {
     res.setHeader("Content-Type", "text/yaml");
     const yamlSpec = yaml.dump(swaggerSpec);
     res.send(yamlSpec);
   });
 
-  // Setup item routes
-  itemRoutes(app);
+  authRoutes(app);
+  productRoutes(app);
+  orderRoutes(app);
+  stockRoutes(app);
+  userRoutes(app);
 };
