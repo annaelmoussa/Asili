@@ -1,5 +1,5 @@
 export interface IStock {
-    productId: string;
-    quantity: number;
-    alertThreshold: number;
+  productId: string;
+  quantity: number;
+  alertThreshold: number;
 }

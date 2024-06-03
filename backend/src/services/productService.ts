@@ -1,40 +1,41 @@
-import { ICrud } from "../interfaces/ICrud";
 import { IProduct } from "../interfaces/IProduct";
-import ProductPostgres from "../models/productModelPostgres";
+import Product from "../models/Product";
 
-class ProductService implements ICrud<IProduct> {
-  async findAll(): Promise<IProduct[]> {
-    return await ProductPostgres.findAll();
-  }
+export type ProductCreationParams = Pick<
+  IProduct,
+  "name" | "description" | "price" | "category" | "stock"
+>;
 
-  async findById(id: string): Promise<IProduct | null> {
-    return await ProductPostgres.findByPk(id);
-  }
-
-  async create(item: Partial<IProduct>): Promise<IProduct> {
-    if (
-      !item.name ||
-      !item.description ||
-      item.price === undefined ||
-      !item.category ||
-      item.stock === undefined
-    ) {
-      throw new Error("Missing required fields");
+export class ProductService {
+  public async get(productId: string): Promise<IProduct | null> {
+    try {
+      const product = await Product.findByPk(productId);
+      return product ? product.toJSON() : null;
+    } catch (error) {
+      console.error("Error fetching product by ID:", error);
+      throw error;
     }
-    return await ProductPostgres.create(item as Omit<IProduct, "id">);
   }
 
-  async update(id: string, item: Partial<IProduct>): Promise<IProduct | null> {
-    const [_, [updatedItem]] = await ProductPostgres.update(item, {
-      where: { id },
-      returning: true,
-    });
-    return updatedItem;
+  public async getAll(): Promise<IProduct[]> {
+    try {
+      const products = await Product.findAll();
+      return products.map((product) => product.toJSON());
+    } catch (error) {
+      console.error("Error fetching all products:", error);
+      throw error;
+    }
   }
 
-  async delete(id: string): Promise<void> {
-    await ProductPostgres.destroy({ where: { id } });
+  public async create(
+    productCreationParams: ProductCreationParams
+  ): Promise<IProduct> {
+    try {
+      const product = await Product.create(productCreationParams);
+      return product.toJSON();
+    } catch (error) {
+      console.error("Error creating product:", error);
+      throw error;
+    }
   }
 }
-
-export default new ProductService();

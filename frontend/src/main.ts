@@ -2,6 +2,7 @@ import './assets/main.css'
 
 import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config'
+import 'primevue/resources/themes/saga-blue/theme.css' // Thème choisi
 import { createApp } from 'vue'
 
 import App from './App.vue'

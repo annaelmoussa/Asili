@@ -12,6 +12,8 @@ yarn-error.log*
 # Dossier de build
 /dist/
 /build/
+/frontend/build/
+/backend/build/
 
 # Dossiers spécifiques à Vue.js
 /frontend/dist/

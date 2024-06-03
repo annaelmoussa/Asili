@@ -37,12 +37,12 @@
                   >
                   <ul class="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                     <li class="hidden lg:block">
-                      <img
+                      <!-- <img
                         src="/images/blocks/ecommerce/storenavigation/storenavigation-2-1.png"
                         alt="Image"
                         height="160"
                         style="border-radius: 12px"
-                      />
+                      /> -->
                     </li>
                     <li class="font-bold my-5 text-xl text-900 hidden lg:block">Clothing</li>
                     <li class="mb-3 cursor-pointer hover:text-900">Dresses</li>
@@ -60,12 +60,12 @@
                   >
                   <ul class="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                     <li class="hidden lg:block">
-                      <img
+                      <!-- <img
                         src="/images/blocks/ecommerce/storenavigation/storenavigation-2-2.png"
                         alt="Image"
                         height="160"
                         style="border-radius: 12px"
-                      />
+                      /> -->
                     </li>
                     <li class="font-bold my-5 text-xl text-900 hidden lg:block">Shoes</li>
                     <li class="mb-3 cursor-pointer hover:text-900">Athletic</li>
@@ -82,12 +82,12 @@
                   >
                   <ul class="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                     <li class="hidden lg:block">
-                      <img
+                      <!-- <img
                         src="/images/blocks/ecommerce/storenavigation/storenavigation-2-3.png"
                         alt="Image"
                         height="160"
                         style="border-radius: 12px"
-                      />
+                      /> -->
                     </li>
                     <li class="font-bold my-5 text-xl text-900 hidden lg:block">Accessories</li>
                     <li class="mb-3 cursor-pointer hover:text-900">Handbags</li>
@@ -104,12 +104,12 @@
                   >
                   <ul class="list-none py-0 pr-0 lg:pl-0 pl-5 m-0 text-700 hidden lg:block">
                     <li class="hidden lg:block">
-                      <img
+                      <!-- <img
                         src="/images/blocks/ecommerce/storenavigation/storenavigation-2-4.png"
                         alt="Image"
                         height="160"
                         style="border-radius: 12px"
-                      />
+                      /> -->
                     </li>
                     <li class="font-bold my-5 text-xl text-900 hidden lg:block">Beauty</li>
                     <li class="mb-3 cursor-pointer hover:text-900">Anklets</li>
@@ -154,7 +154,7 @@
         </ul>
       </div>
       <div class="flex align-items-center justify-content-center py-3">
-        <img src="/images/blocks/logos/hyper-text-indigo.svg" alt="Image" height="40" />
+        <!-- <img src="/images/blocks/logos/hyper-text-indigo.svg" alt="Image" height="40" /> -->
       </div>
       <div class="lg:flex w-full lg:w-auto hidden py-3 lg:py-0">
         <ul class="list-none p-0 m-0 flex w-full" style="min-height: 30px">

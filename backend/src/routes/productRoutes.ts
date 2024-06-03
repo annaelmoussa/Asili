@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { createProduct, getProducts } from "../controllers/productController";
+import { RegisterRoutes } from "../../build/routes";
 
 const router = Router();
 
@@ -15,7 +15,7 @@ const router = Router();
  *       500:
  *         description: Server error
  */
-router.get("/products", getProducts);
+router.get("/products", RegisterRoutes);
 
 /**
  * @swagger
@@ -40,7 +40,7 @@ router.get("/products", getProducts);
  *       400:
  *         description: Invalid input
  */
-router.post("/products", createProduct);
+router.post("/products", RegisterRoutes);
 
 export const productRoutes = (app: express.Application) => {
   app.use("/api", router);
