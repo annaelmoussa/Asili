@@ -14,6 +14,7 @@ class Product
   public price!: number;
   public category!: string;
   public stock!: number;
+  public image!: string;
 }
 
 Product.init(
@@ -42,6 +43,10 @@ Product.init(
     stock: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

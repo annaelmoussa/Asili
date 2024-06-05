@@ -27,13 +27,13 @@
     "typescript-json-schema": "^0.63.0"
   },
   "scripts": {
-    "build": "tsc && tsoa spec-and-routes",
-    "start": "node build/server.js",
-    "dev": "ts-node-dev src/server.ts",
-    "migrate": "node migrate.js",
-    "seed": "npx sequelize-cli db:seed:all",
-    "test": "jest"
-  },
+  "build": "tsc && tsoa spec-and-routes",
+  "start": "node build/server.js",
+  "dev": "ts-node-dev src/server.ts",
+  "migrate": "node migrate.js",
+  "seed": "npx sequelize-cli db:seed:all",
+  "test": "jest"
+},
   "name": "backend",
   "version": "1.0.0",
   "main": "server.js",

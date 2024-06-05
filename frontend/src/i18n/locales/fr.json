@@ -1,0 +1,37 @@
+{
+    "app": {
+      "title": "Asili",
+      "navbar": {
+        "proteins": "Protéines",
+        "snacks": "Barres/Encas & Boissons",
+        "clothing": "Vêtements",
+        "creatines": "Créatines",
+        "vitamins": "Vitamines",
+        "vegan": "Végan"
+      },
+      "account": "Compte",
+      "cart": "Panier",
+      "search": "Rechercher",
+      "banner": {
+        "title": "Toujours de la place pour des snacks",
+        "description": "Avec 40% sur les barres et snacks",
+        "button": "Acheter"
+      },
+      "products": {
+        "title": "Nos Produits",
+        "loading": "Chargement...",
+        "noProducts": "Aucun produit trouvé",
+        "price": "Prix",
+        "category": "Catégorie",
+        "inStock": "En stock",
+        "addToCart": "Ajouter au panier"
+      },
+      "contact": "Nous contacter",
+      "help": "Aide",
+      "language": {
+        "fr": "Français",
+        "en": "Anglais"
+      }
+    }
+  }
+  

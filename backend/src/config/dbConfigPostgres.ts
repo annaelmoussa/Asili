@@ -1,10 +1,10 @@
 import { Sequelize } from "sequelize";
 
 const sequelize = new Sequelize(
-  (process.env.POSTGRES_URI as string) ||
-    "postgres://postgres:password@localhost:5432/postgres",
+  process.env.POSTGRES_URI as string,
   {
     dialect: "postgres",
+    logging: false,
   }
 );
 

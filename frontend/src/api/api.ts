@@ -65,43 +65,55 @@ export interface IProduct {
      * @memberof IProduct
      */
     'stock': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof IProduct
+     */
+    'image'?: string;
 }
 /**
  * From T, pick a set of properties whose keys are in the union K
  * @export
- * @interface PickIProductNameOrDescriptionOrPriceOrCategoryOrStock
+ * @interface PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage
  */
-export interface PickIProductNameOrDescriptionOrPriceOrCategoryOrStock {
+export interface PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage {
     /**
      * 
      * @type {string}
-     * @memberof PickIProductNameOrDescriptionOrPriceOrCategoryOrStock
+     * @memberof PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage
      */
     'name': string;
     /**
      * 
      * @type {string}
-     * @memberof PickIProductNameOrDescriptionOrPriceOrCategoryOrStock
+     * @memberof PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage
      */
     'description': string;
     /**
      * 
      * @type {number}
-     * @memberof PickIProductNameOrDescriptionOrPriceOrCategoryOrStock
+     * @memberof PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage
      */
     'price': number;
     /**
      * 
      * @type {string}
-     * @memberof PickIProductNameOrDescriptionOrPriceOrCategoryOrStock
+     * @memberof PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage
      */
     'category': string;
     /**
      * 
      * @type {number}
-     * @memberof PickIProductNameOrDescriptionOrPriceOrCategoryOrStock
+     * @memberof PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage
      */
     'stock': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage
+     */
+    'image'?: string;
 }
 
 /**
@@ -112,11 +124,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
-         * @param {PickIProductNameOrDescriptionOrPriceOrCategoryOrStock} body 
+         * @param {PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createProduct: async (body: PickIProductNameOrDescriptionOrPriceOrCategoryOrStock, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createProduct: async (body: PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             assertParamExists('createProduct', 'body', body)
             const localVarPath = `/products`;
@@ -219,11 +231,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {PickIProductNameOrDescriptionOrPriceOrCategoryOrStock} body 
+         * @param {PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createProduct(body: PickIProductNameOrDescriptionOrPriceOrCategoryOrStock, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IProduct>> {
+        async createProduct(body: PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IProduct>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createProduct(body, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.createProduct']?.[localVarOperationServerIndex]?.url;
@@ -264,11 +276,11 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
-         * @param {PickIProductNameOrDescriptionOrPriceOrCategoryOrStock} body 
+         * @param {PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createProduct(body: PickIProductNameOrDescriptionOrPriceOrCategoryOrStock, options?: any): AxiosPromise<IProduct> {
+        createProduct(body: PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage, options?: any): AxiosPromise<IProduct> {
             return localVarFp.createProduct(body, options).then((request) => request(axios, basePath));
         },
         /**
@@ -300,12 +312,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 export class DefaultApi extends BaseAPI {
     /**
      * 
-     * @param {PickIProductNameOrDescriptionOrPriceOrCategoryOrStock} body 
+     * @param {PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage} body 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public createProduct(body: PickIProductNameOrDescriptionOrPriceOrCategoryOrStock, options?: RawAxiosRequestConfig) {
+    public createProduct(body: PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).createProduct(body, options).then((request) => request(this.axios, this.basePath));
     }
 

@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import HomeView from '@/views/HomeView.vue'
 </script>
-
 <template>
-  <HelloWorld />
+  <HomeView />
 </template>
 
 <style scoped>
-header {
-  background-color: #41b883;
-  color: white;
-  padding: 10px 0;
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f1f2f6;
 }
 </style>

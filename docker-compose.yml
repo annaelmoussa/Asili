@@ -5,6 +5,8 @@ services:
       - mongo_data:/data/db
     networks:
       - backend
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
 
   postgres:
     image: postgres:alpine
@@ -18,6 +20,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4
@@ -37,11 +44,11 @@ services:
       - ./backend:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
+      - "8000:8000"
     environment:
       NODE_ENV: development
-      MONGO_URI: ${MONGO_URI}
-      POSTGRES_URI: ${POSTGRES_URI}
+      MONGO_URI: mongodb://mongo:27017/${MONGO_INITDB_DATABASE}
+      POSTGRES_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
     depends_on:
       - mongo

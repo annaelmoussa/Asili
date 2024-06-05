@@ -5,20 +5,26 @@ import { ProductService } from "../services/productService";
 
 const productService = new ProductService();
 
-beforeAll(async () => {
-  await sequelize.sync({ force: true }); // Reset the database before tests
-});
-
-afterAll(async () => {
-  await sequelize.close(); // Close the database connection after tests
-});
-
-beforeEach(async () => {
-  // Clear the database before each test
-  await sequelize.truncate({ cascade: true });
-});
-
 describe("ProductService", () => {
+  let transaction: any;
+
+  beforeAll(async () => {
+    await sequelize.authenticate();
+    await sequelize.sync({ force: true });
+  });
+
+  afterAll(async () => {
+    await sequelize.close();
+  });
+
+  beforeEach(async () => {
+    transaction = await sequelize.transaction();
+  });
+
+  afterEach(async () => {
+    await transaction.rollback();
+  });
+
   it("should create a product", async () => {
     const productCreationParams: IProduct = {
       name: "Test Product",
@@ -27,7 +33,10 @@ describe("ProductService", () => {
       category: "Test Category",
       stock: 100,
     };
-    const product = await productService.create(productCreationParams);
+
+    const product = await productService.create(productCreationParams, {
+      transaction,
+    });
 
     expect(product).toMatchObject(productCreationParams);
     expect(product.id).toBeDefined();
@@ -49,10 +58,10 @@ describe("ProductService", () => {
       stock: 150,
     };
 
-    await productService.create(product1);
-    await productService.create(product2);
+    await productService.create(product1, { transaction });
+    await productService.create(product2, { transaction });
 
-    const products = await productService.getAll();
+    const products = await productService.getAll({ transaction });
 
     expect(products.length).toBe(2);
     expect(products).toEqual(
@@ -72,9 +81,12 @@ describe("ProductService", () => {
       stock: 200,
     };
 
-    const createdProduct = await productService.create(productCreationParams);
+    const createdProduct = await productService.create(productCreationParams, {
+      transaction,
+    });
     const fetchedProduct = await productService.get(
-      createdProduct.id as string
+      createdProduct.id as string,
+      { transaction }
     );
 
     expect(fetchedProduct).toMatchObject(productCreationParams);
@@ -82,7 +94,9 @@ describe("ProductService", () => {
 
   it("should return null for a non-existing product", async () => {
     const nonExistingId = uuidv4();
-    const fetchedProduct = await productService.get(nonExistingId);
+    const fetchedProduct = await productService.get(nonExistingId, {
+      transaction,
+    });
     expect(fetchedProduct).toBeNull();
   });
 });
