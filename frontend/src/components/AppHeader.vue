@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <div class="logo">{{ $t('app.title') }}</div>
+    <a class="logo" href="#" @click="goToHomeView()">{{ $t('app.title') }}</a>
     <div class="search-container">
       <input type="text" :placeholder="$t('app.search')" class="search-input" />
       <button class="search-button">
@@ -19,6 +19,13 @@
 
 <script setup>
 import AccountDropdown from '@/components/AccountDropdown.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+function goToHomeView() {
+  router.push({ name: 'home' })
+}
 </script>
 
 <style scoped>

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginPage from '../views/LoginPage.vue'
 import SignupPage from '../views/SignUpPage.vue'
+import ProductSingleView from '../views/ProductSingleView.vue'
 import { useUserStore } from '@/stores/user'
 
 const routes = [
@@ -31,7 +32,12 @@ const routes = [
     name: 'member-benefits',
     component: () => import('../views/MemberBenefitsView.vue'),
     meta: { requiresAuth: true }
-  }
+  },
+  {
+    path: '/product/:productId',
+    name: 'ProductSingleView',
+    component: ProductSingleView
+  },
 ]
 
 const router = createRouter({

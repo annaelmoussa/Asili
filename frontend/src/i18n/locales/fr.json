@@ -48,6 +48,11 @@
       "signupButton": "Créer un compte",
       "loginPrompt": "Se connecter",
       "signupPrompt": "Créer un compte"
+    },
+    "ProductSingleView": {
+      "loading": "Chargement du produit...",
+      "noProduct": "Produit non trouvé",
+      "details": "Détails du produit"
     }
   }
 }

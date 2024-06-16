@@ -1,5 +1,5 @@
 <template>
-  <div v-if="product" class="product-card">
+  <div v-if="product" class="product-card" @click="goToProductSingleView(product.id)">
     <img v-if="product.image" :src="product.image" alt="Product image" class="product-image" />
     <div v-else class="no-image">{{ $t('app.products.noImage') }}</div>
     <div class="product-info">
@@ -17,7 +17,10 @@
 <script setup lang="ts">
 import { defineProps, computed } from 'vue'
 import { useCurrencyStore } from '@/stores/currency'
+import { useRouter } from 'vue-router'
 import type { IProduct } from '@/api'
+
+const router = useRouter()
 
 const props = defineProps<{ product: IProduct }>()
 const currencyStore = useCurrencyStore()
@@ -28,6 +31,10 @@ const formattedPrice = computed(() => {
 
 const addToCart = () => {
   console.log('Add to cart', props.product)
+}
+
+function goToProductSingleView(productId) {
+  router.push({ name: 'ProductSingleView', params: { productId } })
 }
 </script>
 
