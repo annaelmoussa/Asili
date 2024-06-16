@@ -111,7 +111,7 @@
 
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ES2021",
     "module": "commonjs",
     "rootDir": ".",
     "outDir": "./build",
@@ -125,8 +125,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "resolveJsonModule": true
   },
-  "include": ["src/**/*", "build/routes.ts", "src/**/*.ts"],
+  "include": ["src/**/*", "build/routes.ts", "src/**/*.ts", "src/types.d.ts"],
   "exclude": ["node_modules", "build"]
 }

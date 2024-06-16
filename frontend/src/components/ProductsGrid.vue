@@ -12,18 +12,18 @@
 </template>
 
 <script setup lang="ts">
-import { Configuration, DefaultApi, type IProduct } from '@/api'
-import { onMounted, ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { defaultApi } from '@/api/config'
 import ProductItem from './ProductItem.vue'
+import type { IProduct } from '@/api'
 
-const api = new DefaultApi(new Configuration({ basePath: 'http://localhost:3000' }))
-const products = ref<IProduct[] | null>(null)
+const products = ref<IProduct[]>([])
 const isLoading = ref(true)
 
 onMounted(async () => {
   try {
-    const response = await api.getProducts()
-    products.value = response.data.length ? response.data : []
+    const response = await defaultApi.getProducts()
+    products.value = response.data
   } catch (error) {
     console.error('Failed to fetch products:', error)
   } finally {

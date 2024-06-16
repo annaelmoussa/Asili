@@ -1,4 +1,3 @@
-// src/services/productService.ts
 import { IProduct } from "../interfaces/IProduct";
 import Product from "../models/Product";
 import { Transaction } from "sequelize";

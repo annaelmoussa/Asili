@@ -1,37 +1,53 @@
 {
-    "app": {
-      "title": "Asili",
-      "navbar": {
-        "proteins": "Proteins",
-        "snacks": "Bars/Snacks & Drinks",
-        "clothing": "Clothing",
-        "creatines": "Creatines",
-        "vitamins": "Vitamins",
-        "vegan": "Vegan"
-      },
-      "account": "Account",
-      "cart": "Cart",
-      "search": "Search",
-      "banner": {
-        "title": "Always Room for Snacks",
-        "description": "With 40% off bars and snacks",
-        "button": "Shop Now"
-      },
-      "products": {
-        "title": "Our Products",
-        "loading": "Loading...",
-        "noProducts": "No products found",
-        "price": "Price",
-        "category": "Category",
-        "inStock": "In stock",
-        "addToCart": "Add to Cart"
-      },
-      "contact": "Contact Us",
-      "help": "Help",
-      "language": {
-        "fr": "French",
-        "en": "English"
-      }
+  "app": {
+    "title": "ASILI",
+    "navbar": {
+      "proteins": "Proteins",
+      "snacks": "Bars/Snacks & Drinks",
+      "clothing": "Clothing",
+      "creatines": "Creatines",
+      "vitamins": "Vitamins",
+      "vegan": "Vegan"
+    },
+    "account": "Account",
+    "cart": "Cart",
+    "search": "Search",
+    "banner": {
+      "title": "Always Room for Snacks",
+      "description": "With 40% off bars and snacks",
+      "button": "Shop Now"
+    },
+    "products": {
+      "title": "Our Products",
+      "loading": "Loading...",
+      "noProducts": "No products found",
+      "price": "Price",
+      "category": "Category",
+      "inStock": "In stock",
+      "addToCart": "Add to cart"
+    },
+    "contact": "Contact Us",
+    "help": "Help",
+    "language": {
+      "fr": "French",
+      "en": "English"
+    },
+    "auth": {
+      "login": "Login",
+      "signup": "Sign Up",
+      "favorites": "Favorites",
+      "orders": "Your Orders",
+      "referrals": "Your Referrals",
+      "memberBenefits": "Member Benefits",
+      "logout": "Logout",
+      "email": "Email Address",
+      "password": "Password",
+      "loginTitle": "Login",
+      "signupTitle": "Create an Account",
+      "loginButton": "Login",
+      "signupButton": "Sign Up",
+      "loginPrompt": "Login",
+      "signupPrompt": "Sign Up"
     }
   }
-  
+}

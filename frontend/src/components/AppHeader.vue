@@ -8,10 +8,7 @@
       </button>
     </div>
     <div class="header-icons">
-      <div class="icon-container">
-        <i class="pi pi-user"></i>
-        <span>{{ $t('app.account') }}</span>
-      </div>
+      <AccountDropdown />
       <div class="icon-container">
         <i class="pi pi-shopping-cart"></i>
         <span>{{ $t('app.cart') }}</span>
@@ -19,6 +16,10 @@
     </div>
   </header>
 </template>
+
+<script setup>
+import AccountDropdown from '@/components/AccountDropdown.vue'
+</script>
 
 <style scoped>
 .header {
