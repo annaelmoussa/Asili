@@ -10,7 +10,6 @@
       "vegan": "Végan"
     },
     "account": "Compte",
-    "cart": "Panier",
     "search": "Rechercher",
     "banner": {
       "title": "Toujours de la place pour des snacks",
@@ -53,6 +52,15 @@
       "loading": "Chargement du produit...",
       "noProduct": "Produit non trouvé",
       "details": "Détails du produit"
+    },
+    "cart": {
+      "title": "Panier",
+      "loading": "Chargement du panier...",
+      "noProduct": "Panier vide",
+      "quantityIncreased": "Quantité augmentée.",
+      "quantityDecreased": "Quantité réduite.",
+      "productRemoved": "Produit retiré du panier.",
+      "productAdded": "Produit ajouté au panier."
     }
   }
 }

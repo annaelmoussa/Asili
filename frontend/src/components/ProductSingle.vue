@@ -15,10 +15,15 @@
         </div>
         <button @click="addToCart" class="add-to-cart-detail" :disabled="product.stock <= 0">
           <i class="pi pi-shopping-cart"></i>
-          {{ $t('app.products.addToCart') }}
+          <span class="ml-4">{{ $t('app.products.addToCart') }}</span>
         </button>
       </div>
     </div>
+    <transition name="fade">
+      <div v-if="messageVisible" class="message">
+        {{ $t('app.cart.productAdded') }}
+      </div>
+    </transition>
   </div>
   <div v-else class="no-product">{{ $t('app.ProductSingleView.noProduct') }}</div>
 </template>
@@ -27,6 +32,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useCurrencyStore } from '@/stores/currency'
+import { addToCart as addToCartHelper } from '@/utils/cartHelper';
 import { defaultApi } from '@/api/config'
 import type { IProduct } from '@/api'
 
@@ -37,7 +43,11 @@ const isLoading = ref(true)
 const currencyStore = useCurrencyStore()
 
 const formattedPrice = computed(() => {
-  return currencyStore.formattedPrice(product.value?.price)
+  if (product.value?.price !== undefined) {
+    return currencyStore.formattedPrice(product.value.price);
+  } else {
+    return "Prix non disponible";
+  }
 })
 
 onMounted(async () => {
@@ -52,12 +62,38 @@ onMounted(async () => {
   }
 })
 
+const messageVisible = ref(false);
+
 const addToCart = () => {
-  console.log('Add to cart', product.value)
+  addToCartHelper(product.value);
+  messageVisible.value = true;
+  setTimeout(() => {
+    messageVisible.value = false;
+  }, 3000);
 }
 </script>
 
 <style scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+.message {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px;
+  background-color: #dff0d8;
+  color: #3c763d;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: auto;
+  max-width: 300px;
+  text-align: center;
+}
 .product-details-container {
   display: flex;
   flex-direction: row;

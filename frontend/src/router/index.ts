@@ -3,12 +3,25 @@ import HomeView from '../views/HomeView.vue'
 import LoginPage from '../views/LoginPage.vue'
 import SignupPage from '../views/SignUpPage.vue'
 import ProductSingleView from '../views/ProductSingleView.vue'
+import CartView from '../views/CartView.vue'
 import { useUserStore } from '@/stores/user'
 
 const routes = [
-  { path: '/', name: 'home', component: HomeView },
-  { path: '/login', name: 'login', component: LoginPage },
-  { path: '/signup', name: 'signup', component: SignupPage },
+  {
+    path: '/',
+    name: 'home',
+    component: HomeView
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginPage
+  },
+  {
+    path: '/signup',
+    name: 'signup',
+    component: SignupPage
+  },
   {
     path: '/favorites',
     name: 'favorites',
@@ -37,6 +50,11 @@ const routes = [
     path: '/product/:productId',
     name: 'ProductSingleView',
     component: ProductSingleView
+  },
+  {
+    path: '/cart',
+    name: 'cart',
+    component: CartView
   },
 ]
 

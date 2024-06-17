@@ -10,7 +10,6 @@
       "vegan": "Vegan"
     },
     "account": "Account",
-    "cart": "Cart",
     "search": "Search",
     "banner": {
       "title": "Always Room for Snacks",
@@ -48,6 +47,20 @@
       "signupButton": "Sign Up",
       "loginPrompt": "Login",
       "signupPrompt": "Sign Up"
+    },
+    "ProductSingleView": {
+      "loading": "Loading...",
+      "noProduct": "No products found",
+      "details": "Product details"
+    },
+    "cart": {
+      "title": "Cart",
+      "loading": "Loading...",
+      "noProduct": "Cart empty",
+      "quantityIncreased": "Quantity increased.",
+      "quantityDecreased": "Quantity decreased.",
+      "productRemoved": "Product removed from cart.",
+      "productAdded": "Product added to cart"
     }
   }
 }

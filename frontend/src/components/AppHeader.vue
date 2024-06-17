@@ -9,9 +9,9 @@
     </div>
     <div class="header-icons">
       <AccountDropdown />
-      <div class="icon-container">
+      <div class="icon-container" @click="goToCartView">
         <i class="pi pi-shopping-cart"></i>
-        <span>{{ $t('app.cart') }}</span>
+        <span>{{ $t('app.cart.title') }} ({{ cartItemCount }})</span>
       </div>
     </div>
   </header>
@@ -20,11 +20,17 @@
 <script setup>
 import AccountDropdown from '@/components/AccountDropdown.vue'
 import { useRouter } from 'vue-router'
+import { useCart } from '@/composables/useCart'
 
 const router = useRouter()
+const { cartItemCount } = useCart()
 
 function goToHomeView() {
   router.push({ name: 'home' })
+}
+
+function goToCartView() {
+  router.push({ name: 'cart' })
 }
 </script>
 

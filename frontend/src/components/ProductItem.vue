@@ -19,6 +19,7 @@ import { defineProps, computed } from 'vue'
 import { useCurrencyStore } from '@/stores/currency'
 import { useRouter } from 'vue-router'
 import type { IProduct } from '@/api'
+import ProductSingleView from "@/views/ProductSingleView.vue";
 
 const router = useRouter()
 
@@ -33,8 +34,11 @@ const addToCart = () => {
   console.log('Add to cart', props.product)
 }
 
-function goToProductSingleView(productId) {
-  router.push({ name: 'ProductSingleView', params: { productId } })
+function goToProductSingleView(productId: string | undefined) {
+  if (productId === undefined)
+    return;
+
+  return router.push({ name: 'ProductSingleView', params: { productId } })
 }
 </script>
 
