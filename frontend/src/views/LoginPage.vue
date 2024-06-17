@@ -14,13 +14,18 @@
         :placeholder="$t('app.auth.password')"
       />
       <button @click="handleLogin">{{ $t('app.auth.loginButton') }}</button>
-      <p @click="navigateToSignup">{{ $t('app.auth.signupPrompt') }}</p>
+      <p class="loginLink" @click="navigateToSignup">{{ $t('app.auth.signupPrompt') }}</p>
+      <p class="loginLink" @click="navigateToResetPassword">Mot de passe oublié?</p>
+      <p v-if="message" class="error-message">{{ message }}</p>
+      <button v-if="message === 'Please confirm your email address'" @click="handleResendConfirmation">
+        Resend Confirmation Email
+      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
@@ -30,18 +35,33 @@ const email = ref('')
 const password = ref('')
 const router = useRouter()
 const userStore = useUserStore()
+const message = computed(() => userStore.message);
 
 const handleLogin = async () => {
   try {
     await userStore.login(email.value, password.value)
-    router.push('/')
+    if (!userStore.message) {
+      router.push('/')
+    }
   } catch (error) {
     console.error('Login failed:', error)
   }
 }
 
+const handleResendConfirmation = async () => {
+  try {
+    await userStore.resendConfirmationEmail(email.value)
+  } catch (error) {
+    console.error('Resend confirmation failed:', error)
+  }
+}
+
 const navigateToSignup = () => {
   router.push('/signup')
+}
+
+const navigateToResetPassword = () => {
+  router.push('/reset-password-request')
 }
 </script>
 
@@ -90,9 +110,15 @@ const navigateToSignup = () => {
   cursor: pointer;
 }
 
-.auth-form p {
+.auth-form .loginLink {
   color: #42b883;
   cursor: pointer;
   text-align: center;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
 }
 </style>

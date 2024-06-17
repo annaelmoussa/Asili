@@ -170,6 +170,12 @@ export interface IUser {
      * @memberof IUser
      */
     'token'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof IUser
+     */
+    'confirmationToken'?: string;
 }
 /**
  * 
@@ -323,6 +329,89 @@ export interface PickIProductNameOrDescriptionOrPriceOrCategoryOrStockOrImage {
 /**
  * 
  * @export
+ * @interface RegisterResponse
+ */
+export interface RegisterResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterResponse
+     */
+    'message': string;
+}
+/**
+ * 
+ * @export
+ * @interface ResendConfirmationRequest
+ */
+export interface ResendConfirmationRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ResendConfirmationRequest
+     */
+    'email': string;
+}
+/**
+ * 
+ * @export
+ * @interface ResetPasswordRequest
+ */
+export interface ResetPasswordRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof ResetPasswordRequest
+     */
+    'email': string;
+}
+/**
+ * 
+ * @export
+ * @interface SendEmail200Response
+ */
+export interface SendEmail200Response {
+    /**
+     * 
+     * @type {string}
+     * @memberof SendEmail200Response
+     */
+    'message': string;
+}
+/**
+ * 
+ * @export
+ * @interface SendEmailRequest
+ */
+export interface SendEmailRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof SendEmailRequest
+     */
+    'to': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SendEmailRequest
+     */
+    'subject': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SendEmailRequest
+     */
+    'text': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SendEmailRequest
+     */
+    'html'?: string;
+}
+/**
+ * 
+ * @export
  * @interface SignupRequest
  */
 export interface SignupRequest {
@@ -338,6 +427,31 @@ export interface SignupRequest {
      * @memberof SignupRequest
      */
     'password': string;
+}
+/**
+ * 
+ * @export
+ * @interface UpdatePasswordRequest
+ */
+export interface UpdatePasswordRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdatePasswordRequest
+     */
+    'token': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdatePasswordRequest
+     */
+    'password': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdatePasswordRequest
+     */
+    'confirm_password': string;
 }
 /**
  * 
@@ -395,6 +509,42 @@ export interface WidgetCreationParams {
  */
 export const AuthApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @param {string} token 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        confirmEmail: async (token: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'token' is not null or undefined
+            assertParamExists('confirmEmail', 'token', token)
+            const localVarPath = `/auth/confirm`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (token !== undefined) {
+                localVarQueryParameter['token'] = token;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @param {*} [options] Override http request option.
@@ -496,6 +646,111 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * 
+         * @param {ResendConfirmationRequest} resendConfirmationRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        resendConfirmationEmail: async (resendConfirmationRequest: ResendConfirmationRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'resendConfirmationRequest' is not null or undefined
+            assertParamExists('resendConfirmationEmail', 'resendConfirmationRequest', resendConfirmationRequest)
+            const localVarPath = `/auth/resend-confirmation-email`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(resendConfirmationRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {UpdatePasswordRequest} updatePasswordRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        resetPassword: async (updatePasswordRequest: UpdatePasswordRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'updatePasswordRequest' is not null or undefined
+            assertParamExists('resetPassword', 'updatePasswordRequest', updatePasswordRequest)
+            const localVarPath = `/auth/reset-password`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updatePasswordRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {ResetPasswordRequest} resetPasswordRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        resetPasswordRequest: async (resetPasswordRequest: ResetPasswordRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'resetPasswordRequest' is not null or undefined
+            assertParamExists('resetPasswordRequest', 'resetPasswordRequest', resetPasswordRequest)
+            const localVarPath = `/auth/reset-password-request`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(resetPasswordRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {SignupRequest} signupRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -541,6 +796,18 @@ export const AuthApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @param {string} token 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async confirmEmail(token: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SendEmail200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.confirmEmail(token, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.confirmEmail']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -576,11 +843,47 @@ export const AuthApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {ResendConfirmationRequest} resendConfirmationRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async resendConfirmationEmail(resendConfirmationRequest: ResendConfirmationRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SendEmail200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.resendConfirmationEmail(resendConfirmationRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.resendConfirmationEmail']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {UpdatePasswordRequest} updatePasswordRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async resetPassword(updatePasswordRequest: UpdatePasswordRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SendEmail200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.resetPassword(updatePasswordRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.resetPassword']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {ResetPasswordRequest} resetPasswordRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async resetPasswordRequest(resetPasswordRequest: ResetPasswordRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SendEmail200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.resetPasswordRequest(resetPasswordRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.resetPasswordRequest']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {SignupRequest} signupRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async signup(signupRequest: SignupRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IUser>> {
+        async signup(signupRequest: SignupRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RegisterResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.signup(signupRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AuthApi.signup']?.[localVarOperationServerIndex]?.url;
@@ -596,6 +899,15 @@ export const AuthApiFp = function(configuration?: Configuration) {
 export const AuthApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = AuthApiFp(configuration)
     return {
+        /**
+         * 
+         * @param {string} token 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        confirmEmail(token: string, options?: any): AxiosPromise<SendEmail200Response> {
+            return localVarFp.confirmEmail(token, options).then((request) => request(axios, basePath));
+        },
         /**
          * 
          * @param {*} [options] Override http request option.
@@ -624,11 +936,38 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
         },
         /**
          * 
+         * @param {ResendConfirmationRequest} resendConfirmationRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        resendConfirmationEmail(resendConfirmationRequest: ResendConfirmationRequest, options?: any): AxiosPromise<SendEmail200Response> {
+            return localVarFp.resendConfirmationEmail(resendConfirmationRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {UpdatePasswordRequest} updatePasswordRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        resetPassword(updatePasswordRequest: UpdatePasswordRequest, options?: any): AxiosPromise<SendEmail200Response> {
+            return localVarFp.resetPassword(updatePasswordRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {ResetPasswordRequest} resetPasswordRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        resetPasswordRequest(resetPasswordRequest: ResetPasswordRequest, options?: any): AxiosPromise<SendEmail200Response> {
+            return localVarFp.resetPasswordRequest(resetPasswordRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {SignupRequest} signupRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        signup(signupRequest: SignupRequest, options?: any): AxiosPromise<IUser> {
+        signup(signupRequest: SignupRequest, options?: any): AxiosPromise<RegisterResponse> {
             return localVarFp.signup(signupRequest, options).then((request) => request(axios, basePath));
         },
     };
@@ -641,6 +980,17 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
  * @extends {BaseAPI}
  */
 export class AuthApi extends BaseAPI {
+    /**
+     * 
+     * @param {string} token 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public confirmEmail(token: string, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).confirmEmail(token, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @param {*} [options] Override http request option.
@@ -671,6 +1021,39 @@ export class AuthApi extends BaseAPI {
      */
     public logout(logoutRequest: LogoutRequest, options?: RawAxiosRequestConfig) {
         return AuthApiFp(this.configuration).logout(logoutRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {ResendConfirmationRequest} resendConfirmationRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public resendConfirmationEmail(resendConfirmationRequest: ResendConfirmationRequest, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).resendConfirmationEmail(resendConfirmationRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {UpdatePasswordRequest} updatePasswordRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public resetPassword(updatePasswordRequest: UpdatePasswordRequest, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).resetPassword(updatePasswordRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {ResetPasswordRequest} resetPasswordRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public resetPasswordRequest(resetPasswordRequest: ResetPasswordRequest, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).resetPasswordRequest(resetPasswordRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -897,6 +1280,41 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @param {SendEmailRequest} sendEmailRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendEmail: async (sendEmailRequest: SendEmailRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sendEmailRequest' is not null or undefined
+            assertParamExists('sendEmail', 'sendEmailRequest', sendEmailRequest)
+            const localVarPath = `/email/send`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(sendEmailRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {string} itemId 
          * @param {number} quantity 
          * @param {*} [options] Override http request option.
@@ -1016,6 +1434,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {SendEmailRequest} sendEmailRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sendEmail(sendEmailRequest: SendEmailRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SendEmail200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sendEmail(sendEmailRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.sendEmail']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {string} itemId 
          * @param {number} quantity 
          * @param {*} [options] Override http request option.
@@ -1090,6 +1520,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         removeItem(itemId: string, options?: any): AxiosPromise<void> {
             return localVarFp.removeItem(itemId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {SendEmailRequest} sendEmailRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendEmail(sendEmailRequest: SendEmailRequest, options?: any): AxiosPromise<SendEmail200Response> {
+            return localVarFp.sendEmail(sendEmailRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1175,6 +1614,17 @@ export class DefaultApi extends BaseAPI {
      */
     public removeItem(itemId: string, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).removeItem(itemId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {SendEmailRequest} sendEmailRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public sendEmail(sendEmailRequest: SendEmailRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).sendEmail(sendEmailRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

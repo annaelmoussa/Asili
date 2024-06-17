@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginPage from '../views/LoginPage.vue'
+import ResetPasswordRequestView from '../views/ResetPasswordRequestView.vue'
+import ResetPasswordView from '../views/ResetPasswordView.vue'
 import SignupPage from '../views/SignUpPage.vue'
 import ProductSingleView from '../views/ProductSingleView.vue'
 import CartView from '../views/CartView.vue'
@@ -28,6 +30,16 @@ const routes: Array<RouteRecordRaw> = [
     path: '/signup',
     name: 'signup',
     component: SignupPage
+  },
+  {
+    path: '/reset-password-request',
+    name: 'reset-password-request',
+    component: ResetPasswordRequestView
+  },
+  {
+    path: '/reset-password',
+    name: 'reset-password',
+    component : ResetPasswordView
   },
   {
     path: '/favorites',

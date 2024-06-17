@@ -1,8 +1,10 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../config/dbConfigPostgres";
 import { IUser } from "../interfaces/IUser";
+import EmailNotification from "./EmailNotification";
+import UserPreferences from "./UserPreferences";
 
-type UserCreationAttributes = Optional<IUser, "id" | "isConfirmed">;
+type UserCreationAttributes = Optional<IUser, "id" | "isConfirmed" | "confirmationToken">;
 
 class User extends Model<IUser, UserCreationAttributes> implements IUser {
   public id!: string;
@@ -10,7 +12,15 @@ class User extends Model<IUser, UserCreationAttributes> implements IUser {
   public password!: string;
   public role!: string;
   public isConfirmed!: boolean;
-  public token?: string;
+  public confirmationToken?: string;
+
+  static associate() {
+    User.hasMany(EmailNotification, {
+      foreignKey: "userId",
+      as: "notifications",
+    });
+    User.hasOne(UserPreferences, { foreignKey: "userId", as: "preferences" });
+  }
 }
 
 User.init(
@@ -41,6 +51,10 @@ User.init(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
+    },
+    confirmationToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

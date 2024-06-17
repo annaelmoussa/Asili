@@ -1,4 +1,3 @@
-<!-- src/views/AdminUsers.vue -->
 <template>
     <div>
       <h1>Admin Order</h1>
