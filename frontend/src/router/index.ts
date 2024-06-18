@@ -1,12 +1,13 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginPage from '../views/LoginPage.vue'
 import SignupPage from '../views/SignUpPage.vue'
 import ProductSingleView from '../views/ProductSingleView.vue'
 import CartView from '../views/CartView.vue'
 import { useUserStore } from '@/stores/user'
+import DashboardView from '../views/DashboardView.vue';
 
-const routes = [
+const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
@@ -56,6 +57,12 @@ const routes = [
     name: 'cart',
     component: CartView
   },
+  {
+    path: '/dashboard',
+    name: 'dashboard',
+    component: DashboardView,
+    meta: { requiresAuth: true }
+  }
 ]
 
 const router = createRouter({

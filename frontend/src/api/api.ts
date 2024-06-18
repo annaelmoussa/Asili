@@ -118,6 +118,61 @@ export interface IUser {
 /**
  * 
  * @export
+ * @interface IWidget
+ */
+export interface IWidget {
+    /**
+     * 
+     * @type {string}
+     * @memberof IWidget
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof IWidget
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof IWidget
+     */
+    'type': string;
+    /**
+     * 
+     * @type {any}
+     * @memberof IWidget
+     */
+    'settings': any;
+    /**
+     * 
+     * @type {number}
+     * @memberof IWidget
+     */
+    'x': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof IWidget
+     */
+    'y': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof IWidget
+     */
+    'w': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof IWidget
+     */
+    'h': number;
+}
+/**
+ * 
+ * @export
  * @interface Login200Response
  */
 export interface Login200Response {
@@ -227,6 +282,55 @@ export interface SignupRequest {
      * @memberof SignupRequest
      */
     'password': string;
+}
+/**
+ * 
+ * @export
+ * @interface WidgetCreationParams
+ */
+export interface WidgetCreationParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof WidgetCreationParams
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WidgetCreationParams
+     */
+    'type': string;
+    /**
+     * 
+     * @type {any}
+     * @memberof WidgetCreationParams
+     */
+    'settings': any;
+    /**
+     * 
+     * @type {number}
+     * @memberof WidgetCreationParams
+     */
+    'x': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof WidgetCreationParams
+     */
+    'y': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof WidgetCreationParams
+     */
+    'w': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof WidgetCreationParams
+     */
+    'h': number;
 }
 
 /**
@@ -1131,6 +1235,309 @@ export class UserApi extends BaseAPI {
      */
     public updateUser(userId: string, iUser: IUser, options?: RawAxiosRequestConfig) {
         return UserApiFp(this.configuration).updateUser(userId, iUser, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * WidgetsApi - axios parameter creator
+ * @export
+ */
+export const WidgetsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {WidgetCreationParams} widgetCreationParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createWidget: async (widgetCreationParams: WidgetCreationParams, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'widgetCreationParams' is not null or undefined
+            assertParamExists('createWidget', 'widgetCreationParams', widgetCreationParams)
+            const localVarPath = `/widgets`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(widgetCreationParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} widgetId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteWidget: async (widgetId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'widgetId' is not null or undefined
+            assertParamExists('deleteWidget', 'widgetId', widgetId)
+            const localVarPath = `/widgets/{widgetId}`
+                .replace(`{${"widgetId"}}`, encodeURIComponent(String(widgetId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWidgets: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/widgets`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} widgetId 
+         * @param {WidgetCreationParams} widgetCreationParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateWidget: async (widgetId: string, widgetCreationParams: WidgetCreationParams, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'widgetId' is not null or undefined
+            assertParamExists('updateWidget', 'widgetId', widgetId)
+            // verify required parameter 'widgetCreationParams' is not null or undefined
+            assertParamExists('updateWidget', 'widgetCreationParams', widgetCreationParams)
+            const localVarPath = `/widgets/{widgetId}`
+                .replace(`{${"widgetId"}}`, encodeURIComponent(String(widgetId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(widgetCreationParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * WidgetsApi - functional programming interface
+ * @export
+ */
+export const WidgetsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = WidgetsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {WidgetCreationParams} widgetCreationParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createWidget(widgetCreationParams: WidgetCreationParams, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IWidget>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createWidget(widgetCreationParams, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['WidgetsApi.createWidget']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} widgetId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteWidget(widgetId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteWidget(widgetId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['WidgetsApi.deleteWidget']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getWidgets(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<IWidget>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getWidgets(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['WidgetsApi.getWidgets']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} widgetId 
+         * @param {WidgetCreationParams} widgetCreationParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateWidget(widgetId: string, widgetCreationParams: WidgetCreationParams, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IWidget>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateWidget(widgetId, widgetCreationParams, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['WidgetsApi.updateWidget']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * WidgetsApi - factory interface
+ * @export
+ */
+export const WidgetsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = WidgetsApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {WidgetCreationParams} widgetCreationParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createWidget(widgetCreationParams: WidgetCreationParams, options?: any): AxiosPromise<IWidget> {
+            return localVarFp.createWidget(widgetCreationParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} widgetId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteWidget(widgetId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteWidget(widgetId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWidgets(options?: any): AxiosPromise<Array<IWidget>> {
+            return localVarFp.getWidgets(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} widgetId 
+         * @param {WidgetCreationParams} widgetCreationParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateWidget(widgetId: string, widgetCreationParams: WidgetCreationParams, options?: any): AxiosPromise<IWidget> {
+            return localVarFp.updateWidget(widgetId, widgetCreationParams, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * WidgetsApi - object-oriented interface
+ * @export
+ * @class WidgetsApi
+ * @extends {BaseAPI}
+ */
+export class WidgetsApi extends BaseAPI {
+    /**
+     * 
+     * @param {WidgetCreationParams} widgetCreationParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof WidgetsApi
+     */
+    public createWidget(widgetCreationParams: WidgetCreationParams, options?: RawAxiosRequestConfig) {
+        return WidgetsApiFp(this.configuration).createWidget(widgetCreationParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} widgetId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof WidgetsApi
+     */
+    public deleteWidget(widgetId: string, options?: RawAxiosRequestConfig) {
+        return WidgetsApiFp(this.configuration).deleteWidget(widgetId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof WidgetsApi
+     */
+    public getWidgets(options?: RawAxiosRequestConfig) {
+        return WidgetsApiFp(this.configuration).getWidgets(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} widgetId 
+     * @param {WidgetCreationParams} widgetCreationParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof WidgetsApi
+     */
+    public updateWidget(widgetId: string, widgetCreationParams: WidgetCreationParams, options?: RawAxiosRequestConfig) {
+        return WidgetsApiFp(this.configuration).updateWidget(widgetId, widgetCreationParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
