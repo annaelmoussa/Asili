@@ -29,18 +29,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useCurrencyStore } from '@/stores/currency'
-import { addToCart as addToCartHelper } from '@/utils/cartHelper';
-import { defaultApi } from '@/api/config'
-import type { IProduct } from '@/api'
+import { ref, onMounted, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useCurrencyStore } from '@/stores/currency';
+import { useCartStore } from '@/stores/cart';
+import { defaultApi } from '@/api/config';
+import type { IProduct } from '@/api';
 
-const route = useRoute()
-const router = useRouter()
-const product = ref<IProduct | null>(null)
-const isLoading = ref(true)
-const currencyStore = useCurrencyStore()
+const route = useRoute();
+const router = useRouter();
+const product = ref<IProduct | null>(null);
+const isLoading = ref(true);
+const currencyStore = useCurrencyStore();
+const cart = useCartStore();
 
 const formattedPrice = computed(() => {
   if (product.value?.price !== undefined) {
@@ -48,29 +49,32 @@ const formattedPrice = computed(() => {
   } else {
     return "Prix non disponible";
   }
-})
+});
 
 onMounted(async () => {
   try {
-    const productId = route.params.productId as string
-    const response = await defaultApi.getProduct(productId)
-    product.value = response.data
+    const productId = route.params.productId as string;
+    const response = await defaultApi.getProduct(productId);
+    product.value = response.data;
   } catch (error) {
-    console.error('Failed to fetch product details:', error)
+    console.error('Failed to fetch product details:', error);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-})
+});
 
-const messageVisible = ref(false);
-
-const addToCart = () => {
-  addToCartHelper(product.value);
+const showMessage = (key) => {
+  messageText.value = t(`app.cart.${key}`);
   messageVisible.value = true;
   setTimeout(() => {
     messageVisible.value = false;
   }, 3000);
-}
+};
+
+const addToCart = () => {
+  cart.addToCart({...product.value, quantity: 1});
+  showMessage("productAdded");
+};
 </script>
 
 <style scoped>

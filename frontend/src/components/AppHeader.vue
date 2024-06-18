@@ -1,3 +1,20 @@
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
+import { useCartStore } from '@/stores/cart';
+import AccountDropdown from "@/components/AccountDropdown.vue";
+
+const router = useRouter();
+const cartStore = useCartStore(); // Utiliser le store
+
+function goToHomeView() {
+  router.push({ name: 'home' });
+}
+
+function goToCartView() {
+  router.push({ name: 'cart' });
+}
+</script>
+
 <template>
   <header class="header">
     <a class="logo" href="#" @click="goToHomeView()">{{ $t('app.title') }}</a>
@@ -8,31 +25,14 @@
       </button>
     </div>
     <div class="header-icons">
-      <AccountDropdown />
+      <AccountDropdown></AccountDropdown>
       <div class="icon-container" @click="goToCartView">
         <i class="pi pi-shopping-cart"></i>
-        <span>{{ $t('app.cart.title') }} ({{ cartItemCount }})</span>
+        <span>{{ $t('app.cart.title') }} ({{ cartStore.totalItems }})</span>
       </div>
     </div>
   </header>
 </template>
-
-<script setup>
-import AccountDropdown from '@/components/AccountDropdown.vue'
-import { useRouter } from 'vue-router'
-import { useCart } from '@/composables/useCart'
-
-const router = useRouter()
-const { cartItemCount } = useCart()
-
-function goToHomeView() {
-  router.push({ name: 'home' })
-}
-
-function goToCartView() {
-  router.push({ name: 'cart' })
-}
-</script>
 
 <style scoped>
 .header {

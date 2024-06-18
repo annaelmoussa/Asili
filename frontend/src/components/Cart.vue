@@ -4,47 +4,39 @@
     <transition name="fade">
       <div v-if="messageVisible" class="message">{{ messageText }}</div>
     </transition>
-    <div v-for="item in cart" :key="item.product.id" class="product-details-container">
-      <img :src="item.product.image" alt="Product image" class="product-image-detail"/>
+    <div v-for="item in cart.items" :key="item.id" class="product-details-container">
+      <img :src="item.image" alt="Product image" class="product-image-detail"/>
       <div class="product-details">
-        <h1 class="product-title">{{ item.product.name }}</h1>
-        <h2 class="product-category">{{ item.product.category }}</h2>
-        <p class="product-description-detail">{{ item.product.description }}</p>
+        <h1 class="product-title">{{ item.name }}</h1>
+        <h2 class="product-category">{{ item.category }}</h2>
+        <p class="product-description-detail">{{ item.description }}</p>
         <div class="price-stock-container">
-          <span class="product-price-detail">{{ item.product.price }}</span>
+          <span class="product-price-detail">{{ item.price }}</span>
           <div class="quantity-controls">
-            <button @click="decrement(item.product.id)" :disabled="item.quantity <= 1" class="quantity-btn">
+            <button @click="decrement(item.id)" :disabled="item.quantity <= 1" class="quantity-btn">
               <i class="pi pi-minus"></i>
             </button>
             <span class="quantity-number">{{ item.quantity }}</span>
-            <button @click="increment(item.product.id)" class="quantity-btn">
+            <button @click="increment(item.id)" class="quantity-btn">
               <i class="pi pi-plus"></i>
             </button>
-            <button @click="removeFromCart(item.product.id)" class="remove-from-cart">
+            <button @click="removeFromCart(item.id)" class="remove-from-cart">
               <i class="pi pi-trash"></i>
             </button>
           </div>
         </div>
       </div>
     </div>
-    <div v-if="cart.length === 0" class="no-product">{{ $t('app.products.noProducts') }}</div>
+    <div v-if="cart.items.length === 0" class="no-product">{{ $t('app.cart.noProducts') }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { getCart, updateCart, removeFromCart as removeItem } from '@/utils/cartHelper';
-import type { CartItem } from '@/utils/cartHelper';
+import { useCartStore } from '@/stores/cart';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
-const cart = ref<CartItem[]>([]);
-const messageVisible = ref(false);
-const messageText = ref("");
-
-onMounted(() => {
-  cart.value = getCart();
-});
+const cart = useCartStore();
 
 const showMessage = (key) => {
   messageText.value = t(`app.cart.${key}`);
@@ -55,34 +47,20 @@ const showMessage = (key) => {
 };
 
 const increment = (productId: string) => {
-  const item = cart.value.find(item => item.product.id === productId);
-  if (item) {
-    item.quantity++;
-    updateCart(cart.value);
-    showMessage("quantityIncreased");
-  }
+  cart.increment(productId);
+  showMessage("quantityIncreased");
 };
 
 const decrement = (productId: string) => {
-  const item = cart.value.find(item => item.product.id === productId);
-  if (item && item.quantity > 1) {
-    item.quantity--;
-    updateCart(cart.value);
-    showMessage("quantityDecreased");
-  } else if (item && item.quantity === 1) {
-    removeFromCart(productId);
-    cart.value = cart.value.filter(item => item.product.id !== productId);
-    showMessage("productRemoved");
-  }
+  cart.decrement(productId);
+  showMessage("quantityDecreased");
 };
 
 const removeFromCart = (productId: string) => {
-  removeItem(productId);
-  cart.value = cart.value.filter(item => item.product.id !== productId);
+  cart.removeFromCart(productId);
   showMessage("productRemoved");
 };
 </script>
-
 
 <style scoped>
 .fade-enter-active, .fade-leave-active {
