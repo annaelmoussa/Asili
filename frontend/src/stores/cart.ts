@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import type {IProduct} from "@/api";
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
@@ -6,12 +7,14 @@ export const useCartStore = defineStore('cart', {
   }),
   getters: {
     totalItems(state) {
-      return state.items.reduce((sum, item) => sum + item.quantity, 0);
+      // TODO Lotfi : any to ICart
+      return state.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
     }
   },
   actions: {
-    addToCart(product) {
-      const existingItem = this.items.find(item => item.id === product.id);
+    // TODO Lotfi : any to ICart
+    addToCart(product: any) {
+      const existingItem = this.items.find((item: IProduct) => item.id === product.id);
       if (existingItem) {
         existingItem.quantity++;
       } else {
@@ -19,19 +22,19 @@ export const useCartStore = defineStore('cart', {
       }
       this.saveCart();
     },
-    removeFromCart(productId) {
-      this.items = this.items.filter(item => item.id !== productId);
+    removeFromCart(productId: string) {
+      this.items = this.items.filter((item: IProduct) => item.id !== productId);
       this.saveCart();
     },
-    increment(productId) {
-      const item = this.items.find(item => item.id === productId);
+    increment(productId: string) {
+      const item = this.items.find((item: IProduct) => item.id === productId);
       if (item) {
         item.quantity++;
       }
       this.saveCart();
     },
-    decrement(productId) {
-      const item = this.items.find(item => item.id === productId);
+    decrement(productId: string) {
+      const item = this.items.find((item: IProduct) => item.id === productId);
       if (item && item.quantity > 1) {
         item.quantity--;
       } else {

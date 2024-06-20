@@ -41,7 +41,7 @@ const cart = useCartStore();
 const messageVisible = ref(false);
 const messageText = ref("");
 
-const showMessage = (key) => {
+const showMessage = (key: string) => {
   messageText.value = t(`app.cart.${key}`);
   messageVisible.value = true;
   setTimeout(() => {

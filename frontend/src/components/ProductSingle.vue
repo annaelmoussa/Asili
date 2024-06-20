@@ -67,7 +67,7 @@ onMounted(async () => {
   }
 });
 
-const showMessage = (key) => {
+const showMessage = (key: string) => {
   messageText.value = t(`app.cart.${key}`);
   messageVisible.value = true;
   setTimeout(() => {
