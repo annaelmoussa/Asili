@@ -4,7 +4,7 @@
     <StickyHeader />
     <main class="main-content">
       <HomeBanner />
-      <ProductsGrid />
+      
     </main>
   </div>
 </template>

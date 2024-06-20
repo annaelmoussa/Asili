@@ -6,6 +6,11 @@ import ProductSingleView from '../views/ProductSingleView.vue'
 import CartView from '../views/CartView.vue'
 import { useUserStore } from '@/stores/user'
 import DashboardView from '../views/DashboardView.vue';
+import PanelLayout from '../views/Layout/PanelLayout.vue';
+import PanelDashboard from '../views/Panel/PanelDashboard.vue';
+import PanelUsers from '../views/Panel/PanelUsers.vue';
+import PanelSettings from '../views/Panel/PanelSettings.vue';
+
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -62,7 +67,28 @@ const routes: Array<RouteRecordRaw> = [
     name: 'dashboard',
     component: DashboardView,
     meta: { requiresAuth: true }
-  }
+  },
+  {
+    path: '/panel',
+    component: PanelLayout,
+    children: [
+      {
+        path: 'dashboard',
+        name: 'PanelDashboard',
+        component: PanelDashboard,
+      },
+      {
+        path: 'users',
+        name: 'PanelUsers',
+        component: PanelUsers,
+      },
+      {
+        path: 'settings',
+        name: 'PanelSettings',
+        component: PanelSettings,
+      },
+    ],
+  },
 ]
 
 const router = createRouter({
