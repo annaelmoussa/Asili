@@ -35,13 +35,17 @@ import { useCurrencyStore } from '@/stores/currency';
 import { useCartStore } from '@/stores/cart';
 import { defaultApi } from '@/api/config';
 import type { IProduct } from '@/api';
+import {useI18n} from "vue-i18n";
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const product = ref<IProduct | null>(null);
 const isLoading = ref(true);
 const currencyStore = useCurrencyStore();
 const cart = useCartStore();
+const messageVisible = ref(false);
+const messageText = ref("");
 
 const formattedPrice = computed(() => {
   if (product.value?.price !== undefined) {

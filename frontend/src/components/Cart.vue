@@ -34,9 +34,12 @@
 <script setup lang="ts">
 import { useCartStore } from '@/stores/cart';
 import { useI18n } from 'vue-i18n';
+import { ref } from 'vue';
 
 const { t } = useI18n();
 const cart = useCartStore();
+const messageVisible = ref(false);
+const messageText = ref("");
 
 const showMessage = (key) => {
   messageText.value = t(`app.cart.${key}`);
