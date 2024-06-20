@@ -2,9 +2,15 @@
 import { useRouter } from 'vue-router';
 import { useCartStore } from '@/stores/cart';
 import AccountDropdown from "@/components/AccountDropdown.vue";
+import {onMounted} from "vue";
+import {defaultApi} from "@/api/config";
 
 const router = useRouter();
 const cartStore = useCartStore(); // Utiliser le store
+
+onMounted(async () => {
+  cartStore.init();
+});
 
 function goToHomeView() {
   router.push({ name: 'home' });

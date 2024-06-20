@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { AuthApi, Configuration, type IUser, type LoginRequest, type LogoutRequest } from '@/api'
+import {useCartStore} from "@/stores/cart";
 
 const configuration = new Configuration({
   basePath: 'http://localhost:3000',
@@ -40,6 +41,8 @@ export const useUserStore = defineStore('user', () => {
       token.value = response.data.token
       saveUserData()
       loading.value = false
+      const cartStore = useCartStore();
+      cartStore.clearCart();
     } catch (error) {
       console.error('Login failed:', error)
       user.value = null
@@ -56,6 +59,8 @@ export const useUserStore = defineStore('user', () => {
       token.value = null
       localStorage.removeItem('user')
       localStorage.removeItem('token')
+      const cartStore = useCartStore();
+      cartStore.clearCart();
     }
   }
 

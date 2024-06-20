@@ -56,7 +56,8 @@ Widget.init(
   },
   {
     sequelize,
-    modelName: "Widget",
+    modelName: 'Widget',
+    tableName: 'Widget',
     timestamps: true,
   }
 );

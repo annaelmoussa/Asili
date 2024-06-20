@@ -1,4 +1,6 @@
 <template>
+  <LanguageSwitcher />
+  <AppHeader />
   <div class="auth-container">
     <div class="auth-form">
       <h2>{{ $t('app.auth.loginTitle') }}</h2>
@@ -21,6 +23,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
+import AppHeader from "@/components/AppHeader.vue";
 
 const email = ref('')
 const password = ref('')

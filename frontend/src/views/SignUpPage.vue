@@ -1,4 +1,6 @@
 <template>
+  <LanguageSwitcher />
+  <AppHeader />
   <div class="auth-container">
     <div class="auth-form">
       <h2>{{ $t('app.auth.signupTitle') }}</h2>
@@ -17,6 +19,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { authApi } from '@/api/config'
 import type { SignupRequest } from '@/api'
+import AppHeader from "@/components/AppHeader.vue";
+import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
 
 const email = ref('')
 const password = ref('')

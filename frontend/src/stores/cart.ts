@@ -1,49 +1,134 @@
 import { defineStore } from 'pinia';
-import type {IProduct} from "@/api";
+import { useUserStore } from './user';
+import { defaultApi } from '@/api/config';
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    items: JSON.parse(localStorage.getItem('cartItems') || '[]'),
+    items: [],
   }),
   getters: {
     totalItems(state) {
-      // TODO Lotfi : any to ICart
-      return state.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
+      return state.items.reduce((sum, item) => sum + item.quantity, 0);
     }
   },
   actions: {
-    // TODO Lotfi : any to ICart
-    addToCart(product: any) {
-      const existingItem = this.items.find((item: IProduct) => item.id === product.id);
-      if (existingItem) {
-        existingItem.quantity++;
+    async init() {
+      const userStore = useUserStore();
+      if (userStore.isAuthenticated) {
+        await this.fetchCart();
       } else {
-        this.items.push({ ...product, quantity: 1 });
+        this.loadLocalCart();
       }
-      this.saveCart();
     },
-    removeFromCart(productId: string) {
-      this.items = this.items.filter((item: IProduct) => item.id !== productId);
-      this.saveCart();
+    async clearCart() {
+      localStorage.removeItem('cart');
+      this.items = [];
+      const userStore = useUserStore();
+      if (userStore.isAuthenticated) {
+        await this.fetchCart();
+      } else {
+        this.loadLocalCart();
+      }
     },
-    increment(productId: string) {
-      const item = this.items.find((item: IProduct) => item.id === productId);
-      if (item) {
+    async fetchCart() {
+      const userStore = useUserStore();
+      if (userStore.isAuthenticated) {
+        try {
+          const response = await defaultApi.getCartItems(userStore.user.id);
+          this.items = response.data;
+        } catch (error) {
+          console.error('Failed to fetch cart:', error);
+        }
+      } else {
+        this.loadLocalCart();
+      }
+    },
+    loadLocalCart() {
+      const localItems = localStorage.getItem('cart');
+      if (localItems) {
+        this.items = JSON.parse(localItems);
+      }
+    },
+    async addToCart(product) {
+      const userStore = useUserStore();
+      if (userStore.isAuthenticated) {
+        const existingItem = this.items.find(item => item.productId === product.id);
+        if (existingItem) {
+          existingItem.quantity++;
+          await this.increment(product.id);
+        } else {
+          await defaultApi.addItem(userStore.user.id, { productId: product.id, quantity: 1 });
+          await this.fetchCart();
+        }
+      } else {
+        const existingItem = this.items.find(item => item.product && item.product.id === product.id);
+        if (existingItem) {
+          existingItem.quantity++;
+        } else {
+          this.items.push({
+            id: product.id,
+            product: {
+              id: product.id,
+              name: product.name,
+              description: product.description,
+              price: product.price,
+              category: product.category,
+              stock: product.stock,
+              image: product.image
+            },
+            quantity: 1
+          });
+        }
+        this.saveCart();
+      }
+    },
+    async removeFromCart(itemId) {
+      const userStore = useUserStore();
+      if (userStore.isAuthenticated) {
+        await defaultApi.removeItem(itemId);
+        await this.fetchCart();
+      } else {
+        this.items = this.items.filter(item => item.id != itemId);
+        this.saveCart();
+      }
+    },
+    async increment(productId) {
+      const item = this.items.find(item => item.product.id == productId);
+      console.log(productId, item, this.items);
+      if (!item)
+          return;
+
+      const userStore = useUserStore();
+      if (userStore.isAuthenticated) {
+        const newQuantity = item.quantity + 1;
+        await defaultApi.updateItemQuantity(productId, newQuantity);
+        await this.fetchCart();
+      } else {
         item.quantity++;
+        this.saveCart();
       }
-      this.saveCart();
     },
-    decrement(productId: string) {
-      const item = this.items.find((item: IProduct) => item.id === productId);
-      if (item && item.quantity > 1) {
+    async decrement(productId) {
+      const item = this.items.find(item => item.product.id == productId);
+      if (!item)
+        return;
+
+      const userStore = useUserStore();
+      if (userStore.isAuthenticated) {
+        const newQuantity = item.quantity - 1;
+        await defaultApi.updateItemQuantity(productId, newQuantity);
+        await this.fetchCart();
+      } else if (item && item.quantity > 1) {
         item.quantity--;
+        this.saveCart();
       } else {
-        this.removeFromCart(productId);
+        this.removeFromCart(item.id);
       }
-      this.saveCart();
     },
     saveCart() {
-      localStorage.setItem('cartItems', JSON.stringify(this.items));
+      if (!useUserStore().isAuthenticated) {
+        localStorage.setItem('cart', JSON.stringify(this.items));
+      }
     }
   }
 });

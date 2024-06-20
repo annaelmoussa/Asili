@@ -5,41 +5,47 @@
       <div v-if="messageVisible" class="message">{{ messageText }}</div>
     </transition>
     <div v-for="item in cart.items" :key="item.id" class="product-details-container">
-      <img :src="item.image" alt="Product image" class="product-image-detail"/>
+      <img :src="item.product.image" alt="Product image" class="product-image-detail"/>
       <div class="product-details">
-        <h1 class="product-title">{{ item.name }}</h1>
-        <h2 class="product-category">{{ item.category }}</h2>
-        <p class="product-description-detail">{{ item.description }}</p>
+        <h1 class="product-title">{{ item.product.name }}</h1>
+        <h2 class="product-category">{{ item.product.category }}</h2>
+        <p class="product-description-detail">{{ item.product.description }}</p>
         <div class="price-stock-container">
-          <span class="product-price-detail">{{ item.price }}</span>
+          <span class="product-price-detail">{{ item.product.price }}</span>
           <div class="quantity-controls">
-            <button @click="decrement(item.id)" :disabled="item.quantity <= 1" class="quantity-btn">
+            <button @click="decrement(item.product.id)" :disabled="item.quantity <= 1" class="quantity-btn">
               <i class="pi pi-minus"></i>
             </button>
             <span class="quantity-number">{{ item.quantity }}</span>
-            <button @click="increment(item.id)" class="quantity-btn">
+            <button @click="increment(item.product.id)" class="quantity-btn">
               <i class="pi pi-plus"></i>
             </button>
-            <button @click="removeFromCart(item.id)" class="remove-from-cart">
+            <button @click="removeFromCart(item.product.id)" class="remove-from-cart">
               <i class="pi pi-trash"></i>
             </button>
           </div>
         </div>
       </div>
     </div>
-    <div v-if="cart.items.length === 0" class="no-product">{{ $t('app.cart.noProducts') }}</div>
+    <div v-if="cart.items.length === 0" class="no-product">{{ $t('app.cart.cartEmpty') }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useCartStore } from '@/stores/cart';
+import { useUserStore } from '@/stores/user';
 import { useI18n } from 'vue-i18n';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const { t } = useI18n();
 const cart = useCartStore();
+const user = useUserStore();
 const messageVisible = ref(false);
 const messageText = ref("");
+
+onMounted(() => {
+  cart.init();
+});
 
 const showMessage = (key: string) => {
   messageText.value = t(`app.cart.${key}`);

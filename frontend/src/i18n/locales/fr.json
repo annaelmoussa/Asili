@@ -60,7 +60,8 @@
       "quantityIncreased": "Quantité augmentée.",
       "quantityDecreased": "Quantité réduite.",
       "productRemoved": "Produit retiré du panier.",
-      "productAdded": "Produit ajouté au panier."
+      "productAdded": "Produit ajouté au panier.",
+      "cartEmpty": "Panier vide."
     }
   }
 }

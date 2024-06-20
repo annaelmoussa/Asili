@@ -3,7 +3,7 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     const productsCount = await queryInterface.rawSelect(
-      "Products",
+      "Product",
       {
         where: {},
       },
@@ -11,7 +11,7 @@ module.exports = {
     );
 
     if (!productsCount) {
-      await queryInterface.bulkInsert("Products", [
+      await queryInterface.bulkInsert("Product", [
         {
           id: Sequelize.literal("uuid_generate_v4()"),
           name: "Vitalité Plus",
@@ -147,6 +147,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.bulkDelete("Products", null, {});
+    await queryInterface.bulkDelete("Product", null, {});
   },
 };

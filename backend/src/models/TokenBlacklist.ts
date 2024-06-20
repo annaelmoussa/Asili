@@ -26,7 +26,8 @@ TokenBlacklist.init(
   },
   {
     sequelize,
-    modelName: "TokenBlacklist",
+    modelName: 'TokenBlacklist',
+    tableName: 'TokenBlacklist',
     timestamps: true,
   }
 );

@@ -60,7 +60,8 @@
       "quantityIncreased": "Quantity increased.",
       "quantityDecreased": "Quantity decreased.",
       "productRemoved": "Product removed from cart.",
-      "productAdded": "Product added to cart"
+      "productAdded": "Product added to cart",
+      "cartEmpty": "Cart empty."
     }
   }
 }

@@ -33,7 +33,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useCurrencyStore } from '@/stores/currency';
 import { useCartStore } from '@/stores/cart';
-import { defaultApi } from '@/api/config';
+import { defaultApi  } from '@/api/config';
 import type { IProduct } from '@/api';
 import {useI18n} from "vue-i18n";
 import { Button } from '@/components/ui/button'
@@ -45,9 +45,9 @@ const router = useRouter();
 const product = ref<IProduct | null>(null);
 const isLoading = ref(true);
 const currencyStore = useCurrencyStore();
-const cart = useCartStore();
 const messageVisible = ref(false);
 const messageText = ref("");
+const cart = useCartStore();
 
 const formattedPrice = computed(() => {
   if (product.value?.price !== undefined) {
@@ -67,6 +67,7 @@ onMounted(async () => {
   } finally {
     isLoading.value = false;
   }
+  cart.init();
 });
 
 const showMessage = (key: string) => {

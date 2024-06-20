@@ -38,6 +38,15 @@ services:
     depends_on:
       - postgres
 
+  adminer:
+    image: adminer:latest
+    ports:
+      - 5055:8080
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
   backend:
     build: ./backend
     volumes:
