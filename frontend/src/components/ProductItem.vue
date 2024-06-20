@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, computed } from 'vue'
+import { computed } from 'vue'
 import { useCurrencyStore } from '@/stores/currency'
 import { useRouter } from 'vue-router'
 import type { IProduct } from '@/api'
