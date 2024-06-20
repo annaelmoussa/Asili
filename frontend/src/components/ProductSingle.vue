@@ -36,6 +36,8 @@ import { useCartStore } from '@/stores/cart';
 import { defaultApi } from '@/api/config';
 import type { IProduct } from '@/api';
 import {useI18n} from "vue-i18n";
+import { Button } from '@/components/ui/button'
+
 
 const { t } = useI18n();
 const route = useRoute();
