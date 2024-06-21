@@ -15,6 +15,7 @@
     "generate-api": "openapi-generator-cli generate -i ../backend/build/swagger.json -g typescript-axios -o ./src/api --skip-validate-spec"
   },
   "dependencies": {
+    "@vueuse/core": "^10.11.0",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
     "class-variance-authority": "^0.7.0",

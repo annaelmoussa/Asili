@@ -7,10 +7,11 @@ import CartView from '../views/CartView.vue'
 import { useUserStore } from '@/stores/user'
 import DashboardView from '../views/DashboardView.vue';
 import PanelLayout from '../views/Layout/PanelLayout.vue';
-import PanelDashboard from '../views/Panel/PanelDashboard.vue';
-import PanelUsers from '../views/Panel/PanelUsers.vue';
-import PanelSettings from '../views/Panel/PanelSettings.vue';
-
+import PanelDashboard from '../views/Panel/PanelDashboardView.vue';
+import PanelUsers from '../views/Panel/PanelUsersView.vue';
+import PanelSettings from '../views/Panel/PanelSettingsView.vue';
+import PanelProduct from '../views/Panel/PanelProductView.vue';
+import PanelOrder from '../views/Panel/PanelOrderView.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -87,6 +88,16 @@ const routes: Array<RouteRecordRaw> = [
         name: 'PanelSettings',
         component: PanelSettings,
       },
+      {
+        path: 'products',
+        name: 'PanelProducts',
+        component:PanelProduct,
+      },
+      {
+        path: 'orders',
+        name: 'PanelOrders',
+        component:PanelOrder,
+      }
     ],
   },
 ]
