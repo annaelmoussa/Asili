@@ -83,6 +83,7 @@ import { Label } from '@/components/ui/label'
 
 const email = ref('')
 const password = ref('')
+const errorMessage = ref('')
 const router = useRouter()
 const userStore = useUserStore()
 const message = computed(() => userStore.message);
@@ -91,6 +92,7 @@ const message = computed(() => userStore.message);
 const handleLogin = async () => {
   
   try {
+    errorMessage.value = ''
     await userStore.login(email.value, password.value)
     
     if (!userStore.message) {

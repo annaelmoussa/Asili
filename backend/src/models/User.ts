@@ -4,8 +4,13 @@ import { IUser } from "../interfaces/IUser";
 import Widget from "./Widget";
 import { ALL_SCOPES } from "../config/scopes";
 import AlertPreference from "./AlertPreference";
+import EmailNotification from "./EmailNotification";
+import UserPreferences from "./UserPreferences";
 
-type UserCreationAttributes = Optional<IUser, "id" | "isConfirmed" | "confirmationToken">;
+type UserCreationAttributes = Optional<
+  IUser,
+  "id" | "isConfirmed" | "confirmationToken"
+>;
 
 class User extends Model<IUser, UserCreationAttributes> implements IUser {
   public id!: string;
@@ -21,7 +26,15 @@ class User extends Model<IUser, UserCreationAttributes> implements IUser {
 
   static associate() {
     User.hasMany(Widget, { foreignKey: "userId" });
-    User.hasOne(AlertPreference, { foreignKey: "userId", as: "alertPreferences" });
+    User.hasOne(AlertPreference, {
+      foreignKey: "userId",
+      as: "alertPreferences",
+    });
+    User.hasMany(EmailNotification, {
+      foreignKey: "userId",
+      as: "notifications",
+    });
+    User.hasOne(UserPreferences, { foreignKey: "userId", as: "preferences" });
   }
 }
 
@@ -59,8 +72,8 @@ User.init(
       allowNull: true,
     },
     stripeCustomerId: {
-        type: DataTypes.STRING,
-        allowNull: true,
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     scopes: {
       type: DataTypes.ARRAY(DataTypes.STRING),
@@ -75,20 +88,20 @@ User.init(
   },
   {
     sequelize,
-    modelName: 'User',
-    tableName: 'User',
+    modelName: "User",
+    tableName: "User",
     timestamps: true,
     hooks: {
       beforeCreate: (user: User) => {
         if (user.role === "ROLE_ADMIN") {
           user.scopes = ALL_SCOPES;
         }
-        if (user.changed('password')) {
+        if (user.changed("password")) {
           user.lastPasswordChange = new Date();
         }
       },
       beforeUpdate: (user: User) => {
-        if (user.changed('password')) {
+        if (user.changed("password")) {
           user.lastPasswordChange = new Date();
         }
       },
