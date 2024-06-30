@@ -1,13 +1,16 @@
 <template>
-  <LanguageSwitcher />
-  <AppHeader />
   <div class="auth-container">
     <div class="auth-form">
       <h2>{{ $t('app.auth.signupTitle') }}</h2>
       <label for="email">{{ $t('app.auth.email') }}</label>
       <input type="email" v-model="email" id="email" :placeholder="$t('app.auth.email')" />
       <label for="password">{{ $t('app.auth.password') }}</label>
-      <input type="password" v-model="password" id="password" :placeholder="$t('app.auth.password')" />
+      <input
+        type="password"
+        v-model="password"
+        id="password"
+        :placeholder="$t('app.auth.password')"
+      />
       <button @click="signup">{{ $t('app.auth.signupButton') }}</button>
       <p @click="navigateToLogin">{{ $t('app.auth.loginPrompt') }}</p>
     </div>
@@ -17,10 +20,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { type SignupRequest } from '@/api'
 import { authApi } from '@/api/config'
-import type { SignupRequest } from '@/api'
-import AppHeader from "@/components/AppHeader.vue";
-import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
 
 const email = ref('')
 const password = ref('')
@@ -29,7 +30,7 @@ const router = useRouter()
 const signup = async () => {
   try {
     const signupRequest: SignupRequest = { email: email.value, password: password.value }
-    await authApi.signup(signupRequest)
+    await authApi.signupUser(signupRequest)
     router.push('/login')
   } catch (error) {
     console.error('Signup failed', error)

@@ -5,6 +5,7 @@ import { RegisterRoutes } from "../build/routes";
 import { errorHandler } from "./middlewares/errorHandler";
 // import * as swaggerUi from "swagger-ui-express";
 // import * as swaggerDocument from "../build/swagger.json";
+import { loginRateLimiter } from "./middlewares/rateLimiter";
 
 export const app = express();
 const corsOptions = {
@@ -17,6 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+app.use("/auth/login", loginRateLimiter);
 
 RegisterRoutes(app);
 

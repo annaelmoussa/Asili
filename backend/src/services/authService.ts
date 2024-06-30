@@ -1,12 +1,12 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User";
-import {TokenBlacklist} from "../models/TokenBlacklist";
+import { TokenBlacklist } from "../models/TokenBlacklist";
 import { IUser } from "../interfaces/IUser";
 
-const secret = process.env.JWT_SECRET || "your_jwt_secret";
-
 export class AuthService {
+  private secret = process.env.JWT_SECRET || "your_jwt_secret";
+
   async login(
     email: string,
     password: string
@@ -16,9 +16,18 @@ export class AuthService {
       throw new Error("Invalid credentials");
     }
 
-    const token = jwt.sign({ userId: user.id, role: user.role }, secret, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        scopes: user.scopes,
+      },
+      this.secret,
+      {
+        expiresIn: "1h",
+      }
+    );
 
     return { user: user.toJSON() as IUser, token };
   }
@@ -41,7 +50,7 @@ export class AuthService {
 
   async getUser(token: string): Promise<IUser | null> {
     try {
-      const decoded: any = jwt.verify(token, secret);
+      const decoded: any = jwt.verify(token, this.secret);
       const user = await User.findByPk(decoded.userId);
       return user ? (user.toJSON() as IUser) : null;
     } catch (error) {

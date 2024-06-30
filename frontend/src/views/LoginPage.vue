@@ -1,8 +1,6 @@
 <template>
-  <LanguageSwitcher />
-  <AppHeader />
   <div class="auth-container">
-    <div class="auth-form">
+    <form class="auth-form" @submit.prevent="handleLogin">
       <h2>{{ $t('app.auth.loginTitle') }}</h2>
       <label for="email">{{ $t('app.auth.email') }}</label>
       <input type="email" v-model="email" id="email" :placeholder="$t('app.auth.email')" />
@@ -13,9 +11,10 @@
         id="password"
         :placeholder="$t('app.auth.password')"
       />
-      <button @click="handleLogin">{{ $t('app.auth.loginButton') }}</button>
+      <button type="submit">{{ $t('app.auth.loginButton') }}</button>
       <p @click="navigateToSignup">{{ $t('app.auth.signupPrompt') }}</p>
-    </div>
+      <span v-if="errorMessage" class="error-message">{{ errorMessage }}</span>
+    </form>
   </div>
 </template>
 
@@ -23,20 +22,20 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
-import AppHeader from "@/components/AppHeader.vue";
 
 const email = ref('')
 const password = ref('')
+const errorMessage = ref('')
 const router = useRouter()
 const userStore = useUserStore()
 
 const handleLogin = async () => {
   try {
+    errorMessage.value = ''
     await userStore.login(email.value, password.value)
     router.push('/')
   } catch (error) {
-    console.error('Login failed:', error)
+    errorMessage.value = 'Mot de passe ou email incorrect'
   }
 }
 
@@ -94,5 +93,12 @@ const navigateToSignup = () => {
   color: #42b883;
   cursor: pointer;
   text-align: center;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+  display: block;
 }
 </style>

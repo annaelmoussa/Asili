@@ -2,29 +2,34 @@ import {
   Body,
   Controller,
   Get,
-  Post,
-  Route,
-  Tags,
-  Put,
-  Delete,
   Path,
+  Post,
+  Put,
+  Route,
+  Delete,
+  Tags,
+  Security,
+  Request,
 } from "tsoa";
 import { WidgetsService } from "../services/WidgetsService";
 import { IWidget, WidgetCreationParams } from "../interfaces/IWidget";
 
 @Route("widgets")
 @Tags("Widgets")
+@Security("jwt")
 export class WidgetsController extends Controller {
   @Get()
-  public async getWidgets(): Promise<IWidget[]> {
-    return new WidgetsService().getAll();
+  public async getWidgets(@Request() request: any): Promise<IWidget[]> {
+    return new WidgetsService().getAllByUser(request.user.userId);
   }
 
   @Post()
   public async createWidget(
-    @Body() requestBody: WidgetCreationParams
+    @Body() requestBody: WidgetCreationParams,
+    @Request() request: any
   ): Promise<IWidget> {
-    return new WidgetsService().create(requestBody);
+    const userId = request.user.userId;
+    return new WidgetsService().create(userId, requestBody);
   }
 
   @Put("{widgetId}")
