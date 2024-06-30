@@ -1,23 +1,31 @@
-import { ref, computed } from 'vue';
-import { defineStore } from 'pinia';
-import { AuthApi, Configuration, type IUser, type LoginRequest, type LogoutRequest, type ResetPasswordRequest, type UpdatePasswordRequest } from '@/api';
-import { useCartStore } from "@/stores/cart";
+import { ref, computed } from 'vue'
+import { defineStore } from 'pinia'
+import {
+  AuthApi,
+  Configuration,
+  type IUser,
+  type LoginRequest,
+  type LogoutRequest,
+  type ResetPasswordRequest,
+  type UpdatePasswordRequest
+} from '@/api'
+import { useCartStore } from '@/stores/cart'
 
 const configuration = new Configuration({
   basePath: 'http://localhost:3000',
   baseOptions: {
-    withCredentials: true,
-  },
-});
+    withCredentials: true
+  }
+})
 
-const authApi = new AuthApi(configuration);
+const authApi = new AuthApi(configuration)
 
 export const useUserStore = defineStore('user', () => {
   const user = ref<IUser | null>(null)
   const token = ref<string | null>(null)
   const loading = ref(true)
   const scopes = ref<string[]>([])
-  const message = ref<string | null>(null);
+  const message = ref<string | null>(null)
 
   function saveUserData() {
     if (user.value && token.value) {
@@ -49,9 +57,9 @@ export const useUserStore = defineStore('user', () => {
       loading.value = false
       const cartStore = useCartStore()
       cartStore.clearCart()
-      message.value = null;
-    } catch (error) {
-      message.value = error.response?.data?.message || 'An error occurred during login.';
+      message.value = null
+    } catch (error: any) {
+      message.value = error.response?.data?.message || 'An error occurred during login.'
       console.error('Login failed:', error)
       user.value = null
       token.value = null
@@ -89,29 +97,31 @@ export const useUserStore = defineStore('user', () => {
 
   async function resetPassword(token: string, newPassword: string) {
     try {
-      const updateRequest: UpdatePasswordRequest = { token, newPassword };
-      const response = await authApi.resetPassword(updateRequest);
-      message.value = response.data.message;
+      const updateRequest: UpdatePasswordRequest = { token, newPassword }
+      const response = await authApi.resetPassword(updateRequest)
+      message.value = response.data.message
     } catch (error) {
-      message.value = 'An error occurred. Please try again.';
+      message.value = 'An error occurred. Please try again.'
     }
   }
-  
+
   async function resendConfirmationEmail(email: string) {
     try {
-      await authApi.resendConfirmationEmail({ email });
-      message.value = 'A new confirmation email has been sent. Please check your email.';
+      await authApi.resendConfirmationEmail({ email })
+      message.value = 'A new confirmation email has been sent. Please check your email.'
     } catch (error) {
-      message.value = error.response?.data?.message || 'Une errur est survenue lors de l\'envoi de l\'email de confirmation.';
+      message.value =
+        error.response?.data?.message ||
+        "Une errur est survenue lors de l'envoi de l'email de confirmation."
     }
   }
 
   function setUser(newUser: IUser) {
-    user.value = newUser;
-    saveUserData();
+    user.value = newUser
+    saveUserData()
   }
 
-  loadUserData();
+  loadUserData()
 
   return {
     user,

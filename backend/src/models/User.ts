@@ -1,6 +1,6 @@
 import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 import { sequelize } from "../config/dbConfigPostgres";
-import { IUser } from "../interfaces/IUser";
+import { IUser } from "@/interfaces/IUser";
 import EmailNotification from "./EmailNotification";
 import UserPreferences from "./UserPreferences";
 import Widget from "./Widget";
