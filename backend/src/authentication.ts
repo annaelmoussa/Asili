@@ -1,6 +1,7 @@
 import * as express from "express";
 import * as jwt from "jsonwebtoken";
 import { AuthService } from "./services/authService";
+import { IJwtPayload } from "./interfaces/IJwtPayload";
 
 const authService = new AuthService();
 const secret = process.env.JWT_SECRET || "your_jwt_secret";
@@ -29,7 +30,7 @@ export function expressAuthentication(
         }
 
         if (decoded && typeof decoded !== "string" && scopes) {
-          const jwtPayload = decoded as jwt.JwtPayload;
+          const jwtPayload = decoded as IJwtPayload;
           const tokenScopes = jwtPayload.scopes as string[];
           if (
             !tokenScopes ||
@@ -37,6 +38,11 @@ export function expressAuthentication(
           ) {
             return reject(new Error("JWT does not contain required scope."));
           }
+        }
+
+        if (decoded && typeof decoded !== "string") {
+          const jwtPayload = decoded as IJwtPayload;
+          (request as any).user = jwtPayload;
         }
 
         resolve(decoded);

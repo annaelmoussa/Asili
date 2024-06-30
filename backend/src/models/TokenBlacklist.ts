@@ -20,7 +20,7 @@ TokenBlacklist.init(
       primaryKey: true,
     },
     token: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
   },

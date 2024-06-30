@@ -1,8 +1,6 @@
 <template>
-  <LanguageSwitcher />
-  <AppHeader />
   <div class="auth-container">
-    <div class="auth-form">
+    <form class="auth-form" @submit.prevent="handleLogin">
       <h2>{{ $t('app.auth.loginTitle') }}</h2>
       <label for="email">{{ $t('app.auth.email') }}</label>
       <input type="email" v-model="email" id="email" :placeholder="$t('app.auth.email')" />
@@ -20,16 +18,14 @@
       <button v-if="message === 'Please confirm your email address'" @click="handleResendConfirmation">
         Resend Confirmation Email
       </button>
-    </div>
+    </form>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
-import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
-import AppHeader from "@/components/AppHeader.vue";
+import { useUserStore } from '../stores/user'
 
 const email = ref('')
 const password = ref('')
@@ -43,9 +39,7 @@ const handleLogin = async () => {
     if (!userStore.message) {
       router.push('/')
     }
-  } catch (error) {
-    console.error('Login failed:', error)
-  }
+  } catch (error) {}
 }
 
 const handleResendConfirmation = async () => {
@@ -120,5 +114,6 @@ const navigateToResetPassword = () => {
   color: red;
   text-align: center;
   margin-top: 10px;
+  display: block;
 }
 </style>

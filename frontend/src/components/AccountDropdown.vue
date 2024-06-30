@@ -11,10 +11,11 @@
       </div>
       <div v-else>
         <ul class="menu-list">
-          <li @click="goToFavorites">{{ $t('app.auth.favorites') }}</li>
-          <li @click="goToOrders">{{ $t('app.auth.orders') }}</li>
-          <li @click="goToReferrals">{{ $t('app.auth.referrals') }}</li>
-          <li @click="goToMemberBenefits">{{ $t('app.auth.memberBenefits') }}</li>
+          <li v-if="isAdmin" @click="goToDashboard">{{ $t('app.auth.dashboard') }}</li>
+          <li v-if="!isAdmin" @click="goToFavorites">{{ $t('app.auth.favorites') }}</li>
+          <li v-if="!isAdmin" @click="goToOrders">{{ $t('app.auth.orders') }}</li>
+          <li v-if="!isAdmin" @click="goToReferrals">{{ $t('app.auth.referrals') }}</li>
+          <li v-if="!isAdmin" @click="goToMemberBenefits">{{ $t('app.auth.memberBenefits') }}</li>
           <li @click="logout">{{ $t('app.auth.logout') }}</li>
         </ul>
       </div>
@@ -23,15 +24,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { storeToRefs } from 'pinia'
 
 const showDropdown = ref(false)
 const router = useRouter()
 const userStore = useUserStore()
 
-const user = userStore.user
+const { user } = storeToRefs(userStore)
+
+const isAdmin = computed(() => user.value?.role === 'ROLE_ADMIN')
 
 watch(
   () => userStore.user,
@@ -48,6 +52,14 @@ const goToLogin = () => {
 
 const goToSignup = () => {
   router.push('/signup')
+}
+
+const goToDashboard = () => {
+  if (userStore.isAuthenticated) {
+    router.push('/dashboard')
+  } else {
+    router.push('/login')
+  }
 }
 
 const goToFavorites = () => {

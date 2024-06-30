@@ -5,9 +5,9 @@ import { TokenBlacklist } from "../models/TokenBlacklist";
 import { IUser } from "../interfaces/IUser";
 import sendEmail from "./emailService";
 
-const secret = process.env.JWT_SECRET || "your_jwt_secret";
-
 export class AuthService {
+  private secret = process.env.JWT_SECRET || "your_jwt_secret";
+
   async login(
     email: string,
     password: string
@@ -21,16 +21,25 @@ export class AuthService {
       throw new Error("Please confirm your email address");
     }
 
-    const token = jwt.sign({ userId: user.id, role: user.role }, secret, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        scopes: user.scopes,
+      },
+      this.secret,
+      {
+        expiresIn: "1h",
+      }
+    );
 
     return { user: user.toJSON() as IUser, token };
   }
 
   async signup(email: string, password: string): Promise<IUser> {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const confirmationToken = jwt.sign({ email }, secret, { expiresIn: "1h" });
+    const confirmationToken = jwt.sign({ email }, this.secret, { expiresIn: "1h" });
 
     const user = await User.create({
       email,
@@ -52,7 +61,7 @@ export class AuthService {
 
   async confirmEmail(token: string): Promise<IUser | null> {
     try {
-      const decoded: any = jwt.verify(token, secret);
+      const decoded: any = jwt.verify(token, this.secret);
       const user = await User.findOne({ where: { confirmationToken: token, email: decoded.email } });
       if (!user) {
         throw new Error("User not found");
@@ -75,7 +84,7 @@ export class AuthService {
       throw new Error("Account already confirmed");
     }
   
-    const confirmationToken = jwt.sign({ email: user.email }, secret, { expiresIn: "1h" });
+    const confirmationToken = jwt.sign({ email: user.email }, this.secret, { expiresIn: "1h" });
     user.confirmationToken = confirmationToken;
     await user.save();
   
@@ -95,7 +104,7 @@ export class AuthService {
       return;
     }
 
-    const token = jwt.sign({ email: user.email, id: user.id }, secret, { expiresIn: '1h' });
+    const token = jwt.sign({ email: user.email, id: user.id }, this.secret, { expiresIn: '1h' });
 
     const resetLink = `http://localhost:8080/reset-password?token=${token}`;
     const emailText = `Click here to reset your password: ${resetLink}`;
@@ -109,7 +118,7 @@ export class AuthService {
       throw new Error("Passwords do not match.");
     }
     try {
-      const decoded = jwt.verify(token, secret) as { email: string, id: string };
+      const decoded = jwt.verify(token, this.secret) as { email: string, id: string };
 
       const user = await User.findOne({ where: { id: decoded.id, email: decoded.email } });
       if (!user) {
@@ -130,7 +139,7 @@ export class AuthService {
 
   async getUser(token: string): Promise<IUser | null> {
     try {
-      const decoded: any = jwt.verify(token, secret);
+      const decoded: any = jwt.verify(token, this.secret);
       const user = await User.findByPk(decoded.userId);
       return user ? (user.toJSON() as IUser) : null;
     } catch (error) {

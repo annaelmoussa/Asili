@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../config/dbConfigPostgres";
 import { IWidget } from "../interfaces/IWidget";
+import User from "./User";
 
 type WidgetCreationAttributes = Optional<IWidget, "id">;
 
@@ -16,6 +17,11 @@ class Widget
   public y!: number;
   public w!: number;
   public h!: number;
+  public userId!: string;
+
+  static associate() {
+    Widget.belongsTo(User, { foreignKey: "userId" });
+  }
 }
 
 Widget.init(
@@ -52,6 +58,14 @@ Widget.init(
     h: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    userId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: User,
+        key: "id",
+      },
     },
   },
   {

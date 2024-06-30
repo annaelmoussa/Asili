@@ -12,7 +12,7 @@ import AppNavbar from '@/components/AppNavbar.vue'
 
 <style scoped>
 .sticky-header {
-  position: -webkit-sticky; /* Safari */
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 1000;

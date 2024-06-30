@@ -4,7 +4,7 @@ export interface IUser {
   password: string;
   role: string;
   isConfirmed?: boolean;
-  token?: string;
   confirmationToken?: string;
   stripeCustomerId?: string;
+  scopes?: string[];
 }

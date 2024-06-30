@@ -1,8 +1,10 @@
 "use strict";
+
 const bcrypt = require("bcrypt");
+const { ALL_SCOPES } = require("../config/loadScopes");
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  async up(queryInterface, Sequelize) {
     const hashedPassword = await bcrypt.hash("password", 10);
     return queryInterface.bulkInsert("User", [
       {
@@ -11,6 +13,7 @@ module.exports = {
         password: hashedPassword,
         role: "ROLE_USER",
         isConfirmed: true,
+        scopes: ["read:widgets"],
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -20,6 +23,7 @@ module.exports = {
         password: hashedPassword,
         role: "ROLE_ADMIN",
         isConfirmed: true,
+        scopes: ALL_SCOPES,
         createdAt: new Date(),
         updatedAt: new Date(),
       },

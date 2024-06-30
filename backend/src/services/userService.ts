@@ -1,6 +1,7 @@
 import User from "../models/User";
 import { IUser } from "../interfaces/IUser";
 import { Transaction } from "sequelize";
+import { ALL_SCOPES } from "../config/scopes";
 
 export class UserService {
   public async get(
@@ -33,6 +34,10 @@ export class UserService {
     options?: { transaction?: Transaction }
   ): Promise<IUser> {
     try {
+      if (user.role === "ROLE_ADMIN") {
+        user.scopes = ALL_SCOPES;
+      }
+
       const newUser = await User.create(user, options);
       return newUser.toJSON() as IUser;
     } catch (error) {

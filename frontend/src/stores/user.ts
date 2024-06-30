@@ -13,56 +13,77 @@ const configuration = new Configuration({
 const authApi = new AuthApi(configuration);
 
 export const useUserStore = defineStore('user', () => {
-  const user = ref<IUser | null>(null);
-  const token = ref<string | null>(null);
-  const loading = ref(true);
+  const user = ref<IUser | null>(null)
+  const token = ref<string | null>(null)
+  const loading = ref(true)
+  const scopes = ref<string[]>([])
   const message = ref<string | null>(null);
 
   function saveUserData() {
     if (user.value && token.value) {
-      localStorage.setItem('user', JSON.stringify(user.value));
-      localStorage.setItem('token', token.value);
+      localStorage.setItem('user', JSON.stringify(user.value))
+      localStorage.setItem('token', token.value)
+      localStorage.setItem('scopes', JSON.stringify(scopes.value))
     }
   }
 
   function loadUserData() {
-    const savedUser = localStorage.getItem('user');
-    const savedToken = localStorage.getItem('token');
-    if (savedUser && savedToken) {
-      user.value = JSON.parse(savedUser);
-      token.value = savedToken;
+    const savedUser = localStorage.getItem('user')
+    const savedToken = localStorage.getItem('token')
+    const savedScopes = localStorage.getItem('scopes')
+    if (savedUser && savedToken && savedScopes) {
+      user.value = JSON.parse(savedUser)
+      token.value = savedToken
+      scopes.value = JSON.parse(savedScopes)
     }
   }
 
   async function login(email: string, password: string) {
     try {
-      const loginRequest: LoginRequest = { email, password };
-      const response = await authApi.login(loginRequest);
-      user.value = response.data.user;
-      token.value = response.data.token;
-      saveUserData();   
-      loading.value = false;
-      const cartStore = useCartStore();
-      cartStore.clearCart();
+      const loginRequest: LoginRequest = { email, password }
+      const response = await authApi.loginUser(loginRequest)
+      user.value = response.data.user
+      token.value = response.data.token
+      scopes.value = response.data.user.scopes || []
+      saveUserData()
+      loading.value = false
+      const cartStore = useCartStore()
+      cartStore.clearCart()
       message.value = null;
     } catch (error) {
       message.value = error.response?.data?.message || 'An error occurred during login.';
-      user.value = null;
-      token.value = null;
-      loading.value = false;
+      console.error('Login failed:', error)
+      user.value = null
+      token.value = null
+      scopes.value = []
+      loading.value = false
+      throw error
     }
+  }
+
+  function clearUserData() {
+    user.value = null
+    token.value = null
+    scopes.value = []
+    localStorage.removeItem('user')
+    localStorage.removeItem('token')
+    localStorage.removeItem('scopes')
   }
 
   async function logout() {
     if (token.value) {
-      const logoutRequest: LogoutRequest = { token: token.value };
-      await authApi.logout(logoutRequest);
-      user.value = null;
-      token.value = null;
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      const cartStore = useCartStore();
-      cartStore.clearCart();
+      const logoutRequest: LogoutRequest = { token: token.value }
+      console.log('Logging out:', logoutRequest)
+      await authApi.logoutUser(logoutRequest)
+      console.log('Logged out')
+      user.value = null
+      token.value = null
+      scopes.value = []
+      localStorage.removeItem('user')
+      localStorage.removeItem('token')
+      const cartStore = useCartStore()
+      cartStore.clearCart()
+      localStorage.removeItem('scopes')
     }
   }
 
@@ -95,6 +116,7 @@ export const useUserStore = defineStore('user', () => {
   return {
     user,
     token,
+    scopes,
     login,
     logout,
     resetPassword,
@@ -102,6 +124,8 @@ export const useUserStore = defineStore('user', () => {
     resendConfirmationEmail,
     loading,
     message,
+    clearUserData,
     isAuthenticated: computed(() => !!user.value),
-  };
-});
+    hasScope: (requiredScope: string) => scopes.value.includes(requiredScope)
+  }
+})

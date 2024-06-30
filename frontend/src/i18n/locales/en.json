@@ -46,7 +46,8 @@
       "loginButton": "Login",
       "signupButton": "Sign Up",
       "loginPrompt": "Login",
-      "signupPrompt": "Sign Up"
+      "signupPrompt": "Sign Up",
+      "dashboard": "Dashboard"
     },
     "ProductSingleView": {
       "loading": "Loading...",

@@ -1,8 +1,13 @@
 <template>
+  <LanguageSwitcher />
+  <StickyHeader />
   <router-view />
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
+import StickyHeader from '@/components/StickyHeader.vue'
+</script>
 
 <style scoped>
 body {

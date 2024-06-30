@@ -46,7 +46,8 @@
       "loginButton": "Se connecter",
       "signupButton": "Créer un compte",
       "loginPrompt": "Se connecter",
-      "signupPrompt": "Créer un compte"
+      "signupPrompt": "Créer un compte",
+      "dashboard": "Tableau de bord"
     },
     "ProductSingleView": {
       "loading": "Chargement du produit...",

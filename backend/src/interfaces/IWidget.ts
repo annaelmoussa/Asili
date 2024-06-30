@@ -7,6 +7,7 @@ export interface IWidget {
   y: number;
   w: number;
   h: number;
+  userId: string;
 }
 
 export interface WidgetCreationParams {
@@ -17,4 +18,5 @@ export interface WidgetCreationParams {
   y: number;
   w: number;
   h: number;
+  userId: string;
 }
