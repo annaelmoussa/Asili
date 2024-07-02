@@ -1,50 +1,75 @@
 <template>
   <div class="cart-container">
-    <h1 class="title">{{ $t('app.cart.title') }}</h1>
+    <h1 class="cart-title">{{ $t('app.cart.title') }}</h1>
+
     <transition name="fade">
       <div v-if="messageVisible" class="message">{{ messageText }}</div>
     </transition>
-    <div v-for="item in cart.items" :key="item.id" class="product-details-container">
-      <img :src="item.product.image" alt="Product image" class="product-image-detail"/>
-      <div class="product-details">
-        <h1 class="product-title">{{ item.product.name }}</h1>
-        <h2 class="product-category">{{ item.product.category }}</h2>
-        <p class="product-description-detail">{{ item.product.description }}</p>
-        <div class="price-stock-container">
-          <span class="product-price-detail">{{ item.product.price }}</span>
-          <div class="quantity-controls">
-            <button @click="decrement(item.product.id)" :disabled="item.quantity <= 1" class="quantity-btn">
-              <i class="pi pi-minus"></i>
-            </button>
-            <span class="quantity-number">{{ item.quantity }}</span>
-            <button @click="increment(item.product.id)" class="quantity-btn">
-              <i class="pi pi-plus"></i>
-            </button>
-            <button @click="removeFromCart(item.product.id)" class="remove-from-cart">
+
+    <div v-if="cart.items.length === 0" class="cart-empty">
+      {{ $t('app.cart.cartEmpty') }}
+    </div>
+
+    <template v-else>
+      <div v-for="item in cart.items" :key="item.id" class="cart-item">
+        <img :src="item.product.image" :alt="item.product.name" class="cart-item-image"/>
+        <div class="cart-item-details">
+          <h2 class="cart-item-title">{{ item.product.name }}</h2>
+          <p class="cart-item-category">{{ item.product.category }}</p>
+          <p class="cart-item-description">{{ item.product.description }}</p>
+          <div class="cart-item-price-quantity">
+            <span class="cart-item-price">{{ currencyStore.formattedPrice(item.product.price) }}</span>
+            <div class="quantity-controls">
+              <button @click="decrement(item.product.id)" :disabled="item.quantity <= 1" class="quantity-btn">
+                <i class="pi pi-minus"></i>
+              </button>
+              <span class="quantity-number">{{ item.quantity }}</span>
+              <button @click="increment(item.product.id)" class="quantity-btn">
+                <i class="pi pi-plus"></i>
+              </button>
+            </div>
+            <button @click="removeFromCart(item.product.id)" class="remove-btn">
               <i class="pi pi-trash"></i>
             </button>
           </div>
         </div>
       </div>
-    </div>
-    <div v-if="cart.items.length === 0" class="no-product">{{ $t('app.cart.cartEmpty') }}</div>
+
+      <div class="cart-summary">
+        <h2 class="summary-title">{{ $t('app.payment.orderSummary') }}</h2>
+        <div class="summary-row">
+          <span>{{ $t('app.payment.totalItems') }}</span>
+          <span>{{ cart.totalItems }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>{{ $t('app.payment.totalAmount') }}</span>
+          <span>{{ formattedTotalPrice }}</span>
+        </div>
+        <button @click="goToPayment" class="checkout-btn">
+          {{ $t('app.payment.proceedToPayment') }}
+        </button>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useCartStore } from '@/stores/cart';
-import { useUserStore } from '@/stores/user';
+import { useCurrencyStore } from '@/stores/currency';
 import { useI18n } from 'vue-i18n';
-import { onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useRouter } from "vue-router";
 
 const { t } = useI18n();
 const cart = useCartStore();
-const user = useUserStore();
+const currencyStore = useCurrencyStore();
+const router = useRouter();
+
 const messageVisible = ref(false);
 const messageText = ref("");
 
-onMounted(() => {
-  cart.init();
+const formattedTotalPrice = computed(() => {
+  return currencyStore.formattedPrice(cart.totalPrice);
 });
 
 const showMessage = (key: string) => {
@@ -53,6 +78,10 @@ const showMessage = (key: string) => {
   setTimeout(() => {
     messageVisible.value = false;
   }, 3000);
+};
+
+const goToPayment = () => {
+  router.push({ name: 'StripeCheckoutRedirect' });
 };
 
 const increment = (productId: string) => {
@@ -72,139 +101,180 @@ const removeFromCart = (productId: string) => {
 </script>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s;
+.cart-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: Arial, sans-serif;
 }
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-}
-.message {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 10px;
-  background-color: #dff0d8;
-  color: #3c763d;
-  border-radius: 5px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  width: auto;
-  max-width: 300px;
+
+.cart-title {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  margin-bottom: 2rem;
   text-align: center;
 }
-.cart-container {
-  max-width: 800px; /* ou la largeur que tu préfères */
-  margin: auto; /* centre le conteneur */
-  padding: 20px;
-}
-.product-details-container {
-  display: flex;
-  flex-direction: row;
-  align-items: start;
-  gap: 20px;
-  padding: 20px;
-  background: #fff;
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  margin-bottom: 20px; /* espace entre chaque produit */
-}
 
-.product-image-detail {
-  width: 200px; /* ajuste selon tes besoins */
-  height: 200px; /* ajuste pour maintenir l'aspect ratio */
-  object-fit: cover;
-  border-radius: 5px;
-}
-
-.product-details {
-  flex: 1;
-  text-align: left;
-}
-
-.product-title {
-  font-size: 1.8em;
-  color: #2c3e50;
-  font-weight: bold;
-}
-
-.product-category {
-  font-size: 1.2em;
-  color: #16a085;
-  margin-bottom: 5px;
-}
-
-.product-description-detail {
-  font-size: 1em;
+.cart-empty {
+  text-align: center;
+  font-size: 1.2rem;
   color: #7f8c8d;
-  margin: 10px 0;
+  margin-top: 2rem;
 }
 
-.price-stock-container {
+.cart-item {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin: 10px 0;
+  border-bottom: 1px solid #ecf0f1;
+  padding: 2rem 0;
 }
 
-.product-price-detail {
-  font-size: 1.5em;
+.cart-item-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.cart-item-details {
+  flex: 1;
+  margin-left: 2rem;
+}
+
+.cart-item-title {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.cart-item-category {
+  font-size: 1rem;
+  color: #16a085;
+  margin-bottom: 0.5rem;
+}
+
+.cart-item-description {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  margin-bottom: 1rem;
+}
+
+.cart-item-price-quantity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cart-item-price {
+  font-size: 1.2rem;
   color: #10b981;
   font-weight: bold;
 }
 
-.remove-from-cart {
-  background-color: #ffffff;
-  border: 2px solid #e74c3c;
-  border-radius: 5px;
-  color: #e74c3c;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-  font-size: 1em;
-  margin-top: 10px;
-  margin-left: 10px;
-}
-.remove-from-cart:hover {
-  background-color: #e74c3c;
-  color: #ffffff;
+.quantity-controls {
+  display: flex;
+  align-items: center;
 }
 
-.loading, .no-product {
-  text-align: center;
-  font-size: 1.2em;
-  color: #7f8c8d;
-  margin-top: 20px; /* ajout d'un peu d'espace au-dessus du message */
+.quantity-btn {
+  background: none;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
-button {
+
+.quantity-btn:hover {
+  background-color: #ecf0f1;
+}
+
+.quantity-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quantity-number {
+  margin: 0 1rem;
+  font-size: 1rem;
+}
+
+.remove-btn {
   background: none;
   border: none;
-  cursor: pointer;
-  padding: 5px 10px; /* ajuster selon besoin */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-button:disabled {
-  color: #ccc; /* Grise les icônes désactivées */
-}
-
-button i {
-  font-size: 1.2em; /* Ajuste la taille des icônes si nécessaire */
-}
-
-.remove-from-cart {
-  padding: 5px 10px;
-  margin-left: 10px;
-  border: 2px solid #e74c3c;
-  border-radius: 5px;
   color: #e74c3c;
-  transition: background-color 0.3s, color 0.3s;
-  display: inline-flex;
-  align-items: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: color 0.3s;
 }
 
-.remove-from-cart:hover {
-  background-color: #e74c3c;
-  color: #ffffff;
+.remove-btn:hover {
+  color: #c0392b;
+}
+
+.cart-summary {
+  margin-top: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 2rem;
+}
+
+.summary-title {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #7f8c8d;
+}
+
+.summary-row.total {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #2c3e50;
+  border-top: 1px solid #ecf0f1;
+  padding-top: 1rem;
+}
+
+.checkout-btn {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 1rem;
+}
+
+.checkout-btn:hover {
+  background-color: #0d9668;
+}
+
+.message {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: #10b981;
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 </style>

@@ -14,6 +14,8 @@ import PanelUsers from '../views/Panel/PanelUsersView.vue';
 import PanelSettings from '../views/Panel/PanelSettingsView.vue';
 import PanelProduct from '../views/Panel/PanelProductView.vue';
 import PanelOrder from '../views/Panel/PanelOrderView.vue';
+import PanelPayment from "../views/Panel/PanelPaymentsView.vue";
+import StripeCheckoutRedirect from "../components/StripeCheckoutRedirect.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -82,6 +84,11 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/stripe-checkout',
+    name: 'StripeCheckoutRedirect',
+    component: StripeCheckoutRedirect
+  },
+  {
     path: '/panel',
     component: PanelLayout,
     children: [
@@ -109,6 +116,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'orders',
         name: 'PanelOrders',
         component:PanelOrder,
+      },
+      {
+        path: 'payments',
+        name: 'PanelPayments',
+        component:PanelPayment,
       }
     ],
   },

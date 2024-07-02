@@ -15,11 +15,14 @@
     "generate-api": "openapi-generator-cli generate -i ../backend/build/swagger.json -g typescript-axios -o ./src/api --skip-validate-spec"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^4.1.0",
+    "@vue-stripe/vue-stripe": "^4.5.0",
     "@vueuse/core": "^10.11.0",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "dotenv": "^16.4.5",
     "gridstack": "^10.2.0",
     "lucide-vue-next": "^0.395.0",
     "pinia": "^2.1.7",

@@ -6,4 +6,5 @@ export interface IUser {
   isConfirmed?: boolean;
   token?: string;
   confirmationToken?: string;
+  stripeCustomerId?: string;
 }

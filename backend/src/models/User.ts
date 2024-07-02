@@ -13,6 +13,7 @@ class User extends Model<IUser, UserCreationAttributes> implements IUser {
   public role!: string;
   public isConfirmed!: boolean;
   public confirmationToken?: string;
+  public stripeCustomerId?: string;
 
   static associate() {
     User.hasMany(EmailNotification, {
@@ -55,6 +56,10 @@ User.init(
     confirmationToken: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    stripeCustomerId: {
+        type: DataTypes.STRING,
+        allowNull: true,
     },
   },
   {

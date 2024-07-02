@@ -25,6 +25,8 @@ yarn-error.log*
 /.env.development.local
 /.env.test.local
 /.env.production.local
+/backend/.env
+/frontend/.env
 
 # Répertoires de cache
 /.cache
@@ -59,3 +61,6 @@ pnpm-lock.yaml
 # Autres fichiers et répertoires ignorés
 .DS_Store
 Thumbs.db
+
+# fichiers auto-générés
+/frontend/src/api/api.ts

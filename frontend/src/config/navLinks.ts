@@ -1,4 +1,4 @@
-import { Bell, CircleUser, Home, LineChart, Menu, Package, Package2, Search, ShoppingCart, Users } from 'lucide-vue-next'
+import { Bell, CircleUser, Home, LineChart, Menu, Package, Package2, Search, ShoppingCart, Users, CreditCard } from 'lucide-vue-next'
 import { defineComponent } from 'vue';
 
 interface NavLink {
@@ -12,6 +12,7 @@ const navLinks: NavLink[] = [
   { name: 'Commandes', path: '/panel/orders', icon: ShoppingCart },
   { name: 'Produits', path: '/panel/products', icon: CircleUser },
   { name: 'Utilisateurs', path: '/panel/users', icon: Users},
+  { name: 'Paiements', path: '/panel/payments', icon: CreditCard },
 ];
   
   export default navLinks;

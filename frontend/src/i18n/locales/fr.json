@@ -62,6 +62,14 @@
       "productRemoved": "Produit retiré du panier.",
       "productAdded": "Produit ajouté au panier.",
       "cartEmpty": "Panier vide."
+    },
+    "payment": {
+      "title": "Payer ma commande",
+      "loading": "Chargement...",
+      "orderSummary": "Récapitulatif",
+      "totalItems": "Nombre d'articles",
+      "totalAmount": "Prix total",
+      "proceedToPayment": "Procéder au paiement"
     }
   }
 }

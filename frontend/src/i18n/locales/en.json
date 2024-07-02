@@ -62,6 +62,14 @@
       "productRemoved": "Product removed from cart.",
       "productAdded": "Product added to cart",
       "cartEmpty": "Cart empty."
+    },
+    "payment": {
+      "title": "Order payment",
+      "loading": "Loading...",
+      "orderSummary": "Order Summary",
+      "totalItems": "Total items",
+      "totalAmount": "Total price",
+      "proceedToPayment": "Proceed to payment"
     }
   }
 }

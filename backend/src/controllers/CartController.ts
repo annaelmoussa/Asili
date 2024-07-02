@@ -1,8 +1,6 @@
 import { Body, Controller, Delete, Get, Path, Post, Route, SuccessResponse, Put } from "tsoa";
 import { CartService } from "../services/cartService";
-import { ICart } from "../interfaces/ICart";
 import { ICartItem } from "../interfaces/ICartItem";
-import cartItem from "@/models/CartItem";
 
 interface CartItemUpdate {
     productId: string;
