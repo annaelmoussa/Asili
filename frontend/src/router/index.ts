@@ -101,22 +101,22 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'dashboard',
         name: 'PanelDashboard',
-        component: PanelDashboard,
+        component: PanelDashboard
       },
       {
         path: 'users',
         name: 'PanelUsers',
-        component: PanelUsers,
+        component: PanelUsers
       },
       {
         path: 'settings',
         name: 'PanelSettings',
-        component: PanelSettings,
+        component: PanelSettings
       },
       {
         path: 'products',
         name: 'PanelProducts',
-        component:PanelProduct,
+        component: PanelProduct
       },
       {
         path: 'orders',
@@ -128,8 +128,8 @@ const routes: Array<RouteRecordRaw> = [
         name: 'PanelPayments',
         component:PanelPayment,
       }
-    ],
-  },
+    ]
+  }
 ]
 
 const router = createRouter({
