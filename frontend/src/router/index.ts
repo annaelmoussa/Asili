@@ -7,16 +7,16 @@ import SignupPage from '../views/SignUpPage.vue'
 import ProductSingleView from '../views/ProductSingleView.vue'
 import CartView from '../views/CartView.vue'
 import { useUserStore } from '@/stores/user'
-import DashboardView from '../views/DashboardView.vue';
-import PanelLayout from '../views/Layout/PanelLayout.vue';
-import PanelDashboard from '../views/Panel/PanelDashboardView.vue';
-import PanelUsers from '../views/Panel/PanelUsersView.vue';
-import PanelSettings from '../views/Panel/PanelSettingsView.vue';
-import PanelProduct from '../views/Panel/PanelProductView.vue';
-import PanelOrder from '../views/Panel/PanelOrderView.vue';
-import PanelPayment from "../views/Panel/PanelPaymentsView.vue";
-import StripeCheckoutRedirect from "../components/StripeCheckoutRedirect.vue";
-import PaymentSuccess from "../views/PaymentSuccessView.vue"
+import DashboardView from '../views/DashboardView.vue'
+import PanelLayout from '../views/Layout/PanelLayout.vue'
+import PanelDashboard from '../views/Panel/PanelDashboardView.vue'
+import PanelUsers from '../views/Panel/PanelUsersView.vue'
+import PanelSettings from '../views/Panel/PanelSettingsView.vue'
+import PanelProduct from '../views/Panel/PanelProductView.vue'
+import PanelOrder from '../views/Panel/PanelOrderView.vue'
+import PanelPayment from '../views/Panel/PanelPaymentsView.vue'
+import StripeCheckoutRedirect from '../components/StripeCheckoutRedirect.vue'
+import PaymentSuccess from '../views/PaymentSuccessView.vue'
 import ChangePasswordView from '../views/ChangePasswordView.vue'
 import UserProfile from '../views/ProfileView.vue'
 import UserData from '../views/UserDataView.vue'
@@ -49,7 +49,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/reset-password',
     name: 'reset-password',
-    component : ResetPasswordView,
+    component: ResetPasswordView,
     meta: { hideNavbar: true }
   },
   {
@@ -109,39 +109,39 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'dashboard',
         name: 'PanelDashboard',
-        component: PanelDashboard,
+        component: PanelDashboard
       },
       {
         path: 'users',
         name: 'PanelUsers',
-        component: PanelUsers,
+        component: PanelUsers
       },
       {
         path: 'settings',
         name: 'PanelSettings',
-        component: PanelSettings,
+        component: PanelSettings
       },
       {
         path: 'products',
         name: 'PanelProducts',
-        component:PanelProduct,
+        component: PanelProduct
       },
       {
         path: 'orders',
         name: 'PanelOrders',
-        component:PanelOrder,
+        component: PanelOrder
       },
       {
         path: 'payments',
         name: 'PanelPayments',
-        component:PanelPayment,
+        component: PanelPayment
       }
-    ],
+    ]
   },
   {
     path: '/change-password',
     name: 'change-password',
-    component : ChangePasswordView
+    component: ChangePasswordView
   },
   {
     path: '/profile',
@@ -152,20 +152,20 @@ const routes: Array<RouteRecordRaw> = [
         path: '',
         name: 'profile',
         component: UserProfile,
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true }
       },
       {
         path: 'data',
         name: 'data',
-        component: UserData,
+        component: UserData
       },
       {
         path: 'notifications',
         name: 'notifications',
-        component: UserNotification,
+        component: UserNotification
       }
-    ],
-  },
+    ]
+  }
 ]
 
 const router = createRouter({
@@ -179,7 +179,11 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAuth && !userStore.isAuthenticated) {
     next('/login')
-  }else if (userStore.isAuthenticated && userStore.mustChangePassword && to.name !== 'change-password') {
+  } else if (
+    userStore.isAuthenticated &&
+    userStore.mustChangePassword &&
+    to.name !== 'change-password'
+  ) {
     next('/change-password')
   } else {
     next()
