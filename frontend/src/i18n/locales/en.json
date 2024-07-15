@@ -69,7 +69,10 @@
       "orderSummary": "Order Summary",
       "totalItems": "Total items",
       "totalAmount": "Total price",
-      "proceedToPayment": "Proceed to payment"
+      "proceedToPayment": "Proceed to payment",
+      "successTitle": "Thank's !",
+      "successMessage": "your payment is in process.",
+      "backToHome": "Back to home"
     }
   }
 }

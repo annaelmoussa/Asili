@@ -16,6 +16,7 @@ import PanelProduct from '../views/Panel/PanelProductView.vue';
 import PanelOrder from '../views/Panel/PanelOrderView.vue';
 import PanelPayment from "../views/Panel/PanelPaymentsView.vue";
 import StripeCheckoutRedirect from "../components/StripeCheckoutRedirect.vue";
+import PaymentSuccess from "../views/PaymentSuccessView.vue"
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -87,6 +88,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/stripe-checkout',
     name: 'StripeCheckoutRedirect',
     component: StripeCheckoutRedirect
+  },
+  {
+    path: '/payment-success',
+    name: 'PaymentSuccess',
+    component: PaymentSuccess
   },
   {
     path: '/panel',

@@ -8,23 +8,27 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useCartStore } from '@/stores/cart';
+import { useUserStore } from '@/stores/user';
 import { defaultApi } from '@/api/config';
 import { useRouter } from 'vue-router';
 import { loadStripe } from '@stripe/stripe-js';
 
 const cart = useCartStore();
+const userStore = useUserStore()
 const router = useRouter();
 const isLoading = ref(true);
 const error = ref('');
 const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 
 onMounted(async () => {
+  cart.init();
   await createPaymentSession();
 });
 
 const createPaymentSession = async () => {
   try {
-    const response = await defaultApi.createPaymentSession(cart.items);
+    console.log(cart.items, userStore.user.id);
+    const response = await defaultApi.createPaymentSession(userStore.user.id, cart.items);
     const sessionId = response.data.sessionId;
 
     const stripe = await loadStripe(stripePublicKey);

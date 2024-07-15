@@ -16,7 +16,8 @@ export interface PaymentSessionRequest {
 }
 
 export class PaymentService {
-  async createPaymentSession(items: PaymentSessionRequest[]): Promise<string> {
+    async createPaymentSession(items: PaymentSessionRequest[], userId: string): Promise<string> {
+      console.log(items);
     const lineItems = items.map(item => ({
       price_data: {
         currency: 'eur',
@@ -29,12 +30,17 @@ export class PaymentService {
       quantity: item.quantity,
     }));
 
+    console.log(lineItems)
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: 'http://localhost:8080',
-      cancel_url: 'http://localhost:8080',
+      success_url: 'http://localhost:8080/payment-success',
+      cancel_url: 'http://localhost:8080/payment-cancel',
+      metadata: {
+        userId: userId
+      }
     } as Stripe.Checkout.SessionCreateParams);
 
     return session.id;

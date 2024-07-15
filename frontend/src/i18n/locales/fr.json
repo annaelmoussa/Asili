@@ -69,7 +69,10 @@
       "orderSummary": "Récapitulatif",
       "totalItems": "Nombre d'articles",
       "totalAmount": "Prix total",
-      "proceedToPayment": "Procéder au paiement"
+      "proceedToPayment": "Procéder au paiement",
+      "successTitle": "Merci !",
+      "successMessage": "Votre paiement est en cours de traitement.",
+      "backToHome": "Retourner à l'accueil"
     }
   }
 }

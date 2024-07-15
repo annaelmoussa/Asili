@@ -3,6 +3,7 @@ import helmet from "helmet";
 import cors from "cors";
 import { RegisterRoutes } from "../build/routes";
 import { errorHandler } from "./middlewares/errorHandler";
+import bodyParser from "body-parser";
 // import * as swaggerUi from "swagger-ui-express";
 // import * as swaggerDocument from "../build/swagger.json";
 
@@ -11,6 +12,10 @@ const corsOptions = {
   origin: "http://localhost:8080",
   credentials: true,
 };
+app.use("/stripe-webhook", bodyParser.raw({type: 'application/json'}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(helmet());
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));

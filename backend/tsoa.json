@@ -2,6 +2,11 @@
   "entryFile": "src/server.ts",
   "noImplicitAdditionalProperties": "throw-on-extras",
   "controllerPathGlobs": ["src/controllers/**/*.ts"],
+  "routes": {
+    "routesDir": "build",
+    "authenticationModule": "./src/authentication.ts",
+    "middleware": "express"
+  },
   "spec": {
     "outputDirectory": "build",
     "specVersion": 3,
@@ -11,10 +16,22 @@
         "name": "Authorization",
         "in": "header"
       }
+    },
+    "paths": {
+      "/stripe-webhook": {
+        "post": {
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
     }
-  },
-  "routes": {
-    "routesDir": "build",
-    "authenticationModule": "./src/authentication.ts"
   }
 }
