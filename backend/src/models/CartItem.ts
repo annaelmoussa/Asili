@@ -1,65 +1,51 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import { sequelize } from "../config/dbConfigPostgres";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+} from "sequelize-typescript";
 import { ICartItem } from "../interfaces/ICartItem";
-import Product from "./Product";
 import Cart from "./Cart";
+import Product from "./Product";
 
-type ProductCreationAttributes = Optional<ICartItem, "id">;
+@Table({
+  tableName: "CartItem",
+  modelName: "CartItem",
+})
+export default class CartItem extends Model<ICartItem> implements ICartItem {
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
 
-class CartItem
-  extends Model<ICartItem, ProductCreationAttributes>
-  implements ICartItem
-{
-  public id!: string;
-  public cartId!: string;
-  public productId!: string;
-  public quantity!: number;
+  @ForeignKey(() => Cart)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  cartId!: string;
 
-  static associate(models: any) {
-    CartItem.belongsTo(models.Cart, { foreignKey: "cartId", as: "cart" });
-    CartItem.belongsTo(models.Product, {
-      foreignKey: "productId",
-      as: "product",
-    });
-  }
+  @ForeignKey(() => Product)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  productId!: string;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    defaultValue: 1,
+  })
+  quantity!: number;
+
+  @BelongsTo(() => Product)
+  product!: Product;
+
+  @BelongsTo(() => Cart)
+  cart!: Cart;
 }
-
-CartItem.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    cartId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: "Cart",
-        key: "id",
-      },
-    },
-    productId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: "Product",
-        key: "id",
-      },
-    },
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 1,
-    },
-  },
-  {
-    sequelize,
-    modelName: "CartItem",
-    tableName: "CartItem",
-  }
-);
-
-CartItem.associate({ Cart, Product });
-
-export default CartItem;

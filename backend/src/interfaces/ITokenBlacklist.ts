@@ -1,5 +1,5 @@
 export interface ITokenBlacklist {
-    id: string;
+    id?: string;
     token: string;
   }
   

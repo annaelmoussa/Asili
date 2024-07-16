@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User";
-import { TokenBlacklist } from "../models/TokenBlacklist";
+import TokenBlacklist from "../models/TokenBlacklist";
 import { IUser } from "../interfaces/IUser";
 
 export class AuthService {

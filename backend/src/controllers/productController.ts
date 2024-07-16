@@ -12,14 +12,31 @@ import {
 } from "tsoa";
 import { IProduct, ProductCreationParams } from "../interfaces/IProduct";
 import { ProductService } from "../services/productService";
+import { CategoryService } from "../services/categoryService";
+import { BrandService } from "../services/brandService";
 
 @Route("products")
 export class ProductController extends Controller {
   private productService: ProductService;
+  private categoryService: CategoryService;
+  private brandService: BrandService;
 
   constructor() {
     super();
     this.productService = new ProductService();
+    this.categoryService = new CategoryService();
+    this.brandService = new BrandService();
+  }
+
+  @Get("categories")
+  public async getCategories(): Promise<string[]> {
+    console.log("Getting categories");
+    return this.productService.getCategories();
+  }
+
+  @Get("brands")
+  public async getBrands(): Promise<string[]> {
+    return this.productService.getBrands();
   }
 
   @Get("search")
@@ -27,15 +44,26 @@ export class ProductController extends Controller {
     @Query() query?: string,
     @Query() category?: string,
     @Query() brand?: string,
-    @Query() minPrice?: number,
-    @Query() maxPrice?: number,
-    @Query() isPromotion?: boolean,
-    @Query() inStock?: boolean
+    @Query() minPrice?: string,
+    @Query() maxPrice?: string,
+    @Query() isPromotion?: string,
+    @Query() inStock?: string
   ): Promise<IProduct[]> {
     console.log("Searching products with query:", query);
+
+    let categoryId, brandId;
+    if (category) {
+      const categoryObj = await this.categoryService.getByName(category);
+      categoryId = categoryObj?.id;
+    }
+    if (brand) {
+      const brandObj = await this.brandService.getByName(brand);
+      brandId = brandObj?.id;
+    }
+
     const facets = {
-      category,
-      brand,
+      category: categoryId,
+      brand: brandId,
       minPrice,
       maxPrice,
       isPromotion,
@@ -76,6 +104,4 @@ export class ProductController extends Controller {
   public async deleteProduct(@Path() productId: string): Promise<void> {
     await this.productService.delete(productId);
   }
-
-  
 }

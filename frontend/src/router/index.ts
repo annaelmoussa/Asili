@@ -12,6 +12,7 @@ import PanelUsers from '../views/Panel/PanelUsersView.vue'
 import PanelSettings from '../views/Panel/PanelSettingsView.vue'
 import PanelProduct from '../views/Panel/PanelProductView.vue'
 import PanelOrder from '../views/Panel/PanelOrderView.vue'
+import SearchView from '../views/SearchView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -64,14 +65,20 @@ const routes: Array<RouteRecordRaw> = [
     component: CartView
   },
   {
+    path: '/search',
+    name: 'search',
+    component: SearchView
+  },
+  {
     path: '/dashboard',
     name: 'dashboard',
     component: DashboardView,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/panel',
     component: PanelLayout,
+    meta: { requiresAuth: true, requiresAdmin: true },
     children: [
       {
         path: 'dashboard',
@@ -110,9 +117,13 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+  const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin)
 
   if (requiresAuth && !userStore.isAuthenticated) {
     next('/login')
+  } else if (requiresAdmin && userStore.user?.role !== 'ROLE_ADMIN') {
+    console.log('Access denied: Admin role required')
+    next('/')
   } else {
     next()
   }

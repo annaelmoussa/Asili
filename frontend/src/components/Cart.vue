@@ -5,15 +5,19 @@
       <div v-if="messageVisible" class="message">{{ messageText }}</div>
     </transition>
     <div v-for="item in cart.items" :key="item.id" class="product-details-container">
-      <img :src="item.product.image" alt="Product image" class="product-image-detail"/>
+      <img :src="item.product.image" alt="Product image" class="product-image-detail" />
       <div class="product-details">
         <h1 class="product-title">{{ item.product.name }}</h1>
-        <h2 class="product-category">{{ item.product.category }}</h2>
+        <h2 class="product-category">{{ item.product.category?.name }}</h2>
         <p class="product-description-detail">{{ item.product.description }}</p>
         <div class="price-stock-container">
           <span class="product-price-detail">{{ item.product.price }}</span>
           <div class="quantity-controls">
-            <button @click="decrement(item.product.id)" :disabled="item.quantity <= 1" class="quantity-btn">
+            <button
+              @click="decrement(item.product.id)"
+              :disabled="item.quantity <= 1"
+              class="quantity-btn"
+            >
               <i class="pi pi-minus"></i>
             </button>
             <span class="quantity-number">{{ item.quantity }}</span>
@@ -32,50 +36,52 @@
 </template>
 
 <script setup lang="ts">
-import { useCartStore } from '@/stores/cart';
-import { useUserStore } from '@/stores/user';
-import { useI18n } from 'vue-i18n';
-import { onMounted, ref } from 'vue';
+import { useCartStore } from '@/stores/cart'
+import { useUserStore } from '@/stores/user'
+import { useI18n } from 'vue-i18n'
+import { onMounted, ref } from 'vue'
 
-const { t } = useI18n();
-const cart = useCartStore();
-const user = useUserStore();
-const messageVisible = ref(false);
-const messageText = ref("");
+const { t } = useI18n()
+const cart = useCartStore()
+const user = useUserStore()
+const messageVisible = ref(false)
+const messageText = ref('')
 
 onMounted(() => {
-  cart.init();
-});
+  cart.init()
+})
 
 const showMessage = (key: string) => {
-  messageText.value = t(`app.cart.${key}`);
-  messageVisible.value = true;
+  messageText.value = t(`app.cart.${key}`)
+  messageVisible.value = true
   setTimeout(() => {
-    messageVisible.value = false;
-  }, 3000);
-};
+    messageVisible.value = false
+  }, 3000)
+}
 
 const increment = (productId: string) => {
-  cart.increment(productId);
-  showMessage("quantityIncreased");
-};
+  cart.increment(productId)
+  showMessage('quantityIncreased')
+}
 
 const decrement = (productId: string) => {
-  cart.decrement(productId);
-  showMessage("quantityDecreased");
-};
+  cart.decrement(productId)
+  showMessage('quantityDecreased')
+}
 
 const removeFromCart = (productId: string) => {
-  cart.removeFromCart(productId);
-  showMessage("productRemoved");
-};
+  cart.removeFromCart(productId)
+  showMessage('productRemoved')
+}
 </script>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.5s;
 }
-.fade-enter-from, .fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 .message {
@@ -158,7 +164,9 @@ const removeFromCart = (productId: string) => {
   border-radius: 5px;
   color: #e74c3c;
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
   font-size: 1em;
   margin-top: 10px;
   margin-left: 10px;
@@ -168,7 +176,8 @@ const removeFromCart = (productId: string) => {
   color: #ffffff;
 }
 
-.loading, .no-product {
+.loading,
+.no-product {
   text-align: center;
   font-size: 1.2em;
   color: #7f8c8d;
@@ -198,7 +207,9 @@ button i {
   border: 2px solid #e74c3c;
   border-radius: 5px;
   color: #e74c3c;
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
   display: inline-flex;
   align-items: center;
 }

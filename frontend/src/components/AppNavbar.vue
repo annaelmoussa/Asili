@@ -1,13 +1,34 @@
 <template>
   <nav class="navbar">
-    <a href="#proteins">{{ $t('app.navbar.proteins') }}</a>
-    <a href="#snacks">{{ $t('app.navbar.snacks') }}</a>
-    <a href="#clothing">{{ $t('app.navbar.clothing') }}</a>
-    <a href="#creatines">{{ $t('app.navbar.creatines') }}</a>
-    <a href="#vitamins">{{ $t('app.navbar.vitamins') }}</a>
-    <a href="#vegan">{{ $t('app.navbar.vegan') }}</a>
+    <a
+      v-for="category in categories"
+      :key="category"
+      href="#"
+      @click.prevent="goToCategory(category)"
+    >
+      {{ $t(`app.navbar.${decapitalize(category)}`) }}
+    </a>
   </nav>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const categories = ref(['Proteins', 'Snacks', 'Clothing', 'Creatines', 'Vitamins', 'Vegan'])
+
+function decapitalize(str: string) {
+  return str.charAt(0).toLowerCase() + str.slice(1)
+}
+
+function goToCategory(category: string) {
+  router.push({
+    name: 'search',
+    query: { category: category }
+  })
+}
+</script>
 
 <style scoped>
 .navbar {
@@ -25,6 +46,7 @@
   transition:
     background-color 0.3s,
     color 0.3s;
+  cursor: pointer;
 }
 
 .navbar a:hover {
