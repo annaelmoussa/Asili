@@ -2,7 +2,7 @@
 
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('Subscription', {
+        await queryInterface.createTable('Order', {
             id: {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
@@ -16,21 +16,17 @@ module.exports = {
                     key: 'id'
                 }
             },
-            stripeSubscriptionId: {
+            stripeInvoiceId: {
                 type: Sequelize.STRING,
+                allowNull: false
+            },
+            amount: {
+                type: Sequelize.DOUBLE,
                 allowNull: false
             },
             status: {
                 type: Sequelize.STRING,
                 allowNull: false
-            },
-            startDate: {
-                type: Sequelize.DATE,
-                allowNull: true
-            },
-            endDate: {
-                type: Sequelize.DATE,
-                allowNull: true
             },
             createdAt: {
                 allowNull: false,
@@ -44,6 +40,6 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('Subscription');
+        await queryInterface.dropTable('Order');
     }
 };

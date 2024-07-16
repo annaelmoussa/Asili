@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 import { CartService } from './cartService';
-import Invoice from '../models/Invoice';
+import Order from '../models/Order';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -34,8 +34,7 @@ export class StripeWebhookService {
       throw new Error('User ID not found in session metadata');
     }
 
-    // TODO Lotfi : maybe à retirer
-    await Invoice.create({
+    await Order.create({
       userId: userId,
       stripeInvoiceId: session.payment_intent as string,
       amount: session.amount_total! / 100,
@@ -43,7 +42,6 @@ export class StripeWebhookService {
     });
 
     console.log('Payment successful for session:', session.id);
-    // TODO Lotfi : Vider le panier
-    // await this.cartService.clearCart(userId);
+    await this.cartService.clearCart(userId);
   }
 }
