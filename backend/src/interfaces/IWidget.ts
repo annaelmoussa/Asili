@@ -1,5 +1,5 @@
 export interface IWidget {
-  id: string;
+  id?: string;
   name: string;
   type: string;
   settings: any;

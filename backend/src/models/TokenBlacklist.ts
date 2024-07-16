@@ -1,35 +1,28 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import { sequelize } from "../config/dbConfigPostgres";
+import { Table, Column, Model, DataType } from "sequelize-typescript";
 import { ITokenBlacklist } from "../interfaces/ITokenBlacklist";
+import { Optional } from "sequelize";
 
-type TokenBlacklistCreationAttributes = Optional<ITokenBlacklist, "id">;
+interface TokenBlacklistCreationAttributes
+  extends Optional<ITokenBlacklist, "id"> {}
 
-class TokenBlacklist
+@Table({
+  tableName: "TokenBlacklist",
+  timestamps: true,
+})
+export default class TokenBlacklist
   extends Model<ITokenBlacklist, TokenBlacklistCreationAttributes>
   implements ITokenBlacklist
 {
-  public id!: string;
-  public token!: string;
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: false,
+  })
+  token!: string;
 }
-
-TokenBlacklist.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    token: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: 'TokenBlacklist',
-    tableName: 'TokenBlacklist',
-    timestamps: true,
-  }
-);
-
-export { TokenBlacklist };

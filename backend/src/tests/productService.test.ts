@@ -3,13 +3,23 @@ import { Transaction } from "sequelize";
 import { IProduct, ProductCreationParams } from "../interfaces/IProduct";
 import { ProductService } from "../services/productService";
 import { sequelize } from "../config/dbConfigPostgres";
+import Brand from "../models/Brand";
+import Category from "../models/Category";
 
 describe("ProductService", () => {
   let productService: ProductService;
   let transaction: Transaction;
+  let testBrandId: string;
+  let testCategoryId: string;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     productService = new ProductService(sequelize);
+
+    // Créer une marque et une catégorie de test
+    const brand = await Brand.create({ name: "Test Brand" });
+    const category = await Category.create({ name: "Test Category" });
+    testBrandId = brand.id;
+    testCategoryId = category.id;
   });
 
   beforeEach(async () => {
@@ -20,13 +30,17 @@ describe("ProductService", () => {
     await transaction.rollback();
   });
 
-  const createTestProduct = async (name: string = "Test Product"): Promise<IProduct> => {
+  const createTestProduct = async (
+    name: string = "Test Product"
+  ): Promise<IProduct> => {
     const productCreationParams: ProductCreationParams = {
       name,
       description: `Description for ${name}`,
       price: 10,
-      category: "Test Category",
+      brandId: testBrandId,
+      categoryId: testCategoryId,
       stock: 100,
+      isPromotion: false,
     };
     return await productService.create(productCreationParams, { transaction });
   };
@@ -37,8 +51,10 @@ describe("ProductService", () => {
       name: "Test Product",
       description: "Description for Test Product",
       price: 10,
-      category: "Test Category",
+      brandId: testBrandId,
+      categoryId: testCategoryId,
       stock: 100,
+      isPromotion: false,
     });
     expect(product.id).toBeDefined();
   });
@@ -46,7 +62,7 @@ describe("ProductService", () => {
   it("should get all products", async () => {
     await Promise.all([
       createTestProduct("Product 1"),
-      createTestProduct("Product 2")
+      createTestProduct("Product 2"),
     ]);
 
     const products = await productService.getAll({ transaction });
@@ -62,20 +78,26 @@ describe("ProductService", () => {
 
   it("should get a product by id", async () => {
     const createdProduct = await createTestProduct();
-    const fetchedProduct = await productService.get(createdProduct.id as string, { transaction });
+    const fetchedProduct = await productService.get(createdProduct.id, {
+      transaction,
+    });
 
     expect(fetchedProduct).toMatchObject({
       name: "Test Product",
       description: "Description for Test Product",
       price: 10,
-      category: "Test Category",
+      brandId: testBrandId,
+      categoryId: testCategoryId,
       stock: 100,
+      isPromotion: false,
     });
   });
 
   it("should return null for a non-existing product", async () => {
     const nonExistingId = uuidv4();
-    const fetchedProduct = await productService.get(nonExistingId, { transaction });
+    const fetchedProduct = await productService.get(nonExistingId, {
+      transaction,
+    });
     expect(fetchedProduct).toBeNull();
   });
 
@@ -87,7 +109,7 @@ describe("ProductService", () => {
     };
 
     const updatedProduct = await productService.update(
-      createdProduct.id as string,
+      createdProduct.id,
       updateParams,
       { transaction }
     );
@@ -102,11 +124,15 @@ describe("ProductService", () => {
 
   it("should delete a product", async () => {
     const createdProduct = await createTestProduct();
-    const deleteResult = await productService.delete(createdProduct.id as string, { transaction });
+    const deleteResult = await productService.delete(createdProduct.id, {
+      transaction,
+    });
 
     expect(deleteResult).toBe(true);
 
-    const fetchedProduct = await productService.get(createdProduct.id as string, { transaction });
+    const fetchedProduct = await productService.get(createdProduct.id, {
+      transaction,
+    });
     expect(fetchedProduct).toBeNull();
   });
 });

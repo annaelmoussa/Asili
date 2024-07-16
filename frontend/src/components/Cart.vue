@@ -12,15 +12,21 @@
 
     <template v-else>
       <div v-for="item in cart.items" :key="item.id" class="cart-item">
-        <img :src="item.product.image" :alt="item.product.name" class="cart-item-image"/>
+        <img :src="item.product.image" :alt="item.product.name" class="cart-item-image" />
         <div class="cart-item-details">
           <h2 class="cart-item-title">{{ item.product.name }}</h2>
-          <p class="cart-item-category">{{ item.product.category }}</p>
+          <p class="cart-item-category">{{ item.product.category?.name }}</p>
           <p class="cart-item-description">{{ item.product.description }}</p>
           <div class="cart-item-price-quantity">
-            <span class="cart-item-price">{{ currencyStore.formattedPrice(item.product.price) }}</span>
+            <span class="cart-item-price">{{
+              currencyStore.formattedPrice(item.product.price)
+            }}</span>
             <div class="quantity-controls">
-              <button @click="decrement(item.product.id)" :disabled="item.quantity <= 1" class="quantity-btn">
+              <button
+                @click="decrement(item.product.id)"
+                :disabled="item.quantity <= 1"
+                class="quantity-btn"
+              >
                 <i class="pi pi-minus"></i>
               </button>
               <span class="quantity-number">{{ item.quantity }}</span>
@@ -54,50 +60,56 @@
 </template>
 
 <script setup lang="ts">
-import { useCartStore } from '@/stores/cart';
-import { useCurrencyStore } from '@/stores/currency';
-import { useI18n } from 'vue-i18n';
-import { computed, ref } from 'vue';
-import { useRouter } from "vue-router";
+import { useCartStore } from '@/stores/cart'
+import { useCurrencyStore } from '@/stores/currency'
+import { useUserStore } from '@/stores/user'
+import { useI18n } from 'vue-i18n'
+import { computed, ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
-const { t } = useI18n();
-const cart = useCartStore();
-const currencyStore = useCurrencyStore();
-const router = useRouter();
+const { t } = useI18n()
+const cart = useCartStore()
+const currencyStore = useCurrencyStore()
+const user = useUserStore()
+const router = useRouter()
 
-const messageVisible = ref(false);
-const messageText = ref("");
+const messageVisible = ref(false)
+const messageText = ref('')
+
+onMounted(() => {
+  cart.init()
+})
 
 const formattedTotalPrice = computed(() => {
-  return currencyStore.formattedPrice(cart.totalPrice);
-});
+  return currencyStore.formattedPrice(cart.totalPrice)
+})
 
 const showMessage = (key: string) => {
-  messageText.value = t(`app.cart.${key}`);
-  messageVisible.value = true;
+  messageText.value = t(`app.cart.${key}`)
+  messageVisible.value = true
   setTimeout(() => {
-    messageVisible.value = false;
-  }, 3000);
-};
+    messageVisible.value = false
+  }, 3000)
+}
 
 const goToPayment = () => {
-  router.push({ name: 'StripeCheckoutRedirect' });
-};
+  router.push({ name: 'StripeCheckoutRedirect' })
+}
 
 const increment = (productId: string) => {
-  cart.increment(productId);
-  showMessage("quantityIncreased");
-};
+  cart.increment(productId)
+  showMessage('quantityIncreased')
+}
 
 const decrement = (productId: string) => {
-  cart.decrement(productId);
-  showMessage("quantityDecreased");
-};
+  cart.decrement(productId)
+  showMessage('quantityDecreased')
+}
 
 const removeFromCart = (productId: string) => {
-  cart.removeFromCart(productId);
-  showMessage("productRemoved");
-};
+  cart.removeFromCart(productId)
+  showMessage('productRemoved')
+}
 </script>
 
 <style scoped>
@@ -126,11 +138,15 @@ const removeFromCart = (productId: string) => {
   display: flex;
   border-bottom: 1px solid #ecf0f1;
   padding: 2rem 0;
+  background: #fff;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin-bottom: 20px;
 }
 
 .cart-item-image {
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 200px;
   object-fit: cover;
   border-radius: 8px;
 }
@@ -141,19 +157,20 @@ const removeFromCart = (productId: string) => {
 }
 
 .cart-item-title {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: #2c3e50;
   margin-bottom: 0.5rem;
+  font-weight: bold;
 }
 
 .cart-item-category {
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: #16a085;
   margin-bottom: 0.5rem;
 }
 
 .cart-item-description {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #7f8c8d;
   margin-bottom: 1rem;
 }
@@ -165,7 +182,7 @@ const removeFromCart = (productId: string) => {
 }
 
 .cart-item-price {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   color: #10b981;
   font-weight: bold;
 }
@@ -200,15 +217,20 @@ const removeFromCart = (productId: string) => {
 
 .remove-btn {
   background: none;
-  border: none;
+  border: 2px solid #e74c3c;
+  border-radius: 5px;
   color: #e74c3c;
   cursor: pointer;
   font-size: 1.2rem;
-  transition: color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+  padding: 0.5rem;
 }
 
 .remove-btn:hover {
-  color: #c0392b;
+  background-color: #e74c3c;
+  color: #ffffff;
 }
 
 .cart-summary {
@@ -260,21 +282,25 @@ const removeFromCart = (productId: string) => {
 
 .message {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  background-color: #10b981;
-  color: white;
+  bottom: 20px;
+  right: 20px;
+  background-color: #dff0d8;
+  color: #3c763d;
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 5px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+  max-width: 300px;
+  text-align: center;
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.5s;
 }
 
-.fade-enter-from, .fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 </style>

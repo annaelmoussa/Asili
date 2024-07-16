@@ -21,6 +21,7 @@ import ChangePasswordView from '../views/ChangePasswordView.vue'
 import UserProfile from '../views/ProfileView.vue'
 import UserData from '../views/UserDataView.vue'
 import UserNotification from '../views/UserNotificationView.vue'
+import SearchView from '../views/SearchView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -87,10 +88,15 @@ const routes: Array<RouteRecordRaw> = [
     component: CartView
   },
   {
+    path: '/search',
+    name: 'search',
+    component: SearchView
+  },
+  {
     path: '/dashboard',
     name: 'dashboard',
     component: DashboardView,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/stripe-checkout',
@@ -105,6 +111,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/panel',
     component: PanelLayout,
+    meta: { requiresAuth: true, requiresAdmin: true },
     children: [
       {
         path: 'dashboard',
@@ -176,9 +183,13 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+  const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin)
 
   if (requiresAuth && !userStore.isAuthenticated) {
     next('/login')
+  } else if (requiresAdmin && userStore.user?.role !== 'ROLE_ADMIN') {
+    console.log('Access denied: Admin role required')
+    next('/')
   } else if (
     userStore.isAuthenticated &&
     userStore.mustChangePassword &&

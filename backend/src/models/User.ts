@@ -1,112 +1,104 @@
-import { DataTypes, Model, Optional, Sequelize } from "sequelize";
-import { sequelize } from "../config/dbConfigPostgres";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  HasMany,
+  HasOne,
+  BeforeCreate,
+  BeforeUpdate,
+} from "sequelize-typescript";
 import { IUser } from "../interfaces/IUser";
-import Widget from "./Widget";
 import { ALL_SCOPES } from "../config/scopes";
-import AlertPreference from "./AlertPreference";
 import EmailNotification from "./EmailNotification";
 import UserPreferences from "./UserPreferences";
+import Widget from "./Widget";
 
-type UserCreationAttributes = Optional<
-  IUser,
-  "id" | "isConfirmed" | "confirmationToken"
->;
+@Table({
+  tableName: "User",
+  timestamps: true,
+})
+export default class User extends Model<IUser> implements IUser {
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
 
-class User extends Model<IUser, UserCreationAttributes> implements IUser {
-  public id!: string;
-  public email!: string;
-  public password!: string;
-  public role!: string;
-  public isConfirmed!: boolean;
-  public confirmationToken?: string;
-  public stripeCustomerId?: string;
-  public token?: string;
-  public scopes?: string[];
-  public lastPasswordChange!: Date;
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    unique: true,
+    validate: {
+      isEmail: true,
+    },
+  })
+  email!: string;
 
-  static associate() {
-    User.hasMany(Widget, { foreignKey: "userId" });
-    User.hasOne(AlertPreference, {
-      foreignKey: "userId",
-      as: "alertPreferences",
-    });
-    User.hasMany(EmailNotification, {
-      foreignKey: "userId",
-      as: "notifications",
-    });
-    User.hasOne(UserPreferences, { foreignKey: "userId", as: "preferences" });
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  password!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    defaultValue: "ROLE_USER",
+  })
+  role!: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  isConfirmed!: boolean;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  confirmationToken?: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  stripeCustomerId?: string;
+
+  @Column({
+    type: DataType.ARRAY(DataType.STRING),
+    allowNull: false,
+    defaultValue: [],
+  })
+  scopes!: string[];
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+    defaultValue: DataType.NOW,
+  })
+  lastPasswordChange!: Date;
+
+  @HasMany(() => EmailNotification)
+  notifications!: EmailNotification[];
+
+  @HasOne(() => UserPreferences)
+  preferences!: UserPreferences;
+
+  @HasMany(() => Widget)
+  widgets!: Widget[];
+
+  @BeforeCreate
+  @BeforeUpdate
+  static beforeSaveHook(instance: User) {
+    if (instance.role === "ROLE_ADMIN") {
+      instance.scopes = ALL_SCOPES;
+    }
+    if (instance.changed("password")) {
+      instance.lastPasswordChange = new Date();
+    }
   }
 }
-
-User.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true,
-      },
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    role: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: "ROLE_USER",
-    },
-    isConfirmed: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-    confirmationToken: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    stripeCustomerId: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    scopes: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
-      allowNull: false,
-      defaultValue: [],
-    },
-    lastPasswordChange: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-  },
-  {
-    sequelize,
-    modelName: "User",
-    tableName: "User",
-    timestamps: true,
-    hooks: {
-      beforeCreate: (user: User) => {
-        if (user.role === "ROLE_ADMIN") {
-          user.scopes = ALL_SCOPES;
-        }
-        if (user.changed("password")) {
-          user.lastPasswordChange = new Date();
-        }
-      },
-      beforeUpdate: (user: User) => {
-        if (user.changed("password")) {
-          user.lastPasswordChange = new Date();
-        }
-      },
-    },
-  }
-);
-
-export default User;

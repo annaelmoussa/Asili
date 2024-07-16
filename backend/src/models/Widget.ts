@@ -1,79 +1,75 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import { sequelize } from "../config/dbConfigPostgres";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+} from "sequelize-typescript";
 import { IWidget } from "../interfaces/IWidget";
 import User from "./User";
 
-type WidgetCreationAttributes = Optional<IWidget, "id">;
+@Table({
+  tableName: "Widget",
+  timestamps: true,
+})
+export default class Widget extends Model<IWidget> implements IWidget {
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
 
-class Widget
-  extends Model<IWidget, WidgetCreationAttributes>
-  implements IWidget
-{
-  public id!: string;
-  public name!: string;
-  public type!: string;
-  public settings!: any;
-  public x!: number;
-  public y!: number;
-  public w!: number;
-  public h!: number;
-  public userId!: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  name!: string;
 
-  static associate() {
-    Widget.belongsTo(User, { foreignKey: "userId" });
-  }
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  type!: string;
+
+  @Column({
+    type: DataType.JSON,
+    allowNull: true,
+  })
+  settings!: any;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  x!: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  y!: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  w!: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  h!: number;
+
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  userId!: string;
+
+  @BelongsTo(() => User)
+  user!: User;
 }
-
-Widget.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    type: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    settings: {
-      type: DataTypes.JSON,
-      allowNull: true,
-    },
-    x: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    y: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    w: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    h: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    userId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: User,
-        key: "id",
-      },
-    },
-  },
-  {
-    sequelize,
-    modelName: 'Widget',
-    tableName: 'Widget',
-    timestamps: true,
-  }
-);
-
-export default Widget;

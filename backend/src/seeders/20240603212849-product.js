@@ -1,4 +1,5 @@
 "use strict";
+const { v4: uuidv4 } = require("uuid");
 
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -11,134 +12,207 @@ module.exports = {
     );
 
     if (!productsCount) {
+      const brands = await queryInterface.sequelize.query(
+        `SELECT id, name FROM "Brand";`
+      );
+      const categories = await queryInterface.sequelize.query(
+        `SELECT id, name FROM "Category";`
+      );
+
+      const brandMap = brands[0].reduce((acc, brand) => {
+        acc[brand.name] = brand.id;
+        return acc;
+      }, {});
+
+      const categoryMap = categories[0].reduce((acc, category) => {
+        acc[category.name] = category.id;
+        return acc;
+      }, {});
+
       await queryInterface.bulkInsert("Product", [
+        // Protéines
         {
-          id: Sequelize.literal("uuid_generate_v4()"),
-          name: "Vitalité Plus",
+          id: uuidv4(),
+          name: "Whey Protein Isolate",
           description:
-            "Un complément multivitaminé complet pour soutenir votre énergie et votre vitalité au quotidien.",
-          price: 15.99,
-          category: "Multivitamines",
+            "Protéine de lactosérum pure et isolée pour une absorption rapide.",
+          price: 29.99,
+          brandId: brandMap["ProteinPower"],
+          categoryId: categoryMap["Proteins"],
+          stock: 100,
+          image:
+            "https://cdn.midjourney.com/a1f4b642-d230-464a-8d83-c4b06b8f0f61/0_3.png",
+          isPromotion: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: uuidv4(),
+          name: "Casein Night Protein",
+          description: "Protéine à libération lente idéale pour la nuit.",
+          price: 27.99,
+          brandId: brandMap["MuscleMax"],
+          categoryId: categoryMap["Proteins"],
+          stock: 80,
+          image:
+            "https://cdn.midjourney.com/b5fc98a2-acde-48aa-8230-c9a0cb9e0d92/0_3.png",
+          isPromotion: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+
+        // Barres/Snacks & Boissons
+        {
+          id: uuidv4(),
+          name: "Protein Bar Chocolate",
+          description: "Barre protéinée au goût chocolat, idéale en collation.",
+          price: 2.49,
+          brandId: brandMap["NutriSnack"],
+          categoryId: categoryMap["Snacks"],
           stock: 200,
           image:
-            "https://cdn.midjourney.com/98e0e79d-63ee-4208-88d0-7b7c6264f77f/0_2.png",
+            "https://cdn.midjourney.com/49dde191-9274-4a0d-8a7a-8b767535273b/0_3.png",
+          isPromotion: false,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          id: Sequelize.literal("uuid_generate_v4()"),
-          name: "Omega-3 Ultra",
-          description:
-            "Riche en acides gras oméga-3 pour favoriser la santé cardiaque et cognitive.",
-          price: 18.99,
-          category: "Acides Gras Essentiels",
+          id: uuidv4(),
+          name: "Energy Drink Zero",
+          description: "Boisson énergisante sans sucre pour un boost immédiat.",
+          price: 1.99,
+          brandId: brandMap["EnergyFuel"],
+          categoryId: categoryMap["Snacks"],
           stock: 150,
           image:
-            "https://cdn.midjourney.com/5a314a1c-5657-4a85-b665-16f5048d2985/0_3.png",
+            "https://cdn.midjourney.com/3dfccccf-1e87-4e51-8d43-6f98a67ea5ae/0_2.png",
+          isPromotion: true,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+
+        // Vêtements
         {
-          id: Sequelize.literal("uuid_generate_v4()"),
-          name: "Défense Immunitaire",
+          id: uuidv4(),
+          name: "T-shirt Compression",
           description:
-            "Renforcez vos défenses naturelles avec ce mélange de vitamines et de minéraux essentiels.",
-          price: 12.99,
-          category: "Immunité",
-          stock: 300,
+            "T-shirt de compression pour un meilleur soutien musculaire.",
+          price: 34.99,
+          brandId: brandMap["FitWear"],
+          categoryId: categoryMap["Clothing"],
+          stock: 50,
           image:
-            "https://cdn.midjourney.com/14229650-e3f5-427f-b159-dae10205323c/0_2.png",
+            "https://cdn.midjourney.com/e0cdf856-0fae-4926-ba8e-0c9376341631/0_2.png",
+          isPromotion: false,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          id: Sequelize.literal("uuid_generate_v4()"),
-          name: "Détente Naturelle",
+          id: uuidv4(),
+          name: "Legging Fitness",
           description:
-            "Formule apaisante à base de plantes pour réduire le stress et améliorer la qualité du sommeil.",
-          price: 16.99,
-          category: "Relaxation",
+            "Legging respirant et extensible pour tous types d'entraînements.",
+          price: 29.99,
+          brandId: brandMap["FitWear"],
+          categoryId: categoryMap["Clothing"],
+          stock: 75,
+          image:
+            "https://cdn.midjourney.com/360bdfff-2cda-4d93-9b93-0df59105dccf/0_3.png",
+          isPromotion: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+
+        // Créatines
+        {
+          id: uuidv4(),
+          name: "Créatine Monohydrate",
+          description:
+            "Créatine pure pour augmenter la force et la masse musculaire.",
+          price: 19.99,
+          brandId: brandMap["CreatineForce"],
+          categoryId: categoryMap["Creatines"],
           stock: 120,
           image:
-            "https://cdn.midjourney.com/2009f867-38bf-40d1-a833-f6b523fb2aea/0_2.png",
+            "https://cdn.midjourney.com/a93d2c98-deac-4e77-a335-41f0f5117fd5/0_1.png",
+          isPromotion: false,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          id: Sequelize.literal("uuid_generate_v4()"),
-          name: "Probiotiques Plus",
-          description:
-            "Favorise une digestion saine et un microbiote équilibré avec 10 souches de probiotiques.",
-          price: 19.99,
-          category: "Digestion",
-          stock: 180,
+          id: uuidv4(),
+          name: "Créatine HCL",
+          description: "Créatine hydrochlorée pour une meilleure absorption.",
+          price: 24.99,
+          brandId: brandMap["PurePump"],
+          categoryId: categoryMap["Creatines"],
+          stock: 90,
           image:
-            "https://cdn.midjourney.com/0d92d2b6-8c9d-4469-8c83-1b59af0a91fb/0_0.png",
+            "https://cdn.midjourney.com/25879c9b-519f-48ee-a863-04b9eef071f0/0_3.png",
+          isPromotion: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+
+        // Vitamines
+        {
+          id: uuidv4(),
+          name: "Multivitamines Daily",
+          description:
+            "Complexe multivitaminé complet pour une santé optimale.",
+          price: 15.99,
+          brandId: brandMap["VitaBoost"],
+          categoryId: categoryMap["Vitamins"],
+          stock: 200,
+          image:
+            "https://cdn.midjourney.com/cc31784d-b3ae-4347-b16f-ba4085f73db3/0_0.png",
+          isPromotion: false,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          id: Sequelize.literal("uuid_generate_v4()"),
-          name: "Articulations Flex",
+          id: uuidv4(),
+          name: "Vitamine D3 + K2",
           description:
-            "Soutenez la santé de vos articulations avec cette formule enrichie en glucosamine et chondroïtine.",
-          price: 22.49,
-          category: "Articulations",
-          stock: 130,
+            "Combinaison synergique de vitamines D3 et K2 pour la santé osseuse.",
+          price: 12.99,
+          brandId: brandMap["NaturePlus"],
+          categoryId: categoryMap["Vitamins"],
+          stock: 150,
           image:
-            "https://cdn.midjourney.com/93e4bac4-eb66-4deb-8cfe-c07a7662fdc8/0_2.png",
+            "https://cdn.midjourney.com/a5af5e1b-b7a2-453d-b32f-b52053e3ce41/0_0.png",
+          isPromotion: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+
+        // Végan
+        {
+          id: uuidv4(),
+          name: "Protéine de Pois Bio",
+          description:
+            "Protéine végétale pure issue de l'agriculture biologique.",
+          price: 22.99,
+          brandId: brandMap["VeganVitality"],
+          categoryId: categoryMap["Vegan"],
+          stock: 80,
+          image:
+            "https://cdn.midjourney.com/88e2ec6c-b1e1-4b0c-a484-740b1ea1d9c5/0_3.png",
+          isPromotion: false,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          id: Sequelize.literal("uuid_generate_v4()"),
-          name: "Énergie Max",
-          description:
-            "Booster votre énergie et combattre la fatigue avec ce mélange de vitamines B et de caféine naturelle.",
-          price: 14.99,
-          category: "Énergie",
-          stock: 250,
+          id: uuidv4(),
+          name: "Barre Végan Fruits Rouges",
+          description: "Barre énergétique 100% végétale aux fruits rouges.",
+          price: 2.49,
+          brandId: brandMap["GreenGains"],
+          categoryId: categoryMap["Vegan"],
+          stock: 120,
           image:
-            "https://cdn.midjourney.com/eb2b3189-1469-4adb-8deb-071d88af3e74/0_0.png",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: Sequelize.literal("uuid_generate_v4()"),
-          name: "Beauté de la Peau",
-          description:
-            "Améliorez l'éclat de votre peau grâce à une combinaison de collagène et d'antioxydants.",
-          price: 21.99,
-          category: "Beauté",
-          stock: 170,
-          image:
-            "https://cdn.midjourney.com/7bad6e3e-cfe6-4c27-abdc-a49612f0af8a/0_2.png",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: Sequelize.literal("uuid_generate_v4()"),
-          name: "Mémoire Plus",
-          description:
-            "Supporte la mémoire et la concentration avec du ginkgo biloba et des vitamines essentielles.",
-          price: 17.99,
-          category: "Cerveau",
-          stock: 140,
-          image:
-            "https://cdn.midjourney.com/c12825ba-e6e9-4d0b-94b7-3f6559a85211/0_2.png",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: Sequelize.literal("uuid_generate_v4()"),
-          name: "Détente Digestive",
-          description:
-            "Un mélange apaisant de fibres et d'enzymes pour une digestion sans tracas.",
-          price: 13.49,
-          category: "Digestion",
-          stock: 210,
-          image:
-            "https://cdn.midjourney.com/1710f69a-2f5c-494b-9e37-b350081d6165/0_0.png",
+            "https://cdn.midjourney.com/d1ff406c-4c17-4cbe-b8b8-0a9e4f252e8d/0_0.png",
+          isPromotion: true,
           createdAt: new Date(),
           updatedAt: new Date(),
         },

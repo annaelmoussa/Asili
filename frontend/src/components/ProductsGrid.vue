@@ -23,6 +23,7 @@ const isLoading = ref(true)
 onMounted(async () => {
   try {
     const response = await defaultApi.getProducts()
+    console.log('Fetched products:', response.data)
     products.value = response.data
   } catch (error) {
     console.error('Failed to fetch products:', error)
