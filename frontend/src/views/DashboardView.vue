@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8 bg-gray-50 min-h-screen">
+  <div class="min-h-screen">
     <div class="mb-4 flex">
       <select v-model="selectedDataType" class="mr-4 px-4 py-2 border rounded">
         <option value="Products">Products</option>

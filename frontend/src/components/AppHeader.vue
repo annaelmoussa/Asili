@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
 import AccountDropdown from '@/components/AccountDropdown.vue'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
@@ -7,13 +7,13 @@ import { defaultApi } from '@/api/config'
 import type { IProduct } from '@/api'
 
 const router = useRouter()
+const route = useRoute()
 const cartStore = useCartStore()
 
 const searchQuery = ref('')
 const searchResults = ref<IProduct[]>([])
 const showResults = ref(false)
 
-// Ajoutez ces refs si vous voulez permettre le filtrage par ces critères
 const selectedCategory = ref('')
 const selectedBrand = ref('')
 const minPrice = ref<number | undefined>(undefined)
@@ -38,27 +38,45 @@ function goToCartView() {
   router.push({ name: 'cart' })
 }
 
+function goToSearchPage() {
+  if (searchQuery.value.trim() || searchResults.value.length >= 0) {
+    if (route.name === 'search') {
+      router.replace({
+        name: 'search',
+        query: { ...route.query, query: searchQuery.value }
+      })
+    } else {
+      router.push({
+        name: 'search',
+        query: { query: searchQuery.value }
+      })
+    }
+    searchQuery.value = ''
+    showResults.value = false
+  }
+}
+
+async function handleSearchInput() {
+  if (searchQuery.value.trim()) {
+    if (route.name === 'search') {
+      goToSearchPage()
+    } else {
+      await handleSearch()
+    }
+  }
+}
+
 async function handleSearch() {
   if (searchQuery.value.trim()) {
     try {
-      console.log('Recherche en cours...')
-      console.log('Critères de recherche:', {
-        searchQuery: searchQuery.value,
-        selectedCategory: selectedCategory.value,
-        selectedBrand: selectedBrand.value,
-        minPrice: minPrice.value,
-        maxPrice: maxPrice.value,
-        isPromotion: isPromotion.value,
-        inStock: inStock.value
-      })
       const response = await defaultApi.searchProducts(
         searchQuery.value,
         selectedCategory.value,
         selectedBrand.value,
-        minPrice.value,
-        maxPrice.value,
-        isPromotion.value,
-        inStock.value
+        minPrice.value?.toString(),
+        maxPrice.value?.toString(),
+        isPromotion.value?.toString(),
+        inStock.value?.toString()
       )
       searchResults.value = response.data
       showResults.value = true
@@ -108,9 +126,9 @@ watch(searchQuery, () => {
         type="text"
         :placeholder="$t('app.search')"
         class="search-input"
-        @keyup.enter="handleSearch"
+        @keyup.enter="handleSearchInput"
       />
-      <button class="search-button" @click="handleSearch">
+      <button class="search-button" @click="goToSearchPage">
         <i class="pi pi-search"></i>
       </button>
       <div v-if="showResults" class="search-results">

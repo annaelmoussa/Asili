@@ -1,41 +1,44 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import { sequelize } from "../config/dbConfigPostgres";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  HasMany,
+  BelongsTo,
+  ForeignKey,
+} from "sequelize-typescript";
 import { ICart } from "../interfaces/ICart";
+import User from "./User";
+import CartItem from "./CartItem";
 
-type ProductCreationAttributes = Optional<ICart, "id">;
+@Table({
+  tableName: "Cart",
+  timestamps: true,
+})
+export default class Cart extends Model<ICart> implements ICart {
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
 
-class Cart
-    extends Model<ICart, ProductCreationAttributes>
-    implements ICart
-{
-    public id!: string;
-    public userId!: string;
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  userId!: string;
 
-    static associate(models: any) {
-        Cart.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
-        Cart.hasMany(models.CartItem, { foreignKey: 'cartItemId', as: 'items' });
-    }
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  reservationExpires!: Date | null;
+
+  @BelongsTo(() => User)
+  user!: User;
+
+  @HasMany(() => CartItem)
+  items!: CartItem[];
 }
-
-Cart.init({
-    id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true
-    },
-    userId: {
-        type: DataTypes.UUID,
-        allowNull: false,
-        references: {
-            model: 'User',
-            key: 'id'
-        }
-    }
-}, {
-    sequelize,
-    modelName: 'Cart',
-    tableName: 'Cart',
-    timestamps: true
-});
-
-export default Cart;

@@ -1,107 +1,222 @@
 import Cart from "../models/Cart";
-import { ICart } from "../interfaces/ICart";
 import CartItem from "../models/CartItem";
-import { ICartItem } from "../interfaces/ICartItem";
 import Product from "../models/Product";
-
-export type CartItemCreationParams = Pick<ICartItem, "productId" | "cartId" | "quantity">;
+import User from "../models/User";
+import { Op, Transaction } from "sequelize";
+import { reservationExpirationQueue, stockReleaseQueue } from "../queues";
+import db from "../models";
+import { ICartItem } from "../interfaces/ICartItem";
 
 export class CartService {
-    async getCartIdByUserId(userId: string): Promise<string | null> {
-        const cart = await Cart.findOne({
-            where: { userId },
-            attributes: ['id']
-        });
-        return cart ? cart.id : null;
+  private RESERVATION_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+  async getCartIdByUserId(userId: string): Promise<string | null> {
+    const cart = await Cart.findOne({
+      where: { userId },
+      attributes: ["id"],
+    });
+    return cart ? cart.id : null;
+  }
+
+  async getCartItems(cartId: string): Promise<ICartItem[]> {
+    try {
+      const items = await CartItem.findAll({
+        where: {
+          cartId,
+          [Op.or]: [
+            { reservationExpires: null },
+            { reservationExpires: { [Op.gt]: new Date() } },
+          ],
+        },
+        include: [
+          {
+            model: Product,
+            as: "product",
+          },
+        ],
+      });
+      console.log("Items fetched:", JSON.stringify(items, null, 2));
+      return items;
+    } catch (error) {
+      console.error("Error fetching cart items:", error);
+      throw error;
     }
+  }
 
-    async getCartItems(cartId: string): Promise<ICartItem[]> {
-        const items = await CartItem.findAll({
-            where: { cartId },
-            include: [{
-                model: Product,
-                as: 'product',
-                attributes: ['id', 'name', 'description', 'price', 'category', 'stock', 'image']  // Spécifiez les attributs que vous souhaitez inclure
-            }],
-            attributes: ['id', 'quantity'],
+  async addItem(
+    userId: string,
+    productId: string,
+    quantity: number
+  ): Promise<ICartItem> {
+    return db.sequelize.transaction(async (t: Transaction) => {
+      const user = await User.findByPk(userId, { transaction: t });
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      const product = await Product.findByPk(productId, {
+        transaction: t,
+        lock: true,
+      });
+      if (!product) {
+        throw new Error("Product not found");
+      }
+
+      if (product.stock < quantity) {
+        throw new Error("Not enough stock");
+      }
+
+      const [cart] = await Cart.findOrCreate({
+        where: { userId },
+        transaction: t,
+      });
+
+      const [item, created] = await CartItem.findOrCreate({
+        where: { cartId: cart.id, productId },
+        defaults: {
+          cartId: cart.id,
+          productId: productId,
+          quantity: 0,
+          reservationExpires: new Date(Date.now() + this.RESERVATION_DURATION),
+        },
+        transaction: t,
+      });
+
+      const newQuantity = item.quantity + quantity;
+      const stockReduction = quantity; // Only reduce stock by the new quantity added
+
+      product.stock -= stockReduction;
+      await product.save({ transaction: t });
+
+      item.quantity = newQuantity;
+      item.reservationExpires = new Date(
+        Date.now() + this.RESERVATION_DURATION
+      );
+      await item.save({ transaction: t });
+
+      try {
+        await reservationExpirationQueue.add(
+          { cartItemId: item.id, quantity: stockReduction },
+          { delay: this.RESERVATION_DURATION }
+        );
+      } catch (error) {
+        console.error("Failed to add reservation expiration job:", error);
+      }
+
+      return item;
+    });
+  }
+
+  async removeItem(itemId: string): Promise<void> {
+    return db.sequelize.transaction(async (t: Transaction) => {
+      const item = await CartItem.findByPk(itemId, {
+        transaction: t,
+        include: [{ model: Product }],
+      });
+
+      if (!item) {
+        throw new Error("Item not found");
+      }
+
+      const product = await Product.findByPk(item.productId, {
+        transaction: t,
+        lock: true,
+      });
+      if (!product) {
+        throw new Error("Product not found");
+      }
+
+      // We don't modify the stock here, as it will be handled by the stockReleaseQueue
+
+      await item.destroy({ transaction: t });
+
+      try {
+        await reservationExpirationQueue.removeJobs(itemId);
+        await stockReleaseQueue.add({
+          productId: item.productId,
+          quantity: item.quantity,
         });
-        return items;
-    }
+      } catch (error) {
+        console.error("Failed to manage queue jobs:", error);
+      }
+    });
+  }
 
-    async updateCart(userId: string, items: { productId: string; quantity: number; }[]): Promise<void> {
-        const cart = await Cart.findOne({
-            where: { userId }
+  async updateItemQuantity(
+    itemId: string,
+    newQuantity: number
+  ): Promise<ICartItem> {
+    return db.sequelize.transaction(async (t: Transaction) => {
+      const item = await CartItem.findByPk(itemId, {
+        transaction: t,
+        include: [{ model: Product }],
+      });
+
+      if (!item) {
+        throw new Error("Item not found");
+      }
+
+      const product = await Product.findByPk(item.productId, {
+        transaction: t,
+        lock: true,
+      });
+      if (!product) {
+        throw new Error("Product not found");
+      }
+
+      const quantityDiff = newQuantity - item.quantity;
+
+      if (product.stock < quantityDiff) {
+        throw new Error("Not enough stock");
+      }
+
+      product.stock -= quantityDiff;
+      await product.save({ transaction: t });
+
+      item.quantity = newQuantity;
+      item.reservationExpires = new Date(
+        Date.now() + this.RESERVATION_DURATION
+      );
+      await item.save({ transaction: t });
+
+      try {
+        await reservationExpirationQueue.removeJobs(itemId);
+        await reservationExpirationQueue.add(
+          { cartItemId: itemId, quantity: newQuantity },
+          { delay: this.RESERVATION_DURATION }
+        );
+      } catch (error) {
+        console.error("Failed to manage queue jobs:", error);
+      }
+
+      return item;
+    });
+  }
+
+  async clearExpiredReservations(): Promise<void> {
+    const expiredItems = await CartItem.findAll({
+      where: {
+        reservationExpires: {
+          [Op.lt]: new Date(),
+        },
+      },
+      include: [{ model: Product }],
+    });
+
+    for (const item of expiredItems) {
+      await db.sequelize.transaction(async (t: Transaction) => {
+        const product = await Product.findByPk(item.productId, {
+          transaction: t,
+          lock: true,
         });
 
-        if (!cart) {
-            throw new Error("Cart not found");
+        if (product) {
+          product.stock += item.quantity;
+          await product.save({ transaction: t });
         }
 
-        await Promise.all(items.map(async item => {
-            const cartItem = await CartItem.findOne({
-                where: {
-                    cartId: cart.id,
-                    productId: item.productId
-                }
-            });
-
-            if (cartItem) {
-                cartItem.quantity = item.quantity;
-                await cartItem.save();
-            } else {
-                await CartItem.create({
-                    cartId: cart.id,
-                    productId: item.productId,
-                    quantity: item.quantity
-                });
-            }
-        }));
+        await item.destroy({ transaction: t });
+      });
     }
-
-
-    async addItem(userId: string, productId: string, quantity: number): Promise<ICartItem> {
-        const [cart, created] = await Cart.findOrCreate({
-            where: { userId }
-        });
-
-        const [item, itemCreated] = await CartItem.findOrCreate({
-            where: { cartId: cart.id, productId },
-            defaults: {
-                cartId: cart.id,
-                productId: productId,
-                quantity: quantity
-            } as CartItemCreationParams
-        });
-
-        if (!itemCreated) {
-            item.quantity += quantity;
-            await item.save();
-        }
-
-        return item;
-    }
-
-    async removeItem(itemId: string): Promise<void> {
-        const result = await CartItem.destroy({
-            where: { productId: itemId }
-        });
-        // TODO Lotfi : voir si utile de supprimer le panier si plus d'article.
-        if (result === 0) {
-            throw new Error("Item not found or already removed");
-        }
-    }
-
-    async updateItemQuantity(itemId: string, quantity: number): Promise<ICartItem> {
-        const item = await CartItem.findOne({
-            where: { productId: itemId }
-        });
-
-        if (!item) {
-            throw new Error("Item not found");
-        }
-
-        item.quantity = quantity;
-        await item.save();
-        return item;
-    }
+  }
 }

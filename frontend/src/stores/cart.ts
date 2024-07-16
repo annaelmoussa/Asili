@@ -1,137 +1,174 @@
-import { defineStore } from 'pinia';
-import { useUserStore } from './user';
-import { defaultApi } from '@/api/config';
+// src/stores/cart.ts
+
+import { defineStore } from 'pinia'
+import { useUserStore } from './user'
+import { defaultApi } from '@/api/config'
+import type { IProduct, ICartItem } from '@/api'
+
+interface CartItem {
+  id: string
+  productId: string
+  product: IProduct
+  quantity: number
+  reservationExpires: string | null
+  createdAt: string
+  updatedAt: string
+}
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    items: [],
+    items: [] as CartItem[]
   }),
+
   getters: {
-    totalItems(state) {
-      return state.items.reduce((sum, item) => sum + item.quantity, 0);
+    totalItems(): number {
+      return this.items.reduce((sum, item) => sum + item.quantity, 0)
     },
-    totalPrice: (state) => {
-      return state.items.reduce((sum, item) => sum + item.quantity * item.product.price, 0);
-    },
+    totalPrice(): number {
+      return this.items.reduce((sum, item) => sum + item.quantity * item.product.price, 0)
+    }
   },
+
   actions: {
     async init() {
-      const userStore = useUserStore();
+      const userStore = useUserStore()
       if (userStore.isAuthenticated) {
-        await this.fetchCart();
+        await this.fetchCart()
       } else {
-        this.loadLocalCart();
+        this.loadLocalCart()
       }
     },
+
     async clearCart() {
-      localStorage.removeItem('cart');
-      this.items = [];
-      const userStore = useUserStore();
+      localStorage.removeItem('cart')
+      this.items = []
+      const userStore = useUserStore()
       if (userStore.isAuthenticated) {
-        await this.fetchCart();
+        await this.fetchCart()
       } else {
-        this.loadLocalCart();
+        this.loadLocalCart()
       }
     },
+
     async fetchCart() {
-      const userStore = useUserStore();
-      if (userStore.isAuthenticated) {
+      const userStore = useUserStore()
+      if (userStore.isAuthenticated && userStore.user?.id) {
         try {
-          const response = await defaultApi.getCartItems(userStore.user.id);
-          this.items = response.data;
+          const response = await defaultApi.getCartItems(userStore.user.id)
+          this.items = response.data.map((item: ICartItem) => ({
+            id: item.id || item.productId,
+            productId: item.productId,
+            product: item.product as IProduct,
+            quantity: item.quantity,
+            reservationExpires: item.reservationExpires || null,
+            createdAt: item.createdAt || new Date().toISOString(),
+            updatedAt: item.updatedAt || new Date().toISOString()
+          }))
         } catch (error) {
-          console.error('Failed to fetch cart:', error);
+          console.error('Failed to fetch cart:', error)
         }
       } else {
-        this.loadLocalCart();
+        this.loadLocalCart()
       }
     },
+
     loadLocalCart() {
-      const localItems = localStorage.getItem('cart');
+      const localItems = localStorage.getItem('cart')
       if (localItems) {
-        this.items = JSON.parse(localItems);
+        this.items = JSON.parse(localItems)
       }
     },
-    async addToCart(product) {
-      const userStore = useUserStore();
-      if (userStore.isAuthenticated) {
-        const existingItem = this.items.find(item => item.productId === product.id);
+
+    async addToCart(product: IProduct) {
+      const userStore = useUserStore()
+      if (userStore.isAuthenticated && userStore.user?.id) {
+        const existingItem = this.items.find((item) => item.product.id === product.id)
         if (existingItem) {
-          existingItem.quantity++;
-          await this.increment(product.id);
+          existingItem.quantity++
+          await this.increment(existingItem.id)
         } else {
-          await defaultApi.addItem(userStore.user.id, { productId: product.id, quantity: 1 });
-          await this.fetchCart();
+          await defaultApi.addItem(userStore.user.id, { productId: product.id, quantity: 1 })
+          await this.fetchCart()
         }
       } else {
-        const existingItem = this.items.find(item => item.product && item.product.id === product.id);
+        const existingItem = this.items.find((item) => item.product.id === product.id)
         if (existingItem) {
-          existingItem.quantity++;
+          existingItem.quantity++
         } else {
-          this.items.push({
+          const newItem: CartItem = {
             id: product.id,
-            product: {
-              id: product.id,
-              name: product.name,
-              description: product.description,
-              price: product.price,
-              category: product.category,
-              stock: product.stock,
-              image: product.image
-            },
-            quantity: 1
-          });
+            productId: product.id,
+            product: product,
+            quantity: 1,
+            reservationExpires: null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+          this.items.push(newItem)
         }
-        this.saveCart();
+        this.saveCart()
       }
     },
-    async removeFromCart(itemId) {
-      const userStore = useUserStore();
-      if (userStore.isAuthenticated) {
-        await defaultApi.removeItem(itemId);
-        await this.fetchCart();
-      } else {
-        this.items = this.items.filter(item => item.id != itemId);
-        this.saveCart();
-      }
-    },
-    async increment(productId) {
-      const item = this.items.find(item => item.product.id == productId);
-      console.log(productId, item, this.items);
-      if (!item)
-          return;
 
-      const userStore = useUserStore();
+    async removeFromCart(itemId: string) {
+      const userStore = useUserStore()
       if (userStore.isAuthenticated) {
-        const newQuantity = item.quantity + 1;
-        await defaultApi.updateItemQuantity(productId, newQuantity);
-        await this.fetchCart();
+        await defaultApi.removeItem(itemId)
+        await this.fetchCart()
       } else {
-        item.quantity++;
-        this.saveCart();
+        this.items = this.items.filter((item) => item.id !== itemId)
+        this.saveCart()
       }
     },
-    async decrement(productId) {
-      const item = this.items.find(item => item.product.id == productId);
-      if (!item)
-        return;
 
-      const userStore = useUserStore();
+    async increment(itemId: string) {
+      const item = this.items.find((item) => item.id === itemId)
+      if (!item) return
+
+      const userStore = useUserStore()
       if (userStore.isAuthenticated) {
-        const newQuantity = item.quantity - 1;
-        await defaultApi.updateItemQuantity(productId, newQuantity);
-        await this.fetchCart();
-      } else if (item && item.quantity > 1) {
-        item.quantity--;
-        this.saveCart();
+        const newQuantity = item.quantity + 1
+        try {
+          await defaultApi.updateItemQuantity(itemId, newQuantity)
+          await this.fetchCart()
+        } catch (error) {
+          console.error('Failed to increment item quantity:', error)
+        }
       } else {
-        this.removeFromCart(item.id);
+        item.quantity++
+        this.saveCart()
       }
     },
+
+    async decrement(itemId: string) {
+      const item = this.items.find((item) => item.id === itemId)
+      if (!item) return
+
+      const userStore = useUserStore()
+      if (userStore.isAuthenticated) {
+        const newQuantity = item.quantity - 1
+        if (newQuantity > 0) {
+          try {
+            await defaultApi.updateItemQuantity(itemId, newQuantity)
+            await this.fetchCart()
+          } catch (error) {
+            console.error('Failed to decrement item quantity:', error)
+          }
+        } else {
+          await this.removeFromCart(itemId)
+        }
+      } else if (item.quantity > 1) {
+        item.quantity--
+        this.saveCart()
+      } else {
+        this.removeFromCart(itemId)
+      }
+    },
+
     saveCart() {
       if (!useUserStore().isAuthenticated) {
-        localStorage.setItem('cart', JSON.stringify(this.items));
+        localStorage.setItem('cart', JSON.stringify(this.items))
       }
     }
   }
-});
+})

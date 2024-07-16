@@ -1,9 +1,11 @@
 import Product from "../models/Product";
+import Brand from "../models/Brand";
+import Category from "../models/Category";
 import { IProduct, ProductCreationParams } from "../interfaces/IProduct";
 import { ProductMongoService } from "./productMongoService";
 import { Sequelize, Transaction } from "sequelize";
 import { sequelize as defaultSequelize } from "../config/dbConfigPostgres";
-import ProductMongo from "../models/ProductMongo";
+import CartItem from "../models/CartItem";
 
 const productMongoService = new ProductMongoService();
 
@@ -13,18 +15,27 @@ export class ProductService {
   constructor(sequelize?: Sequelize) {
     this.sequelize = sequelize || defaultSequelize;
   }
+
   public async get(
     productId: string,
     options?: { transaction?: Transaction }
   ): Promise<IProduct | null> {
-    const product = await Product.findByPk(productId, options);
+    const product = await Product.findByPk(productId, {
+      include: [{ model: Brand }, { model: Category }],
+      ...options,
+    });
     return product ? product.toJSON() : null;
   }
 
   public async getAll(options?: {
     transaction?: Transaction;
   }): Promise<IProduct[]> {
-    const products = await Product.findAll(options);
+    console.time("get-all-products");
+    const products = await Product.findAll({
+      include: [{ model: Brand }, { model: Category }],
+      ...options,
+    });
+    console.log("Products fetched:", JSON.stringify(products, null, 2));
     return products.map((product) => product.toJSON());
   }
 
@@ -34,10 +45,15 @@ export class ProductService {
   ): Promise<IProduct> {
     console.time("create-product");
     try {
-      const product = await Product.create(productCreationParams, options);
-      const productData = product.toJSON();
-      await productMongoService.syncWithPostgres(productData);
-      return productData;
+      const product = await Product.create(
+        productCreationParams as any,
+        options
+      );
+      const productData = await this.get(product.id, options);
+      if (productData) {
+        await productMongoService.syncWithPostgres(productData);
+      }
+      return productData!;
     } finally {
       console.timeEnd("create-product");
     }
@@ -50,18 +66,15 @@ export class ProductService {
   ): Promise<IProduct | null> {
     console.time("update-product");
     try {
-      const [updatedRowsCount, [updatedProduct]] = await Product.update(
-        updates,
-        {
-          where: { id },
-          returning: true,
-          ...options,
-        }
-      );
-      if (updatedRowsCount === 0) return null;
-      const productData = updatedProduct.toJSON();
-      await productMongoService.syncWithPostgres(productData);
-      return productData;
+      await Product.update(updates, {
+        where: { id },
+        ...options,
+      });
+      const updatedProduct = await this.get(id, options);
+      if (updatedProduct) {
+        await productMongoService.syncWithPostgres(updatedProduct);
+      }
+      return updatedProduct;
     } finally {
       console.timeEnd("update-product");
     }
@@ -72,23 +85,63 @@ export class ProductService {
     options?: { transaction?: Transaction }
   ): Promise<boolean> {
     console.time("delete-product");
+    const t = options?.transaction || (await this.sequelize.transaction());
+
     try {
+      // First, remove the product from all carts
+      await CartItem.destroy({
+        where: { productId: id },
+        transaction: t,
+      });
+
+      // Then delete the product
       const deletedRowsCount = await Product.destroy({
         where: { id },
-        ...options,
+        transaction: t,
       });
+
       if (deletedRowsCount > 0) {
-        await ProductMongo.deleteOne({ id });
+        await productMongoService.delete(id);
       }
+
+      if (!options?.transaction) {
+        await t.commit();
+      }
+
       return deletedRowsCount > 0;
+    } catch (error) {
+      if (!options?.transaction) {
+        await t.rollback();
+      }
+      throw error;
     } finally {
       console.timeEnd("delete-product");
     }
   }
 
-  public async search(query: string | undefined, facets: any): Promise<IProduct[]> {
+  public async search(
+    query: string | undefined,
+    facets: any
+  ): Promise<IProduct[]> {
     console.log("Searching with query:", query, "and facets:", facets);
     return productMongoService.search(query, facets);
+  }
+
+  public async getCategories(): Promise<string[]> {
+    console.log("Getting categories");
+    const categories = await Category.findAll({
+      attributes: ["name"],
+      raw: true,
+    });
+    return categories.map((category) => category.name);
+  }
+
+  public async getBrands(): Promise<string[]> {
+    const brands = await Brand.findAll({
+      attributes: ["name"],
+      raw: true,
+    });
+    return brands.map((brand) => brand.name);
   }
 }
 

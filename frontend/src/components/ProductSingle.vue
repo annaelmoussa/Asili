@@ -8,7 +8,7 @@
         <span class="product-stock" :class="{'in-stock': product.stock > 0, 'out-of-stock': product.stock <= 0}">
           {{ product.stock > 0 ? $t('app.products.inStock') : $t('app.products.outOfStock') }}
         </span>
-        <h2 class="product-category">{{ product.category }}</h2>
+        <h2 class="product-category">{{ product.category?.name }}</h2>
         <p class="product-description-detail">{{ product.description }}</p>
         <div class="price-stock-container">
           <span class="product-price-detail">{{ formattedPrice }}</span>
@@ -79,8 +79,10 @@ const showMessage = (key: string) => {
 };
 
 const addToCart = () => {
-  cart.addToCart({...product.value, quantity: 1});
-  showMessage("productAdded");
+  if (product.value) {
+    cart.addToCart(product.value);
+    showMessage("productAdded");
+  }
 };
 </script>
 

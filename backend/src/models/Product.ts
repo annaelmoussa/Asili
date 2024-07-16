@@ -1,60 +1,84 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import { sequelize } from "../config/dbConfigPostgres";
-import { IProduct } from "../interfaces/IProduct";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+} from "sequelize-typescript";
+import { IProduct, ProductAttributes } from "../interfaces/IProduct";
+import Category from "./Category";
+import Brand from "./Brand";
 
-type ProductCreationAttributes = Optional<IProduct, "id">;
-
-class Product
-  extends Model<IProduct, ProductCreationAttributes>
+@Table({
+  tableName: "Product",
+  timestamps: true,
+})
+export default class Product
+  extends Model<ProductAttributes>
   implements IProduct
 {
-  public id!: string;
-  public name!: string;
-  public description!: string;
-  public price!: number;
-  public category!: string;
-  public stock!: number;
-  public image!: string;
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  name!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  description!: string;
+
+  @Column({
+    type: DataType.FLOAT,
+    allowNull: false,
+  })
+  price!: number;
+
+  @ForeignKey(() => Category)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  categoryId!: string;
+
+  @BelongsTo(() => Category)
+  category!: Category;
+
+  @ForeignKey(() => Brand)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  brandId!: string;
+
+  @BelongsTo(() => Brand)
+  brand!: Brand;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  stock!: number;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  image?: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  isPromotion!: boolean;
 }
-
-Product.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    price: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    category: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    stock: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    image: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-  },
-  {
-    sequelize,
-    modelName: "Product",
-    tableName: "Product",
-    timestamps: true,
-  }
-);
-
-export default Product;
