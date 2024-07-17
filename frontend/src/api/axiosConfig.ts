@@ -25,6 +25,12 @@ api.interceptors.response.use(
       notificationStore.showNotification('Error setting up the request', 'error')
     }
 
+    if (error.response.data.message === "Password change required") {
+      router.push('/change-password');
+    } else {
+      router.push('/login');
+    }
+
     if (error.response && error.response.status === 401) {
       console.log('Init user store')
       const userStore = useUserStore()

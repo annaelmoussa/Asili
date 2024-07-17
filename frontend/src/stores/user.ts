@@ -25,13 +25,15 @@ export const useUserStore = defineStore('user', () => {
   const token = ref<string | null>(null)
   const loading = ref(true)
   const scopes = ref<string[]>([])
-  const message = ref<string | null>(null)
+  const message = ref<string | null>(null);
+  const mustChangePassword = ref(false);
 
   function saveUserData() {
     if (user.value && token.value) {
       localStorage.setItem('user', JSON.stringify(user.value))
       localStorage.setItem('token', token.value)
       localStorage.setItem('scopes', JSON.stringify(scopes.value))
+      localStorage.setItem('mustChangePassword', JSON.stringify(mustChangePassword.value));
     }
   }
 
@@ -39,10 +41,12 @@ export const useUserStore = defineStore('user', () => {
     const savedUser = localStorage.getItem('user')
     const savedToken = localStorage.getItem('token')
     const savedScopes = localStorage.getItem('scopes')
-    if (savedUser && savedToken && savedScopes) {
+    const savedMustChangePassword = localStorage.getItem('mustChangePassword');
+    if (savedUser && savedToken && savedScopes && savedMustChangePassword !== null) {
       user.value = JSON.parse(savedUser)
       token.value = savedToken
       scopes.value = JSON.parse(savedScopes)
+      mustChangePassword.value = JSON.parse(savedMustChangePassword);
     }
   }
 
@@ -53,6 +57,7 @@ export const useUserStore = defineStore('user', () => {
       user.value = response.data.user
       token.value = response.data.token
       scopes.value = response.data.user.scopes || []
+      mustChangePassword.value = response.data.mustChangePassword;
       saveUserData()
       loading.value = false
       const cartStore = useCartStore()
@@ -64,6 +69,7 @@ export const useUserStore = defineStore('user', () => {
       user.value = null
       token.value = null
       scopes.value = []
+      mustChangePassword.value = false;
       loading.value = false
       throw error
     }
@@ -73,9 +79,11 @@ export const useUserStore = defineStore('user', () => {
     user.value = null
     token.value = null
     scopes.value = []
+    mustChangePassword.value = false;
     localStorage.removeItem('user')
     localStorage.removeItem('token')
     localStorage.removeItem('scopes')
+    localStorage.removeItem('mustChangePassword');
   }
 
   async function logout() {
@@ -87,11 +95,13 @@ export const useUserStore = defineStore('user', () => {
       user.value = null
       token.value = null
       scopes.value = []
+      mustChangePassword.value = false;
       localStorage.removeItem('user')
       localStorage.removeItem('token')
       const cartStore = useCartStore()
       cartStore.clearCart()
       localStorage.removeItem('scopes')
+      localStorage.removeItem('mustChangePassword');
     }
   }
 
@@ -144,6 +154,7 @@ export const useUserStore = defineStore('user', () => {
     message,
     clearUserData,
     isAuthenticated: computed(() => !!user.value),
-    hasScope: (requiredScope: string) => scopes.value.includes(requiredScope)
+    hasScope: (requiredScope: string) => scopes.value.includes(requiredScope),
+    mustChangePassword
   }
 })

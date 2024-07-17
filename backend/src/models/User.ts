@@ -6,19 +6,23 @@ import {
   HasMany,
   HasOne,
   BeforeCreate,
+  BeforeUpdate,
 } from "sequelize-typescript";
+import { Optional } from "sequelize";
 import { IUser } from "../interfaces/IUser";
 import { ALL_SCOPES } from "../config/scopes";
 import EmailNotification from "./EmailNotification";
 import UserPreferences from "./UserPreferences";
 import Widget from "./Widget";
 
+type UserCreationAttributes = Optional<IUser, "id" | "isConfirmed" | "confirmationToken" | "lastPasswordChange">;
+
 @Table({
   tableName: "User",
   timestamps: true,
   paranoid: true,
 })
-export default class User extends Model<IUser> implements IUser {
+export default class User extends Model<IUser, UserCreationAttributes> implements IUser {
   @Column({
     type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
@@ -75,6 +79,13 @@ export default class User extends Model<IUser> implements IUser {
   })
   scopes!: string[];
 
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+    defaultValue: DataType.NOW,
+  })
+  lastPasswordChange!: Date;
+
   @HasMany(() => EmailNotification)
   notifications!: EmailNotification[];
 
@@ -84,17 +95,23 @@ export default class User extends Model<IUser> implements IUser {
   @HasMany(() => Widget)
   widgets!: Widget[];
 
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  })
-  isDeleted!: boolean;
-
   @BeforeCreate
-  static setAdminScopes(instance: User) {
+  @BeforeUpdate
+  static handleUserChanges(instance: User) {
     if (instance.role === "ROLE_ADMIN") {
       instance.scopes = ALL_SCOPES;
     }
+    if (instance.changed('password')) {
+      instance.lastPasswordChange = new Date();
+    }
+  }
+
+  static associate() {
+    User.hasMany(EmailNotification, {
+      foreignKey: "userId",
+      as: "notifications",
+    });
+    User.hasOne(UserPreferences, { foreignKey: "userId", as: "preferences" });
+    User.hasMany(Widget, { foreignKey: "userId" });
   }
 }

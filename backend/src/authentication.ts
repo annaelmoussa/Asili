@@ -2,6 +2,7 @@ import { Request } from "express";
 import { verify, Secret, JwtPayload } from "jsonwebtoken";
 import { AuthService } from "./services/authService";
 import { IJwtPayload } from "./interfaces/IJwtPayload";
+import { UserService } from "./services/userService";
 
 const authService = new AuthService();
 const secret = process.env.JWT_SECRET;

@@ -24,6 +24,8 @@ import OrdersView from '../views/OrdersView.vue'
 import ReferralsView from '../views/ReferralsView.vue'
 import MemberBenefitsView from '../views/MemberBenefitsView.vue'
 import PanelViewStock from '../views/Panel/PanelStockView.vue'
+import PanelDashboard from '../views/Panel/PanelDashboardView.vue';
+import ChangePasswordView from '../views/ChangePasswordView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -154,7 +156,12 @@ const routes: Array<RouteRecordRaw> = [
         name: 'PanelPayments',
         component: PanelPayment
       }
-    ]
+    ],
+  },
+  {
+    path: '/change-password',
+    name: 'change-password',
+    component : ChangePasswordView
   }
 ]
 
@@ -173,6 +180,8 @@ router.beforeEach((to, from, next) => {
   } else if (requiresAdmin && userStore.user?.role !== 'ROLE_ADMIN') {
     console.log('Access denied: Admin role required')
     next('/')
+  }else if (userStore.isAuthenticated && userStore.mustChangePassword && to.name !== 'change-password') {
+    next('/change-password')
   } else {
     next()
   }

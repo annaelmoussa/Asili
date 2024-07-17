@@ -5,6 +5,7 @@ import { ALL_SCOPES } from "../config/scopes";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import Widget from "../models/Widget";
+import { differenceInDays } from 'date-fns'
 
 export class UserService {
   public async get(
@@ -160,5 +161,14 @@ export class UserService {
     options?: { transaction?: Transaction }
   ): Promise<void> {
     return this.softDelete(userId, options);
+  }
+
+  public async shouldChangePassword(userId: string): Promise<boolean> {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const daysSinceLastChange = differenceInDays(new Date(), user.lastPasswordChange);
+    return daysSinceLastChange >= 60;
   }
 }

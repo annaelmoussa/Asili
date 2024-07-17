@@ -1,5 +1,5 @@
 <template>
-  <div class="sticky-header">
+  <div class="sticky-header" v-if="!isChangePasswordPage">
     <AppHeader />
     <AppNavbar />
   </div>
@@ -8,6 +8,11 @@
 <script setup>
 import AppHeader from '@/components/AppHeader.vue'
 import AppNavbar from '@/components/AppNavbar.vue'
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+const route = useRoute();
+const isChangePasswordPage = computed(() => route.path === '/change-password');
+
 </script>
 
 <style scoped>

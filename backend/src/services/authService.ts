@@ -5,6 +5,7 @@ import TokenBlacklist from "../models/TokenBlacklist";
 import { IUser } from "../interfaces/IUser";
 import { IJwtPayload } from "../interfaces/IJwtPayload";
 import sendEmail from "./emailService";
+import {UserService} from "./userService";
 
 export class AuthService {
   private secret = process.env.JWT_SECRET || "your_jwt_secret";
@@ -109,9 +110,7 @@ export class AuthService {
       return;
     }
 
-    const token = jwt.sign({ email: user.email, id: user.id }, this.secret, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ email: user.email, userId: user.id }, this.secret, { expiresIn: '1h' });
 
     const resetLink = `http://localhost:8080/reset-password?token=${token}`;
     const emailText = `Click here to reset your password: ${resetLink}`;
@@ -129,14 +128,8 @@ export class AuthService {
       throw new Error("Passwords do not match.");
     }
     try {
-      const decoded = jwt.verify(token, this.secret) as {
-        email: string;
-        id: string;
-      };
-
-      const user = await User.findOne({
-        where: { id: decoded.id, email: decoded.email },
-      });
+      const decoded = jwt.verify(token, this.secret) as { email: string, userId: string };
+      const user = await User.findOne({ where: { id: decoded.userId, email: decoded.email } });
       if (!user) {
         throw new Error("Invalid token or user does not exist.");
       }
