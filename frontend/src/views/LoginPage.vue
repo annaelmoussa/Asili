@@ -39,6 +39,7 @@ const handleLogin = async () => {
     if (!userStore.message) {
       router.push('/')
     }
+    
   } catch (error) {}
 }
 

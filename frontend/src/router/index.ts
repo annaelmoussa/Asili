@@ -17,6 +17,7 @@ import PanelOrder from '../views/Panel/PanelOrderView.vue';
 import PanelPayment from "../views/Panel/PanelPaymentsView.vue";
 import StripeCheckoutRedirect from "../components/StripeCheckoutRedirect.vue";
 import PaymentSuccess from "../views/PaymentSuccessView.vue"
+import ChangePasswordView from '../views/ChangePasswordView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -130,6 +131,11 @@ const routes: Array<RouteRecordRaw> = [
       }
     ],
   },
+  {
+    path: '/change-password',
+    name: 'change-password',
+    component : ChangePasswordView
+  }
 ]
 
 const router = createRouter({
@@ -143,6 +149,8 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAuth && !userStore.isAuthenticated) {
     next('/login')
+  }else if (userStore.isAuthenticated && userStore.mustChangePassword && to.name !== 'change-password') {
+    next('/change-password')
   } else {
     next()
   }

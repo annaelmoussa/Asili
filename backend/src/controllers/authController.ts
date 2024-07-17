@@ -44,7 +44,7 @@ export class AuthController extends Controller {
   @OperationId("loginUser")
   public async login(
     @Body() body: LoginRequest
-  ): Promise<{ user: IUser; token: string }> {
+  ): Promise<{ user: IUser; token: string,mustChangePassword : boolean }> {
     const authService = new AuthService();
     try {
       return await authService.login(body.email, body.password);
@@ -111,7 +111,6 @@ export class AuthController extends Controller {
 
   @Post("reset-password")
   public async resetPassword(@Body() body: UpdatePasswordRequest): Promise<{ message: string }> {
-    console.log(body);
     const authService = new AuthService();
     await authService.resetPassword(body.token, body.password, body.confirm_password);
     return { message: "Password has been reset successfully." };

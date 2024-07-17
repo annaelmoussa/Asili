@@ -2,6 +2,7 @@ import User from "../models/User";
 import { IUser } from "../interfaces/IUser";
 import { Transaction } from "sequelize";
 import { ALL_SCOPES } from "../config/scopes";
+import { differenceInDays } from 'date-fns'
 
 export class UserService {
   public async get(
@@ -77,5 +78,14 @@ export class UserService {
       console.error("Error deleting user:", error);
       throw error;
     }
+  }
+
+  public async shouldChangePassword(userId: string): Promise<boolean> {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const daysSinceLastChange = differenceInDays(new Date(), user.lastPasswordChange);
+    return daysSinceLastChange >= 60;
   }
 }

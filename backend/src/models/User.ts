@@ -18,6 +18,7 @@ class User extends Model<IUser, UserCreationAttributes> implements IUser {
   public stripeCustomerId?: string;
   public token?: string;
   public scopes?: string[];
+  public lastPasswordChange!: Date;
 
   static associate() {
     User.hasMany(EmailNotification, {
@@ -71,6 +72,11 @@ User.init(
       allowNull: false,
       defaultValue: [],
     },
+    lastPasswordChange: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     sequelize,
@@ -81,6 +87,14 @@ User.init(
       beforeCreate: (user: User) => {
         if (user.role === "ROLE_ADMIN") {
           user.scopes = ALL_SCOPES;
+        }
+        if (user.changed('password')) {
+          user.lastPasswordChange = new Date();
+        }
+      },
+      beforeUpdate: (user: User) => {
+        if (user.changed('password')) {
+          user.lastPasswordChange = new Date();
         }
       },
     },
