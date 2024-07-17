@@ -4,7 +4,7 @@ import { defineStore } from 'pinia'
 import { useUserStore } from './user'
 import { defaultApi } from '@/api/config'
 import type { IProduct, ICartItem } from '@/api'
-import type { CartItem } from './cartTypes'
+import type { CartItem } from '@/types/cart'
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
@@ -39,11 +39,7 @@ export const useCartStore = defineStore('cart', {
       if (userStore.isAuthenticated && userStore.user?.id) {
         try {
           const response = await defaultApi.getCartItems(userStore.user.id)
-          this.items = response.data.map((item: ICartItem) => ({
-            id: item.id || item.productId, // Use productId as fallback
-            product: item.product as IProduct, // Assert that product is IProduct
-            quantity: item.quantity
-          }))
+          this.items = response.data as CartItem[]
         } catch (error) {
           console.error('Failed to fetch cart:', error)
         }
@@ -73,11 +69,16 @@ export const useCartStore = defineStore('cart', {
         if (existingItem) {
           existingItem.quantity++
         } else {
-          this.items.push({
+          const newItem: Partial<CartItem> = {
             id: product.id,
+            productId: product.id,
             product: product,
-            quantity: 1
-          })
+            quantity: 1,
+            reservationExpires: null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+          this.items.push(newItem as CartItem)
         }
         this.saveCart()
       }
@@ -93,38 +94,47 @@ export const useCartStore = defineStore('cart', {
         this.saveCart()
       }
     },
-    async increment(productId: string) {
-      const item = this.items.find((item) => item.product.id === productId)
+    async increment(itemId: string) {
+      const item = this.items.find((item) => item.id === itemId)
       if (!item) return
 
       const userStore = useUserStore()
-      if (userStore.isAuthenticated && item.id) {
+      if (userStore.isAuthenticated) {
         const newQuantity = item.quantity + 1
-        await defaultApi.updateItemQuantity(item.id, newQuantity)
-        await this.fetchCart()
+        try {
+          await defaultApi.updateItemQuantity(itemId, newQuantity)
+          await this.fetchCart()
+        } catch (error) {
+          console.error('Failed to increment item quantity:', error)
+        }
       } else {
         item.quantity++
         this.saveCart()
       }
     },
-    async decrement(productId: string) {
-      const item = this.items.find((item) => item.product.id === productId)
+
+    async decrement(itemId: string) {
+      const item = this.items.find((item) => item.id === itemId)
       if (!item) return
 
       const userStore = useUserStore()
       if (userStore.isAuthenticated) {
         const newQuantity = item.quantity - 1
         if (newQuantity > 0) {
-          await defaultApi.updateItemQuantity(item.id, newQuantity)
-          await this.fetchCart()
+          try {
+            await defaultApi.updateItemQuantity(itemId, newQuantity)
+            await this.fetchCart()
+          } catch (error) {
+            console.error('Failed to decrement item quantity:', error)
+          }
         } else {
-          await this.removeFromCart(item.id)
+          await this.removeFromCart(itemId)
         }
       } else if (item.quantity > 1) {
         item.quantity--
         this.saveCart()
       } else {
-        this.removeFromCart(item.id)
+        this.removeFromCart(itemId)
       }
     },
     saveCart() {

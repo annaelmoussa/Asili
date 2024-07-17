@@ -43,6 +43,12 @@ export default class CartItem extends Model<ICartItem> implements ICartItem {
   })
   quantity!: number;
 
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  reservationExpires!: Date | null;
+
   @BelongsTo(() => Product)
   product!: Product;
 

@@ -62,7 +62,9 @@
       "quantityDecreased": "Quantité réduite.",
       "productRemoved": "Produit retiré du panier.",
       "productAdded": "Produit ajouté au panier.",
-      "cartEmpty": "Panier vide."
+      "cartEmpty": "Panier vide.",
+      "reservationTime": "Le produit est réservé pour : {time}",
+      "expired": "Expiré"
     }
   }
 }

@@ -4,7 +4,7 @@
     <transition name="fade">
       <div v-if="messageVisible" class="message">{{ messageText }}</div>
     </transition>
-    <div v-for="item in cart.items" :key="item.id" class="product-details-container">
+    <div v-for="item in sortedCartItems" :key="item.id" class="product-details-container">
       <img :src="item.product.image" alt="Product image" class="product-image-detail" />
       <div class="product-details">
         <h1 class="product-title">{{ item.product.name }}</h1>
@@ -13,21 +13,24 @@
         <div class="price-stock-container">
           <span class="product-price-detail">{{ item.product.price }}</span>
           <div class="quantity-controls">
-            <button
-              @click="decrement(item.product.id)"
-              :disabled="item.quantity <= 1"
-              class="quantity-btn"
-            >
+            <button @click="decrement(item.id)" :disabled="item.quantity <= 1" class="quantity-btn">
               <i class="pi pi-minus"></i>
             </button>
             <span class="quantity-number">{{ item.quantity }}</span>
-            <button @click="increment(item.product.id)" class="quantity-btn">
+            <button @click="increment(item.id)" class="quantity-btn">
               <i class="pi pi-plus"></i>
             </button>
-            <button @click="removeFromCart(item.product.id)" class="remove-from-cart">
+            <button @click="removeFromCart(item.id)" class="remove-from-cart">
               <i class="pi pi-trash"></i>
             </button>
           </div>
+        </div>
+        <div v-if="item.reservationExpires" class="reservation-timer">
+          {{
+            $t('app.cart.reservationTime', {
+              time: getReservationTimeRemaining(item.reservationExpires)
+            })
+          }}
         </div>
       </div>
     </div>
@@ -39,16 +42,22 @@
 import { useCartStore } from '@/stores/cart'
 import { useUserStore } from '@/stores/user'
 import { useI18n } from 'vue-i18n'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed, onUnmounted } from 'vue'
 
 const { t } = useI18n()
 const cart = useCartStore()
 const user = useUserStore()
 const messageVisible = ref(false)
 const messageText = ref('')
+const currentTime = ref(Date.now())
+
+const sortedCartItems = computed(() => {
+  return [...cart.items].sort((a, b) => a.id.localeCompare(b.id))
+})
 
 onMounted(() => {
   cart.init()
+  startTimer()
 })
 
 const showMessage = (key: string) => {
@@ -59,20 +68,49 @@ const showMessage = (key: string) => {
   }, 3000)
 }
 
-const increment = (productId: string) => {
-  cart.increment(productId)
+const increment = async (itemId: string) => {
+  await cart.increment(itemId)
   showMessage('quantityIncreased')
 }
 
-const decrement = (productId: string) => {
-  cart.decrement(productId)
+const decrement = async (itemId: string) => {
+  await cart.decrement(itemId)
   showMessage('quantityDecreased')
 }
 
-const removeFromCart = (productId: string) => {
-  cart.removeFromCart(productId)
+const removeFromCart = async (itemId: string) => {
+  await cart.removeFromCart(itemId)
   showMessage('productRemoved')
 }
+
+const getReservationTimeRemaining = (reservationExpires: string | null): string | null => {
+  if (!reservationExpires) return null
+  const expires = new Date(reservationExpires).getTime()
+  const diff = expires - currentTime.value
+  if (diff <= 0) return null
+  const minutes = Math.floor(diff / 60000)
+  const seconds = Math.floor((diff % 60000) / 1000)
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`
+}
+
+let timerInterval: number | null = null
+
+const startTimer = () => {
+  timerInterval = window.setInterval(() => {
+    currentTime.value = Date.now()
+  }, 1000)
+}
+
+onMounted(() => {
+  cart.init()
+  startTimer()
+})
+
+onUnmounted(() => {
+  if (timerInterval !== null) {
+    clearInterval(timerInterval)
+  }
+})
 </script>
 
 <style scoped>
@@ -217,5 +255,11 @@ button i {
 .remove-from-cart:hover {
   background-color: #e74c3c;
   color: #ffffff;
+}
+
+.reservation-timer {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #e67e22;
 }
 </style>

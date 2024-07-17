@@ -16,6 +16,10 @@ module.exports = {
           key: "id",
         },
       },
+      reservationExpires: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
