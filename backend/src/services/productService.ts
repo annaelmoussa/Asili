@@ -5,6 +5,7 @@ import { IProduct, ProductCreationParams } from "../interfaces/IProduct";
 import { ProductMongoService } from "./productMongoService";
 import { Sequelize, Transaction } from "sequelize";
 import { sequelize as defaultSequelize } from "../config/dbConfigPostgres";
+import CartItem from "../models/CartItem";
 
 const productMongoService = new ProductMongoService();
 
@@ -84,15 +85,35 @@ export class ProductService {
     options?: { transaction?: Transaction }
   ): Promise<boolean> {
     console.time("delete-product");
+    const t = options?.transaction || (await this.sequelize.transaction());
+
     try {
+      // First, remove the product from all carts
+      await CartItem.destroy({
+        where: { productId: id },
+        transaction: t,
+      });
+
+      // Then delete the product
       const deletedRowsCount = await Product.destroy({
         where: { id },
-        ...options,
+        transaction: t,
       });
+
       if (deletedRowsCount > 0) {
         await productMongoService.delete(id);
       }
+
+      if (!options?.transaction) {
+        await t.commit();
+      }
+
       return deletedRowsCount > 0;
+    } catch (error) {
+      if (!options?.transaction) {
+        await t.rollback();
+      }
+      throw error;
     } finally {
       console.timeEnd("delete-product");
     }

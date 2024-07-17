@@ -57,7 +57,7 @@ const goToSignup = () => {
 
 const goToDashboard = () => {
   if (userStore.isAuthenticated) {
-    router.push('/dashboard')
+    router.push('/panel')
   } else {
     router.push('/login')
   }

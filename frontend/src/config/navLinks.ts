@@ -1,18 +1,35 @@
-import { Bell, CircleUser, Home, LineChart, Menu, Package, Package2, Search, ShoppingCart, Users, CreditCard } from 'lucide-vue-next'
-import { defineComponent } from 'vue';
+import {
+  Bell,
+  CircleUser,
+  Home,
+  LineChart,
+  Menu,
+  Package,
+  Package2,
+  Search,
+  ShoppingCart,
+  Users,
+  CreditCard
+} from 'lucide-vue-next'
+import { defineComponent } from 'vue'
 
 interface NavLink {
-  name: string;
-  path: string;
-  icon: ReturnType<typeof defineComponent>;
+  name: string
+  path: string
+  icon: ReturnType<typeof defineComponent>
 }
 
 const navLinks: NavLink[] = [
   { name: 'Dashboard', path: '/panel/dashboard', icon: Home },
   { name: 'Commandes', path: '/panel/orders', icon: ShoppingCart },
-  { name: 'Produits', path: '/panel/products', icon: CircleUser },
-  { name: 'Utilisateurs', path: '/panel/users', icon: Users},
+  { name: 'Produits', path: '/panel/products', icon: Package2 },
+  { name: 'Utilisateurs', path: '/panel/users', icon: Users },
   { name: 'Paiements', path: '/panel/payments', icon: CreditCard },
-];
-  
-  export default navLinks;
+  { name: 'Catégories', path: '/panel/categories', icon: Menu },
+  { name: 'Marques', path: '/panel/brands', icon: Package },
+  { name: 'Paramètres', path: '/panel/settings', icon: Bell },
+  { name: 'Recherche', path: '/search', icon: Search },
+  { name: 'Panier', path: '/cart', icon: ShoppingCart }
+]
+
+export default navLinks

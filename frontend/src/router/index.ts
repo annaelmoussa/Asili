@@ -9,7 +9,6 @@ import CartView from '../views/CartView.vue'
 import { useUserStore } from '@/stores/user'
 import DashboardView from '../views/DashboardView.vue'
 import PanelLayout from '../views/Layout/PanelLayout.vue'
-import PanelDashboard from '../views/Panel/PanelDashboardView.vue'
 import PanelUsers from '../views/Panel/PanelUsersView.vue'
 import PanelSettings from '../views/Panel/PanelSettingsView.vue'
 import PanelProduct from '../views/Panel/PanelProductView.vue'
@@ -22,6 +21,12 @@ import UserProfile from '../views/ProfileView.vue'
 import UserData from '../views/UserDataView.vue'
 import UserNotification from '../views/UserNotificationView.vue'
 import SearchView from '../views/SearchView.vue'
+import PanelCategories from '../views/Panel/PanelCategoriesView.vue'
+import PanelBrands from '../views/Panel/PanelBrandsView.vue'
+import FavoritesView from '../views/FavoritesView.vue'
+import OrdersView from '../views/OrdersView.vue'
+import ReferralsView from '../views/ReferralsView.vue'
+import MemberBenefitsView from '../views/MemberBenefitsView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -56,25 +61,25 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/favorites',
     name: 'favorites',
-    component: () => import('../views/FavoritesView.vue'),
+    component: FavoritesView,
     meta: { requiresAuth: true }
   },
   {
     path: '/orders',
     name: 'orders',
-    component: () => import('../views/OrdersView.vue'),
+    component: OrdersView,
     meta: { requiresAuth: true }
   },
   {
     path: '/referrals',
     name: 'referrals',
-    component: () => import('../views/ReferralsView.vue'),
+    component: ReferralsView,
     meta: { requiresAuth: true }
   },
   {
     path: '/member-benefits',
     name: 'member-benefits',
-    component: () => import('../views/MemberBenefitsView.vue'),
+    component: MemberBenefitsView,
     meta: { requiresAuth: true }
   },
   {
@@ -93,12 +98,6 @@ const routes: Array<RouteRecordRaw> = [
     component: SearchView
   },
   {
-    path: '/dashboard',
-    name: 'dashboard',
-    component: DashboardView,
-    meta: { requiresAuth: true, requiresAdmin: true }
-  },
-  {
     path: '/stripe-checkout',
     name: 'StripeCheckoutRedirect',
     component: StripeCheckoutRedirect
@@ -115,8 +114,8 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: 'dashboard',
-        name: 'PanelDashboard',
-        component: PanelDashboard
+        name: 'Dashboard',
+        component: DashboardView
       },
       {
         path: 'users',
@@ -132,6 +131,16 @@ const routes: Array<RouteRecordRaw> = [
         path: 'products',
         name: 'PanelProducts',
         component: PanelProduct
+      },
+      {
+        path: 'categories',
+        name: 'PanelCategories',
+        component: PanelCategories
+      },
+      {
+        path: 'brands',
+        name: 'PanelBrands',
+        component: PanelBrands
       },
       {
         path: 'orders',

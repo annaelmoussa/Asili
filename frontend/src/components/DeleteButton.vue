@@ -1,8 +1,13 @@
 <template>
   <div>
-    <button @click="showModal" :disabled="isLoading" class="delete-button">
-      {{ buttonText }}
-    </button>
+    <div
+      @click="showModal"
+      :disabled="isLoading"
+      class="delete-button cursor-pointer text-red-500 hover:text-red-700"
+    >
+      <Trash v-if="useIcon" />
+      <span class="button-text" v-else>{{ buttonText }}</span>
+    </div>
 
     <teleport to="body">
       <div v-if="isModalVisible" class="modal-overlay" @click="hideModal">
@@ -25,11 +30,15 @@
 
 <script lang="ts">
 import { defineComponent, ref, type PropType } from 'vue'
+import { Trash } from 'lucide-vue-next'
 
 type DeleteFunction = () => Promise<void>
 
 export default defineComponent({
   name: 'DeleteButton',
+  components: {
+    Trash
+  },
   props: {
     buttonText: {
       type: String,
@@ -46,6 +55,10 @@ export default defineComponent({
     onSuccess: {
       type: Function as PropType<() => void>,
       default: () => {}
+    },
+    useIcon: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props) {
