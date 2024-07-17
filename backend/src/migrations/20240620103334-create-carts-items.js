@@ -29,6 +29,10 @@ module.exports = {
         allowNull: false,
         defaultValue: 1,
       },
+      reservationExpires: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

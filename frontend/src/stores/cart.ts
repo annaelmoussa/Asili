@@ -7,8 +7,12 @@ import type { IProduct, ICartItem } from '@/api'
 
 interface CartItem {
   id: string
+  productId: string
   product: IProduct
   quantity: number
+  reservationExpires: string | null
+  createdAt: string
+  updatedAt: string
 }
 
 export const useCartStore = defineStore('cart', {
@@ -53,8 +57,12 @@ export const useCartStore = defineStore('cart', {
           const response = await defaultApi.getCartItems(userStore.user.id)
           this.items = response.data.map((item: ICartItem) => ({
             id: item.id || item.productId,
+            productId: item.productId,
             product: item.product as IProduct,
-            quantity: item.quantity
+            quantity: item.quantity,
+            reservationExpires: item.reservationExpires || null,
+            createdAt: item.createdAt || new Date().toISOString(),
+            updatedAt: item.updatedAt || new Date().toISOString()
           }))
         } catch (error) {
           console.error('Failed to fetch cart:', error)
@@ -77,7 +85,7 @@ export const useCartStore = defineStore('cart', {
         const existingItem = this.items.find((item) => item.product.id === product.id)
         if (existingItem) {
           existingItem.quantity++
-          await this.increment(product.id)
+          await this.increment(existingItem.id)
         } else {
           await defaultApi.addItem(userStore.user.id, { productId: product.id, quantity: 1 })
           await this.fetchCart()
@@ -87,11 +95,16 @@ export const useCartStore = defineStore('cart', {
         if (existingItem) {
           existingItem.quantity++
         } else {
-          this.items.push({
+          const newItem: CartItem = {
             id: product.id,
+            productId: product.id,
             product: product,
-            quantity: 1
-          })
+            quantity: 1,
+            reservationExpires: null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+          this.items.push(newItem)
         }
         this.saveCart()
       }
@@ -108,39 +121,47 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
-    async increment(productId: string) {
-      const item = this.items.find((item) => item.product.id === productId)
+    async increment(itemId: string) {
+      const item = this.items.find((item) => item.id === itemId)
       if (!item) return
 
       const userStore = useUserStore()
-      if (userStore.isAuthenticated && item.id) {
+      if (userStore.isAuthenticated) {
         const newQuantity = item.quantity + 1
-        await defaultApi.updateItemQuantity(item.id, newQuantity)
-        await this.fetchCart()
+        try {
+          await defaultApi.updateItemQuantity(itemId, newQuantity)
+          await this.fetchCart()
+        } catch (error) {
+          console.error('Failed to increment item quantity:', error)
+        }
       } else {
         item.quantity++
         this.saveCart()
       }
     },
 
-    async decrement(productId: string) {
-      const item = this.items.find((item) => item.product.id === productId)
+    async decrement(itemId: string) {
+      const item = this.items.find((item) => item.id === itemId)
       if (!item) return
 
       const userStore = useUserStore()
-      if (userStore.isAuthenticated && item.id) {
+      if (userStore.isAuthenticated) {
         const newQuantity = item.quantity - 1
         if (newQuantity > 0) {
-          await defaultApi.updateItemQuantity(item.id, newQuantity)
-          await this.fetchCart()
+          try {
+            await defaultApi.updateItemQuantity(itemId, newQuantity)
+            await this.fetchCart()
+          } catch (error) {
+            console.error('Failed to decrement item quantity:', error)
+          }
         } else {
-          await this.removeFromCart(item.id)
+          await this.removeFromCart(itemId)
         }
       } else if (item.quantity > 1) {
         item.quantity--
         this.saveCart()
       } else {
-        this.removeFromCart(item.id)
+        this.removeFromCart(itemId)
       }
     },
 

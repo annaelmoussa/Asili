@@ -73,10 +73,10 @@ async function handleSearch() {
         searchQuery.value,
         selectedCategory.value,
         selectedBrand.value,
-        minPrice.value,
-        maxPrice.value,
-        isPromotion.value,
-        inStock.value
+        minPrice.value?.toString(),
+        maxPrice.value?.toString(),
+        isPromotion.value?.toString(),
+        inStock.value?.toString()
       )
       searchResults.value = response.data
       showResults.value = true

@@ -11,7 +11,7 @@
     </div>
 
     <template v-else>
-      <div v-for="item in cart.items" :key="item.id" class="cart-item">
+      <div v-for="item in sortedCartItems" :key="item.id" class="cart-item">
         <img :src="item.product.image" :alt="item.product.name" class="cart-item-image" />
         <div class="cart-item-details">
           <h2 class="cart-item-title">{{ item.product.name }}</h2>
@@ -23,20 +23,27 @@
             }}</span>
             <div class="quantity-controls">
               <button
-                @click="decrement(item.product.id)"
+                @click="decrement(item.id)"
                 :disabled="item.quantity <= 1"
                 class="quantity-btn"
               >
                 <i class="pi pi-minus"></i>
               </button>
               <span class="quantity-number">{{ item.quantity }}</span>
-              <button @click="increment(item.product.id)" class="quantity-btn">
+              <button @click="increment(item.id)" class="quantity-btn">
                 <i class="pi pi-plus"></i>
               </button>
             </div>
-            <button @click="removeFromCart(item.product.id)" class="remove-btn">
+            <button @click="removeFromCart(item.id)" class="remove-btn">
               <i class="pi pi-trash"></i>
             </button>
+          </div>
+          <div v-if="item.reservationExpires" class="reservation-timer">
+            {{
+              $t('app.cart.reservationTime', {
+                time: getReservationTimeRemaining(item.reservationExpires)
+              })
+            }}
           </div>
         </div>
       </div>
@@ -64,7 +71,7 @@ import { useCartStore } from '@/stores/cart'
 import { useCurrencyStore } from '@/stores/currency'
 import { useUserStore } from '@/stores/user'
 import { useI18n } from 'vue-i18n'
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
@@ -75,13 +82,19 @@ const router = useRouter()
 
 const messageVisible = ref(false)
 const messageText = ref('')
+const currentTime = ref(Date.now())
 
 onMounted(() => {
   cart.init()
+  startTimer()
 })
 
 const formattedTotalPrice = computed(() => {
   return currencyStore.formattedPrice(cart.totalPrice)
+})
+
+const sortedCartItems = computed(() => {
+  return [...cart.items].sort((a, b) => a.id.localeCompare(b.id))
 })
 
 const showMessage = (key: string) => {
@@ -96,20 +109,44 @@ const goToPayment = () => {
   router.push({ name: 'StripeCheckoutRedirect' })
 }
 
-const increment = (productId: string) => {
-  cart.increment(productId)
+const increment = async (itemId: string) => {
+  await cart.increment(itemId)
   showMessage('quantityIncreased')
 }
 
-const decrement = (productId: string) => {
-  cart.decrement(productId)
+const decrement = async (itemId: string) => {
+  await cart.decrement(itemId)
   showMessage('quantityDecreased')
 }
 
-const removeFromCart = (productId: string) => {
-  cart.removeFromCart(productId)
+const removeFromCart = async (itemId: string) => {
+  await cart.removeFromCart(itemId)
   showMessage('productRemoved')
 }
+
+const getReservationTimeRemaining = (reservationExpires: string | null): string | null => {
+  if (!reservationExpires) return null
+  const expires = new Date(reservationExpires).getTime()
+  const diff = expires - currentTime.value
+  if (diff <= 0) return null
+  const minutes = Math.floor(diff / 60000)
+  const seconds = Math.floor((diff % 60000) / 1000)
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`
+}
+
+let timerInterval: number | null = null
+
+const startTimer = () => {
+  timerInterval = window.setInterval(() => {
+    currentTime.value = Date.now()
+  }, 1000)
+}
+
+onUnmounted(() => {
+  if (timerInterval !== null) {
+    clearInterval(timerInterval)
+  }
+})
 </script>
 
 <style scoped>
@@ -302,5 +339,11 @@ const removeFromCart = (productId: string) => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.reservation-timer {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #e67e22;
 }
 </style>

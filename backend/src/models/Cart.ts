@@ -30,6 +30,12 @@ export default class Cart extends Model<ICart> implements ICart {
   })
   userId!: string;
 
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  reservationExpires!: Date | null;
+
   @BelongsTo(() => User)
   user!: User;
 

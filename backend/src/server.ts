@@ -6,6 +6,8 @@ import { Sequelize } from "sequelize";
 import connectMongoDB from "./config/dbConfig";
 import { connectPostgresDB } from "./config/dbConfigPostgres";
 import { syncPostgresToMongo } from "./utils/syncPostgresToMongo";
+import { reservationExpirationQueue, stockReleaseQueue } from "./queues";
+import "./queues/processors";
 
 const port = process.env.PORT || 3000;
 
@@ -48,6 +50,15 @@ async function startServer() {
     await connectMongoDB();
     await connectPostgresDB();
     await syncPostgresToMongo();
+
+    // Ajoutez ces gestionnaires d'erreurs
+    reservationExpirationQueue.on("error", (error) => {
+      console.error("Reservation expiration queue error:", error);
+    });
+
+    stockReleaseQueue.on("error", (error) => {
+      console.error("Stock release queue error:", error);
+    });
 
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);

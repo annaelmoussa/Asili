@@ -72,7 +72,9 @@
       "quantityDecreased": "Quantity decreased.",
       "productRemoved": "Product removed from cart.",
       "productAdded": "Product added to cart",
-      "cartEmpty": "Cart empty."
+      "cartEmpty": "Cart empty.",
+      "reservationTime": "The product will be reserved for {time} minutes",
+      "expired": "Expired"
     },
     "payment": {
       "title": "Order payment",

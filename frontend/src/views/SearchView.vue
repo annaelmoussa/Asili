@@ -74,8 +74,8 @@ const selectedCategory = ref('')
 const selectedBrand = ref('')
 const minPrice = ref<number | null>(null)
 const maxPrice = ref<number | null>(null)
-const isPromotion = ref(false)
-const inStock = ref(false)
+const isPromotion = ref<boolean>(false)
+const inStock = ref<boolean>(false)
 
 const products = ref<IProduct[]>([])
 const loading = ref(false)
@@ -142,10 +142,10 @@ async function performSearch() {
       searchQuery.value,
       selectedCategory.value,
       selectedBrand.value,
-      minPrice.value ?? undefined,
-      maxPrice.value ?? undefined,
-      isPromotion.value,
-      inStock.value
+      minPrice.value?.toString() ?? undefined,
+      maxPrice.value?.toString() ?? undefined,
+      isPromotion.value.toString(),
+      inStock.value?.toString()
     )
     products.value = response.data
   } catch (err) {

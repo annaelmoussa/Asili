@@ -64,4 +64,10 @@ export class CartController extends Controller {
     console.log("Updating item quantity:", itemId, quantity);
     return this.cartService.updateItemQuantity(itemId, quantity);
   }
+
+  @Post("clear-expired-reservations")
+  public async clearExpiredReservations(): Promise<void> {
+    await this.cartService.clearExpiredReservations();
+    this.setStatus(200);
+  }
 }
