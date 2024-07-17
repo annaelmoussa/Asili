@@ -64,4 +64,13 @@ export class UserController extends Controller {
   ): Promise<void> {
     return new UserService().delete(userId);
   }
+
+  @Security("jwt")
+  @Get("password-status")
+  @OperationId("getPasswordStatus")
+  public async getPasswordStatus(@Request() request: any): Promise<{ needsChange: boolean }> {
+    const userId = (request as any).user.id;
+    const needsChange = await new UserService().shouldChangePassword(userId);
+    return { needsChange };
+  }
 }

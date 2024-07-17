@@ -2,6 +2,7 @@ import * as express from "express";
 import * as jwt from "jsonwebtoken";
 import { AuthService } from "./services/authService";
 import { IJwtPayload } from "./interfaces/IJwtPayload";
+import { UserService } from "./services/userService";
 
 const authService = new AuthService();
 const secret = process.env.JWT_SECRET || "your_jwt_secret";
@@ -24,7 +25,7 @@ export function expressAuthentication(
         return reject(new Error("Token is blacklisted"));
       }
 
-      jwt.verify(token, secret, (err, decoded) => {
+      jwt.verify(token, secret, async (err, decoded) => {
         if (err) {
           return reject(err);
         }
@@ -43,6 +44,11 @@ export function expressAuthentication(
         if (decoded && typeof decoded !== "string") {
           const jwtPayload = decoded as IJwtPayload;
           (request as any).user = jwtPayload;
+          const userService = new UserService();
+          const needsChange = await userService.shouldChangePassword(jwtPayload.userId);
+          if (needsChange) {
+            return reject(new Error("Password change required"));
+          }
         }
 
         resolve(decoded);
