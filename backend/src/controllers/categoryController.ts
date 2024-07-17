@@ -51,7 +51,14 @@ export class CategoryController extends Controller {
   }
 
   @Delete("{categoryId}")
-  public async deleteCategory(@Path() categoryId: string): Promise<void> {
-    await this.categoryService.delete(categoryId);
+  public async deleteCategory(
+    @Path() categoryId: string
+  ): Promise<string | void> {
+    const result = await this.categoryService.delete(categoryId);
+    if (!result.success) {
+      this.setStatus(400); // Bad Request
+      return result.message;
+    }
+    this.setStatus(204); // No Content
   }
 }

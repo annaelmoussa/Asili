@@ -3,6 +3,7 @@ import Category from "../models/Category";
 import { ICategory, CategoryCreationParams } from "../interfaces/ICategory";
 import { Sequelize, Transaction } from "sequelize";
 import { sequelize as defaultSequelize } from "../config/dbConfigPostgres";
+import Product from "../models/Product";
 
 export class CategoryService {
   private sequelize: Sequelize;
@@ -52,13 +53,43 @@ export class CategoryService {
 
   public async delete(
     id: string,
-    options?: { Transaction?: Transaction }
-  ): Promise<boolean> {
-    const deletedRowsCount = await Category.destroy({
-      where: { id },
-      ...options,
-    });
-    return deletedRowsCount > 0;
+    options?: { transaction?: Transaction }
+  ): Promise<{ success: boolean; message?: string }> {
+    const transaction =
+      options?.transaction || (await this.sequelize.transaction());
+
+    try {
+      // Vérifier si des produits sont associés à cette catégorie
+      const productsCount = await Product.count({
+        where: { categoryId: id },
+        transaction,
+      });
+
+      if (productsCount > 0) {
+        if (!options?.transaction) await transaction.rollback();
+        return {
+          success: false,
+          message: `Impossible de supprimer la catégorie. ${productsCount} produit(s) y sont associés.`,
+        };
+      }
+
+      const deletedRowsCount = await Category.destroy({
+        where: { id },
+        transaction,
+      });
+
+      if (!options?.transaction) await transaction.commit();
+      return {
+        success: deletedRowsCount > 0,
+        message:
+          deletedRowsCount > 0
+            ? "Catégorie supprimée avec succès."
+            : "Catégorie non trouvée.",
+      };
+    } catch (error) {
+      if (!options?.transaction) await transaction.rollback();
+      throw error;
+    }
   }
 
   public async getByName(name: string): Promise<ICategory | null> {
