@@ -27,22 +27,26 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/login',
     name: 'login',
-    component: LoginPage
+    component: LoginPage,
+    meta: { hideNavbar: true }
   },
   {
     path: '/signup',
     name: 'signup',
-    component: SignupPage
+    component: SignupPage,
+    meta: { hideNavbar: true }
   },
   {
     path: '/reset-password-request',
     name: 'reset-password-request',
-    component: ResetPasswordRequestView
+    component: ResetPasswordRequestView,
+    meta: { hideNavbar: true }
   },
   {
     path: '/reset-password',
     name: 'reset-password',
-    component : ResetPasswordView
+    component : ResetPasswordView,
+    meta: { hideNavbar: true }
   },
   {
     path: '/favorites',

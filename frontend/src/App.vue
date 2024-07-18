@@ -1,6 +1,8 @@
 <template>
   <LanguageSwitcher />
-  <StickyHeader />
+  <div v-if="!$route.meta.hideNavbar">
+    <StickyHeader />
+  </div>
   <router-view />
 </template>
 
@@ -10,10 +12,5 @@ import StickyHeader from '@/components/StickyHeader.vue'
 </script>
 
 <style scoped>
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f1f2f6;
-}
+
 </style>

@@ -1,5 +1,56 @@
 <template>
-  <div class="auth-container">
+  <div class="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
+    <div class="flex items-center justify-center py-12">
+      <form class="auth-form" @submit.prevent="handleLogin">
+        <div class="mx-auto grid w-[350px] gap-6">
+          <div class="grid gap-2 text-center">
+            <h1 class="text-3xl font-bold">
+              {{ $t('app.auth.loginTitle') }}
+            </h1>
+            <p class="text-balance text-muted-foreground">
+              {{ $t('app.auth.loginSubtitle') }}
+            </p>
+          </div>
+          <div class="grid gap-4">
+            <div class="grid gap-2">
+              <label for="email">{{ $t('app.auth.email') }}</label>
+              <Input type="email" v-model="email" id="email" :placeholder="$t('app.auth.email')" required />
+            </div>
+            <div class="grid gap-2">
+              <div class="flex items-center">
+                <Label for="password">{{ $t('app.auth.password') }}</Label>
+                <a @click="navigateToResetPassword" class="ml-auto inline-block text-sm underline" style="cursor:pointer">
+                  {{ $t('app.auth.forgotPassword') }}
+                </a>
+              </div>
+              <Input type="password" v-model="password" id="password" :placeholder="$t('app.auth.password')" />
+            </div>
+            <Button @click="handleLogin" type="submit" class="w-full">
+              {{ $t('app.auth.loginButton') }}
+            </Button>
+          </div>
+          <div class="mt-4 text-center text-sm">
+            {{ $t('app.auth.noAccountPrompt') }}
+            <button class="underline" @click="navigateToSignup">
+              {{ $t('app.auth.signupPrompt') }}
+            </button>
+          </div>
+          <p v-if="message" class="error-message">{{ message }}</p>
+          <Button v-if="message === 'Please confirm your email address'" @click="handleResendConfirmation">
+            {{ $t('app.auth.ResendConfirmation') }}
+          </Button>
+        </div>
+      </form>
+    </div>
+    <div class="hidden bg-muted lg:block">
+      <img src="../assets/authImage.png" alt="Image" width="1920" height="1080" class="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale" />
+    </div>
+  </div>
+
+
+
+
+  <!-- <div class="auth-container">
     <form class="auth-form" @submit.prevent="handleLogin">
       <h2>{{ $t('app.auth.loginTitle') }}</h2>
       <label for="email">{{ $t('app.auth.email') }}</label>
@@ -19,13 +70,16 @@
         Resend Confirmation Email
       </button>
     </form>
-  </div>
+  </div> -->
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 const email = ref('')
 const password = ref('')
@@ -33,13 +87,18 @@ const router = useRouter()
 const userStore = useUserStore()
 const message = computed(() => userStore.message);
 
+
 const handleLogin = async () => {
+  
   try {
     await userStore.login(email.value, password.value)
+    
     if (!userStore.message) {
       router.push('/')
     }
-  } catch (error) {}
+  } catch (error) {
+    
+  }
 }
 
 const handleResendConfirmation = async () => {
@@ -60,54 +119,8 @@ const navigateToResetPassword = () => {
 </script>
 
 <style scoped>
-.auth-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f1f2f6;
-}
-
-.auth-form {
-  background: white;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 400px;
-}
-
-.auth-form h2 {
-  margin-bottom: 20px;
-}
-
-.auth-form label {
-  display: block;
-  margin-bottom: 10px;
-}
-
-.auth-form input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-
-.auth-form button {
-  width: 100%;
-  padding: 10px;
-  background-color: #42b883;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.auth-form .loginLink {
-  color: #42b883;
-  cursor: pointer;
-  text-align: center;
+body{
+  overflow-y: hidden;
 }
 
 .error-message {
