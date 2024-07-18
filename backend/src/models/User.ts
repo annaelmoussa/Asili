@@ -16,6 +16,7 @@ import Widget from "./Widget";
 @Table({
   tableName: "User",
   timestamps: true,
+  paranoid: true,
 })
 export default class User extends Model<IUser> implements IUser {
   @Column({
@@ -82,6 +83,13 @@ export default class User extends Model<IUser> implements IUser {
 
   @HasMany(() => Widget)
   widgets!: Widget[];
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  isDeleted!: boolean;
 
   @BeforeCreate
   static setAdminScopes(instance: User) {

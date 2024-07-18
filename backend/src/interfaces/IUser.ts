@@ -7,4 +7,5 @@ export interface IUser {
   confirmationToken?: string;
   stripeCustomerId?: string;
   scopes?: string[];
+  isDeleted?: boolean;
 }
