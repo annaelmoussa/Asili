@@ -6,4 +6,5 @@ export interface IUser {
   isConfirmed?: boolean;
   token?: string;
   scopes?: string[];
+  isDeleted?: boolean;
 }
