@@ -15,6 +15,7 @@ import {
 } from "tsoa";
 import { IUser } from "../interfaces/IUser";
 import { UserService } from "../services/userService";
+import bcrypt from "bcrypt";
 
 @Route("users")
 @Tags("User")
@@ -40,6 +41,10 @@ export class UserController extends Controller {
   @Post()
   @OperationId("createUser")
   public async createUser(@Body() requestBody: IUser): Promise<IUser> {
+    // Hash the password before creating the user
+    if (requestBody.password) {
+      requestBody.password = await bcrypt.hash(requestBody.password, 10);
+    }
     this.setStatus(201);
     return new UserService().create(requestBody);
   }
@@ -52,6 +57,10 @@ export class UserController extends Controller {
     @Body() requestBody: Partial<IUser>,
     @Request() request: any
   ): Promise<IUser | null> {
+    // If the password is being updated, hash it
+    if (requestBody.password) {
+      requestBody.password = await bcrypt.hash(requestBody.password, 10);
+    }
     return new UserService().update(userId, requestBody);
   }
 

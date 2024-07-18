@@ -11,7 +11,7 @@
     :apiActions="apiActions"
   >
     <template #form="{ formData, errors, updateField }">
-      <UserForm :form-data="formData" :errors="errors" @update-field="updateField" />
+      <UserForm :form-data="formData" :errors="errors" :update-field="updateField" />
     </template>
     <template #view="{ item }">
       <UserDetails :user="item" />
@@ -23,7 +23,7 @@
 import { ref, onMounted } from 'vue'
 import { z } from 'zod'
 import { userApi } from '@/api/config'
-import type { IUser } from '@/api'
+import type { IUser, PartialIUser } from '@/api'
 import CrudPanel from '@/components/CrudPanel.vue'
 import type { TableColumn } from '@/types/table'
 import UserForm from '@/components/UserForm.vue'
@@ -65,11 +65,16 @@ export default {
         const response = await userApi.getAllUsers()
         users.value = response.data
       },
-      createItem: async (data: any): Promise<void> => {
+      createItem: async (data: IUser): Promise<void> => {
         await userApi.createUser(data)
       },
-      updateItem: async (id: string, data: any): Promise<void> => {
-        await userApi.updateUser(id, data)
+      updateItem: async (id: string, data: IUser): Promise<void> => {
+        const partialUser: PartialIUser = {}
+        if (data.email !== undefined) partialUser.email = data.email
+        if (data.password !== undefined) partialUser.password = data.password
+        if (data.role !== undefined) partialUser.role = data.role
+        if (data.isConfirmed !== undefined) partialUser.isConfirmed = data.isConfirmed
+        await userApi.updateUser(id, partialUser)
       },
       deleteItem: async (id: string): Promise<void> => {
         await userApi.deleteUser(id)
