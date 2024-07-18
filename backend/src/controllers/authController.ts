@@ -51,7 +51,7 @@ export class AuthController extends Controller {
       return await authService.login(body.email, body.password);
     } catch (error) {
       this.setStatus(401);
-      throw new Error("Invalid email or password");
+      throw new Error((error as Error).message);
     }
   }
 

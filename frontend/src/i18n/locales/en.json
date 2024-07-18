@@ -43,11 +43,21 @@
       "password": "Password",
       "loginTitle": "Login",
       "signupTitle": "Create an Account",
+      "signupSubtitle" : "Enter your information to create an account",
       "loginButton": "Login",
       "signupButton": "Sign Up",
       "loginPrompt": "Login",
       "signupPrompt": "Sign Up",
-      "dashboard": "Dashboard"
+      "dashboard": "Dashboard",
+      "loginSubtitle": "Enter your email to login",
+      "forgotPassword": "Forgot password?",
+      "noAccountPrompt": "Don't have an account?",
+      "loginErrorMessage": "An error occurred during login.",
+      "confirmPassword": "Confirm Password",
+      "alreadyAccountPrompt": "Already have an account?",
+      "ResendConfirmation": "Resend confirmation",
+      "resetPasswordTitle": "Reset Password",
+      "resetPasswordSubtitle": "Enter your email address to reset your password"
     },
     "ProductSingleView": {
       "loading": "Loading...",
