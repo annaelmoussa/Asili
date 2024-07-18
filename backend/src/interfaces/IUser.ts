@@ -8,4 +8,5 @@ export interface IUser {
   stripeCustomerId?: string;
   scopes?: string[];
   lastPasswordChange?: Date;
+  isDeleted?: boolean;
 }

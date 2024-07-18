@@ -22,7 +22,7 @@
 <script lang="ts">
 import { ref, onMounted } from 'vue'
 import { z } from 'zod'
-import { UserApi } from '@/api'
+import { userApi } from '@/api/config'
 import type { IUser } from '@/api'
 import CrudPanel from '@/components/CrudPanel.vue'
 import type { TableColumn } from '@/types/table'
@@ -34,7 +34,6 @@ export default {
   components: { CrudPanel, UserForm, UserDetails },
   setup() {
     const users = ref<IUser[]>([])
-    const userApi = new UserApi()
 
     const columns: TableColumn[] = [
       { key: 'id', label: 'ID', sortable: true, type: 'text' },

@@ -49,7 +49,7 @@ export class UserController extends Controller {
   @OperationId("updateUser")
   public async updateUser(
     @Path() userId: string,
-    @Body() requestBody: IUser,
+    @Body() requestBody: Partial<IUser>,
     @Request() request: any
   ): Promise<IUser | null> {
     return new UserService().update(userId, requestBody);
@@ -62,7 +62,7 @@ export class UserController extends Controller {
     @Path() userId: string,
     @Request() request: any
   ): Promise<void> {
-    return new UserService().delete(userId);
+    return new UserService().softDelete(userId);
   }
 
   @Security("jwt")
