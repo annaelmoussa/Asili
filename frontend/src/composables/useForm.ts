@@ -18,14 +18,31 @@ export function useForm<T extends FormData>(
   let abortController: AbortController | null = null
 
   const applyTransformations = (field: keyof T, value: any): any => {
-    if (transformations[field]) {
+    if (
+      transformations &&
+      field in transformations &&
+      typeof transformations[field] === 'function'
+    ) {
       return transformations[field]!(value)
     }
+
+    // Si le champ est un booléen dans formData, on le convertit en booléen
+    if (typeof (formData as any)[field] === 'boolean') {
+      return Boolean(value)
+    }
+
     return value
   }
 
   const updateField = (field: keyof T, value: any): void => {
-    ;(formData as any)[field] = applyTransformations(field, value)
+    const fieldType = typeof (formData as any)[field]
+
+    if (fieldType === 'boolean') {
+      ;(formData as any)[field] = Boolean(value)
+    } else {
+      ;(formData as any)[field] = applyTransformations(field, value)
+    }
+
     validateField(field)
   }
 
@@ -38,6 +55,17 @@ export function useForm<T extends FormData>(
         ;(errors as any)[field] = error.errors[0].message
       }
     }
+  }
+  const reset = () => {
+    Object.assign(formData, initialData)
+
+    // Fix for the TypeScript error
+    ;(Object.keys(errors) as Array<keyof typeof errors>).forEach((key) => {
+      delete errors[key]
+    })
+
+    serverError.value = null
+    isSubmitting.value = false
   }
 
   const validateForm = (): boolean => {
@@ -91,6 +119,7 @@ export function useForm<T extends FormData>(
     isSubmitting,
     updateField,
     submit,
-    cancelSubmit
+    cancelSubmit,
+    reset
   }
 }
