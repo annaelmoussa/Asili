@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, type PropType } from 'vue'
+import { defineComponent, ref, watch, type PropType } from 'vue'
 import AdvancedTable from './AdvancedTable.vue'
 import { useForm } from '@/composables/useForm'
 import { z } from 'zod'
@@ -85,8 +85,6 @@ interface TableItem {
   id: string | number
   [key: string]: any
 }
-
-
 
 export default defineComponent({
   name: 'CrudPanel',
@@ -116,17 +114,10 @@ export default defineComponent({
     const isEditing = ref(false)
     const currentViewItem = ref<TableItem | null>(null)
 
-    const {
-      formData,
-      errors,
-      isSubmitting,
-      updateField,
-      submit,
-      cancelSubmit // Changez ceci de 'cancel' à 'cancelSubmit'
-    } = useForm(
+    const { formData, errors, isSubmitting, updateField, submit, reset } = useForm(
       props.initialFormData,
       props.formTransformations || {},
-      props.formSchema || z.object({}), // Utilisez un objet Zod vide si formSchema n'est pas fourni
+      props.formSchema || z.object({}),
       async (data: any) => {
         if (isEditing.value) {
           await props.apiActions.updateItem(data.id, data)
@@ -139,7 +130,8 @@ export default defineComponent({
     )
 
     const resetForm = () => {
-      cancelSubmit()
+      reset()
+      Object.assign(formData, props.initialFormData)
     }
 
     const openModal = (item?: any) => {
@@ -157,6 +149,12 @@ export default defineComponent({
       isModalVisible.value = false
       resetForm()
     }
+
+    watch(isModalVisible, (newValue) => {
+      if (!newValue) {
+        resetForm()
+      }
+    })
 
     const viewItem = (item: any) => {
       currentViewItem.value = item

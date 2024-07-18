@@ -282,6 +282,12 @@ export interface IUser {
      * @memberof IUser
      */
     'scopes'?: Array<string>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof IUser
+     */
+    'isDeleted'?: boolean;
 }
 /**
  * 
@@ -517,6 +523,61 @@ export interface PartialIProduct {
      * @memberof PartialIProduct
      */
     'categoryName'?: string;
+}
+/**
+ * Make all properties in T optional
+ * @export
+ * @interface PartialIUser
+ */
+export interface PartialIUser {
+    /**
+     * 
+     * @type {string}
+     * @memberof PartialIUser
+     */
+    'id'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PartialIUser
+     */
+    'email'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PartialIUser
+     */
+    'password'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PartialIUser
+     */
+    'role'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PartialIUser
+     */
+    'isConfirmed'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof PartialIUser
+     */
+    'token'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof PartialIUser
+     */
+    'scopes'?: Array<string>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PartialIUser
+     */
+    'isDeleted'?: boolean;
 }
 /**
  * 
@@ -1828,7 +1889,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteBrand(brandId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async deleteBrand(brandId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteBrand(brandId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteBrand']?.[localVarOperationServerIndex]?.url;
@@ -1840,7 +1901,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteCategory(categoryId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async deleteCategory(categoryId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteCategory(categoryId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteCategory']?.[localVarOperationServerIndex]?.url;
@@ -2104,7 +2165,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteBrand(brandId: string, options?: any): AxiosPromise<void> {
+        deleteBrand(brandId: string, options?: any): AxiosPromise<string> {
             return localVarFp.deleteBrand(brandId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2113,7 +2174,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteCategory(categoryId: string, options?: any): AxiosPromise<void> {
+        deleteCategory(categoryId: string, options?: any): AxiosPromise<string> {
             return localVarFp.deleteCategory(categoryId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2684,15 +2745,15 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
         /**
          * 
          * @param {string} userId 
-         * @param {IUser} iUser 
+         * @param {PartialIUser} partialIUser 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateUser: async (userId: string, iUser: IUser, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateUser: async (userId: string, partialIUser: PartialIUser, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'userId' is not null or undefined
             assertParamExists('updateUser', 'userId', userId)
-            // verify required parameter 'iUser' is not null or undefined
-            assertParamExists('updateUser', 'iUser', iUser)
+            // verify required parameter 'partialIUser' is not null or undefined
+            assertParamExists('updateUser', 'partialIUser', partialIUser)
             const localVarPath = `/users/{userId}`
                 .replace(`{${"userId"}}`, encodeURIComponent(String(userId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -2716,7 +2777,7 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(iUser, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(partialIUser, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -2783,12 +2844,12 @@ export const UserApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {string} userId 
-         * @param {IUser} iUser 
+         * @param {PartialIUser} partialIUser 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateUser(userId: string, iUser: IUser, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IUser>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateUser(userId, iUser, options);
+        async updateUser(userId: string, partialIUser: PartialIUser, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IUser>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateUser(userId, partialIUser, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UserApi.updateUser']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -2841,12 +2902,12 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
         /**
          * 
          * @param {string} userId 
-         * @param {IUser} iUser 
+         * @param {PartialIUser} partialIUser 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateUser(userId: string, iUser: IUser, options?: any): AxiosPromise<IUser> {
-            return localVarFp.updateUser(userId, iUser, options).then((request) => request(axios, basePath));
+        updateUser(userId: string, partialIUser: PartialIUser, options?: any): AxiosPromise<IUser> {
+            return localVarFp.updateUser(userId, partialIUser, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -2904,13 +2965,13 @@ export class UserApi extends BaseAPI {
     /**
      * 
      * @param {string} userId 
-     * @param {IUser} iUser 
+     * @param {PartialIUser} partialIUser 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof UserApi
      */
-    public updateUser(userId: string, iUser: IUser, options?: RawAxiosRequestConfig) {
-        return UserApiFp(this.configuration).updateUser(userId, iUser, options).then((request) => request(this.axios, this.basePath));
+    public updateUser(userId: string, partialIUser: PartialIUser, options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).updateUser(userId, partialIUser, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
