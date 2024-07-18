@@ -43,11 +43,21 @@
       "password": "Mot de passe",
       "loginTitle": "Se connecter",
       "signupTitle": "Créer un Compte",
+      "signupSubtitle" : "Entrez vos informations pour créer un compte",
       "loginButton": "Se connecter",
       "signupButton": "Créer un compte",
       "loginPrompt": "Se connecter",
       "signupPrompt": "Créer un compte",
-      "dashboard": "Tableau de bord"
+      "dashboard": "Tableau de bord",
+      "loginSubtitle": "Entrer votre mail pour vous connecter",
+      "forgotPassword": "Mot de passe oublié?",
+      "noAccountPrompt": "Pas encore de compte?",
+      "loginErrorMessage": "Une erreur s'est produite lors de la connexion.",
+      "alreadyAccountPrompt": "Déjà un compte?",
+      "confirmPassword": "Confirmer le mot de passe",
+      "ResendConfirmation": "Renvoyer la confirmation",
+      "resetPasswordTitle": "Réinitialiser le mot de passe",
+      "resetPasswordSubtitle": "Entrez votre adresse e-mail pour réinitialiser votre mot de passe"
     },
     "ProductSingleView": {
       "loading": "Chargement du produit...",

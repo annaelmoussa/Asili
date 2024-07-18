@@ -1,96 +1,131 @@
 <template>
-    <LanguageSwitcher />
-    <AppHeader />
-    <div class="auth-container">
-      <div class="auth-form">
-        <h2>Modifier mon mot de passe</h2>
-        <label for="password">Password</label>
-        <input type="password" v-model="password" id="password" placeholder="Password" />
-        <label for="confirm_password">Confirm Password</label>
-        <input type="password" v-model="confirm_password" id="confirm_password" placeholder="Confirm Password" />
-        <button @click="requestReset">Request Password Reset</button>
-        <p v-if="message">{{ message }}</p>
+  <div class="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
+    <div class="flex items-center justify-center py-12">
+      <div class="mx-auto grid w-[350px] gap-6">
+        <div class="grid gap-2 text-center">
+          <h1 class="text-3xl font-bold">
+            {{ $t('app.auth.resetPasswordTitle') }}
+          </h1>
+        </div>
+        <div class="grid gap-4">
+          <div class="grid gap-2">
+            <div class="flex items-center">
+              <Label for="password">{{ $t('app.auth.password') }}</Label>
+            </div>      
+            <Input type="password" v-model="password" id="password" :placeholder="$t('app.auth.password')" @input="validatePassword"/>
+          </div>
+          <div class="grid gap-2">
+            <div class="flex items-center">
+              <Label for="confirmPassword">{{ $t('app.auth.confirmPassword') }}</Label>
+            </div>      
+            <Input type="password" v-model="confirmPassword" id="confirmPassword" :placeholder="$t('app.auth.confirmPassword')" @input="validateConfirmPassword"/>
+          </div>
+          <div v-if="formErrors.length" class="text-red-500 text-sm error-list">
+            <ul>
+              <li v-for="error in formErrors" :key="error">{{ error }}</li>
+            </ul>
+          </div>
+          <Button @click="requestReset" type="submit" class="w-full" :disabled="!isFormValid">
+            {{ $t('app.auth.resetPasswordTitle') }}
+          </Button>
+        </div>
+        <div class="mt-4 text-center text-sm">
+          <button class="underline" @click="navigateToLogin">
+            {{ $t('app.auth.loginPrompt') }}
+          </button>
+        </div>
+        <p class="infoMessage" v-if="message">{{ message }}</p>
       </div>
     </div>
-  </template>
-  
-  <script setup lang="ts">
-    import AppHeader from "@/components/AppHeader.vue";
-    import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
-    import { ref } from 'vue'
-    import { useRouter } from 'vue-router'
-    import { useRoute } from 'vue-router'
-    import { authApi } from '@/api/config'
-    import type { UpdatePasswordRequest } from '@/api'
-  const router = useRouter()
-  const route = useRoute();
-  const password = ref('');
-  const confirm_password = ref('');
-  const message = ref('');
-  const token = route.query.token as string;
- 
-  
-  const requestReset = async () => {
-    
-    try{
-        const changePasswordRequest: UpdatePasswordRequest = {token,password: password.value, confirm_password: confirm_password.value };
-        await authApi.resetPassword(changePasswordRequest);
-        router.push('/login');
-    }catch (error){
-        console.error('Change password failed', error);
+    <div class="hidden bg-muted lg:block">
+      <img src="../assets/authImage.png" alt="Image" width="1920" height="1080" class="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale" />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { z } from 'zod'
+import { authApi } from '@/api/config'
+import type { UpdatePasswordRequest } from '@/api'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+
+const router = useRouter()
+const route = useRoute()
+const password = ref('')
+const confirmPassword = ref('')
+const formErrors = ref<string[]>([])
+const message = ref('')
+const token = route.query.token as string
+
+const passwordSchema = z.string()
+  .min(12, { message: "Le mot de passe doit contenir au moins 12 caractères" })
+  .regex(/^(?=.*[a-z])/, { message: "Le mot de passe doit contenir au moins une lettre minuscule" })
+  .regex(/^(?=.*[A-Z])/, { message: "Le mot de passe doit contenir au moins une lettre majuscule" })
+  .regex(/^(?=.*\d)/, { message: "Le mot de passe doit contenir au moins un chiffre" })
+  .regex(/^(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/, { message: "Le mot de passe doit contenir au moins un symbole" })
+
+const validatePassword = () => {
+  try {
+    passwordSchema.parse(password.value)
+    formErrors.value = formErrors.value.filter(error => !error.includes("mot de passe"))
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const passwordErrors = error.errors.map(err => err.message)
+      formErrors.value = [...new Set([...formErrors.value.filter(error => !error.includes("mot de passe")), ...passwordErrors])]
     }
-    
   }
-  </script>
-  
-  <style scoped>
-  .auth-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f1f2f6;
+  validateConfirmPassword()
+}
+
+const validateConfirmPassword = () => {
+  if (password.value !== confirmPassword.value) {
+    const confirmError = "Les mots de passe ne correspondent pas"
+    if (!formErrors.value.includes(confirmError)) {
+      formErrors.value.push(confirmError)
+    }
+  } else {
+    formErrors.value = formErrors.value.filter(error => error !== "Les mots de passe ne correspondent pas")
   }
-  
-  .auth-form {
-    background: white;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
+}
+
+const isFormValid = computed(() => {
+  return password.value && confirmPassword.value && formErrors.value.length === 0
+})
+
+const requestReset = async () => {
+  if (!isFormValid.value) return
+
+  try {
+    const changePasswordRequest: UpdatePasswordRequest = { token, password: password.value, confirm_password: confirmPassword.value }
+    await authApi.resetPassword(changePasswordRequest)
+    router.push('/login')
+  } catch (error) {
+    console.error('Change password failed', error)
   }
-  
-  .auth-form h2 {
-    margin-bottom: 20px;
-  }
-  
-  .auth-form label {
-    display: block;
-    margin-bottom: 10px;
-  }
-  
-  .auth-form input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  .auth-form button {
-    width: 100%;
-    padding: 10px;
-    background-color: #42b883;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  .auth-form p {
-    color: #42b883;
-    text-align: center;
-  }
-  </style>
-  
+}
+
+const navigateToLogin = () => {
+  router.push('/login')
+}
+</script>
+
+<style scoped>
+.error-list ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin-top: 0.5em;
+}
+
+.error-list li {
+  margin-bottom: 0.25em;
+}
+
+.infoMessage {
+  color: #42b883;
+  text-align: center;
+}
+</style>
