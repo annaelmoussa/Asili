@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/User";
 import TokenBlacklist from "../models/TokenBlacklist";
 import { IUser } from "../interfaces/IUser";
+import { IJwtPayload } from "../interfaces/IJwtPayload";
 
 export class AuthService {
   private secret = process.env.JWT_SECRET || "your_jwt_secret";
@@ -16,18 +17,17 @@ export class AuthService {
       throw new Error("Invalid credentials");
     }
 
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        email: user.email,
-        role: user.role,
-        scopes: user.scopes,
-      },
-      this.secret,
-      {
-        expiresIn: "1h",
-      }
-    );
+    const payload: IJwtPayload = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      scopes: user.scopes,
+      password: user.password,
+    };
+
+    const token = jwt.sign(payload, this.secret, {
+      expiresIn: "1h",
+    });
 
     return { user: user.toJSON() as IUser, token };
   }
@@ -50,8 +50,8 @@ export class AuthService {
 
   async getUser(token: string): Promise<IUser | null> {
     try {
-      const decoded: any = jwt.verify(token, this.secret);
-      const user = await User.findByPk(decoded.userId);
+      const decoded = jwt.verify(token, this.secret) as IJwtPayload;
+      const user = await User.findByPk(decoded.id);
       return user ? (user.toJSON() as IUser) : null;
     } catch (error) {
       return null;

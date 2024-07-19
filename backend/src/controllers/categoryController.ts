@@ -8,6 +8,7 @@ import {
   Delete,
   Route,
   SuccessResponse,
+  Security,
 } from "tsoa";
 import { ICategory, CategoryCreationParams } from "../interfaces/ICategory";
 import { CategoryService } from "../services/categoryService";
@@ -33,6 +34,7 @@ export class CategoryController extends Controller {
     return this.categoryService.get(categoryId);
   }
 
+  @Security("jwt", ["ROLE_ADMIN"])
   @SuccessResponse("201", "Created")
   @Post()
   public async createCategory(
@@ -42,6 +44,7 @@ export class CategoryController extends Controller {
     return this.categoryService.create(requestBody);
   }
 
+  @Security("jwt", ["ROLE_ADMIN"])
   @Put("{categoryId}")
   public async updateCategory(
     @Path() categoryId: string,
@@ -50,6 +53,7 @@ export class CategoryController extends Controller {
     return this.categoryService.update(categoryId, requestBody);
   }
 
+  @Security("jwt", ["ROLE_ADMIN"])
   @Delete("{categoryId}")
   public async deleteCategory(
     @Path() categoryId: string

@@ -16,37 +16,44 @@ import {
 import { IUser } from "../interfaces/IUser";
 import { UserService } from "../services/userService";
 import bcrypt from "bcrypt";
+import { AuthenticatedRequest } from "../types/AuthenticatedRequest";
+import { UnauthorizedError } from "../errors/UnauthorizedError";
 
+@Security("jwt")
 @Route("users")
 @Tags("User")
 export class UserController extends Controller {
+  private userService: UserService = new UserService();
+
   @Security("jwt")
   @Get("{userId}")
   @OperationId("getUserById")
   public async getUser(
     @Path() userId: string,
-    @Request() request: any
+    @Request() request: AuthenticatedRequest
   ): Promise<IUser | null> {
-    return new UserService().get(userId);
+    await this.checkAuthorization(request, userId);
+    return this.userService.get(userId);
   }
 
-  @Security("jwt")
+  @Security("jwt", ["ROLE_ADMIN"])
   @Get()
   @OperationId("getAllUsers")
-  public async getUsers(@Request() request: any): Promise<IUser[]> {
-    return new UserService().getAll();
+  public async getUsers(
+    @Request() request: AuthenticatedRequest
+  ): Promise<IUser[]> {
+    return this.userService.getAll();
   }
 
   @SuccessResponse("201", "Created")
   @Post()
   @OperationId("createUser")
   public async createUser(@Body() requestBody: IUser): Promise<IUser> {
-    // Hash the password before creating the user
     if (requestBody.password) {
       requestBody.password = await bcrypt.hash(requestBody.password, 10);
     }
     this.setStatus(201);
-    return new UserService().create(requestBody);
+    return this.userService.create(requestBody);
   }
 
   @Security("jwt")
@@ -55,13 +62,13 @@ export class UserController extends Controller {
   public async updateUser(
     @Path() userId: string,
     @Body() requestBody: Partial<IUser>,
-    @Request() request: any
+    @Request() request: AuthenticatedRequest
   ): Promise<IUser | null> {
-    // If the password is being updated, hash it
+    await this.checkAuthorization(request, userId);
     if (requestBody.password) {
       requestBody.password = await bcrypt.hash(requestBody.password, 10);
     }
-    return new UserService().update(userId, requestBody);
+    return this.userService.update(userId, requestBody);
   }
 
   @Security("jwt")
@@ -69,8 +76,27 @@ export class UserController extends Controller {
   @OperationId("deleteUser")
   public async deleteUser(
     @Path() userId: string,
-    @Request() request: any
+    @Request() request: AuthenticatedRequest
   ): Promise<void> {
-    return new UserService().softDelete(userId);
+    await this.checkAuthorization(request, userId);
+    return this.userService.softDelete(userId);
+  }
+
+  private async checkAuthorization(
+    request: AuthenticatedRequest,
+    userId: string
+  ): Promise<void> {
+    const requestingUserId = request.user.id;
+    const userRole = request.user.role;
+
+    if (userRole === "ROLE_ADMIN") {
+      return; // Admins are always authorized
+    }
+
+    if (requestingUserId !== userId) {
+      throw new UnauthorizedError(
+        "You are not authorized to perform this action on another user's account"
+      );
+    }
   }
 }

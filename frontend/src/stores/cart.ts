@@ -38,7 +38,7 @@ export const useCartStore = defineStore('cart', {
       const userStore = useUserStore()
       if (userStore.isAuthenticated && userStore.user?.id) {
         try {
-          const response = await defaultApi.getCartItems(userStore.user.id)
+          const response = await defaultApi.getCartItems()
           this.items = response.data as CartItem[]
         } catch (error) {
           console.error('Failed to fetch cart:', error)
@@ -61,7 +61,7 @@ export const useCartStore = defineStore('cart', {
           existingItem.quantity++
           await this.increment(product.id)
         } else {
-          await defaultApi.addItem(userStore.user.id, { productId: product.id, quantity: 1 })
+          await defaultApi.addItem({ productId: product.id, quantity: 1 })
           await this.fetchCart()
         }
       } else {

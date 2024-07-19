@@ -18,7 +18,7 @@ export const useWidgetsStore = defineStore('widgets', () => {
   const userStore = useUserStore()
 
   const fetchWidgets = async () => {
-    if (!userStore.hasScope('read:widgets')) {
+    if (!userStore.hasScope('ROLE_ADMIN')) {
       throw new Error('User does not have the required scope to fetch widgets')
     }
 
@@ -26,7 +26,7 @@ export const useWidgetsStore = defineStore('widgets', () => {
     try {
       const response = await widgetsApi.getWidgets()
       widgets.value = response.data.map((widget) => ({
-        id: widget.id,
+        id: widget.id ?? '',
         title: widget.name,
         type: widget.type as 'Area' | 'Line' | 'Bar' | 'Donut',
         data: widget.settings,
@@ -48,7 +48,7 @@ export const useWidgetsStore = defineStore('widgets', () => {
       throw new Error('User ID is undefined')
     }
 
-    if (!userStore.hasScope('create:widgets')) {
+    if (!userStore.hasScope('ROLE_ADMIN')) {
       throw new Error('User does not have the required scope to create widgets')
     }
 
@@ -69,10 +69,10 @@ export const useWidgetsStore = defineStore('widgets', () => {
 
       const newWidget: Widget = {
         ...widget,
-        id: response.data.id
+        id: response.data.id ?? ''
       }
 
-      if (!widgets.value.some(w => w.id === newWidget.id)) {
+      if (!widgets.value.some((w) => w.id === newWidget.id)) {
         widgets.value.push(newWidget)
       }
 
@@ -84,7 +84,7 @@ export const useWidgetsStore = defineStore('widgets', () => {
   }
 
   const removeWidget = async (id: string) => {
-    if (!userStore.hasScope('delete:widgets')) {
+    if (!userStore.hasScope('ROLE_ADMIN')) {
       throw new Error('User does not have the required scope to delete widgets')
     }
 
@@ -108,7 +108,7 @@ export const useWidgetsStore = defineStore('widgets', () => {
       throw new Error('User ID is undefined')
     }
 
-    if (!userStore.hasScope('update:widgets')) {
+    if (!userStore.hasScope('ROLE_ADMIN')) {
       throw new Error('User does not have the required scope to update widgets')
     }
 

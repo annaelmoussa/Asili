@@ -13,23 +13,29 @@ import {
 } from "tsoa";
 import { WidgetsService } from "../services/WidgetsService";
 import { IWidget, WidgetCreationParams } from "../interfaces/IWidget";
+import express from "express";
+import { IJwtPayload } from "../interfaces/IJwtPayload";
+import { AuthenticatedRequest } from "../types/AuthenticatedRequest";
 
 @Route("widgets")
 @Tags("Widgets")
-@Security("jwt")
+@Security("jwt", ["ROLE_ADMIN"])
 export class WidgetsController extends Controller {
   @Get()
-  public async getWidgets(@Request() request: any): Promise<IWidget[]> {
-    return new WidgetsService().getAllByUser(request.user.userId);
+  public async getWidgets(
+    @Request() request: AuthenticatedRequest
+  ): Promise<IWidget[]> {
+    const user = request.user as IJwtPayload;
+    return new WidgetsService().getAllByUser(user.id);
   }
 
   @Post()
   public async createWidget(
     @Body() requestBody: WidgetCreationParams,
-    @Request() request: any
+    @Request() request: AuthenticatedRequest
   ): Promise<IWidget> {
-    const userId = request.user.userId;
-    return new WidgetsService().create(userId, requestBody);
+    const user = request.user as IJwtPayload;
+    return new WidgetsService().create(user.id, requestBody);
   }
 
   @Put("{widgetId}")

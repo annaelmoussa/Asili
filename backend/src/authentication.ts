@@ -1,51 +1,69 @@
-import * as express from "express";
-import * as jwt from "jsonwebtoken";
+import { Request } from "express";
+import { verify, Secret, JwtPayload } from "jsonwebtoken";
 import { AuthService } from "./services/authService";
 import { IJwtPayload } from "./interfaces/IJwtPayload";
 
 const authService = new AuthService();
-const secret = process.env.JWT_SECRET || "your_jwt_secret";
+const secret = process.env.JWT_SECRET;
+if (!secret) {
+  throw new Error("JWT_SECRET is not defined");
+}
 
 export function expressAuthentication(
-  request: express.Request,
+  request: Request,
   securityName: string,
   scopes?: string[]
-): Promise<any> {
+): Promise<JwtPayload | string> {
   if (securityName === "jwt") {
     const token = request.headers["authorization"]?.split(" ")[1];
 
-    return new Promise(async (resolve, reject) => {
+    return new Promise<JwtPayload | string>((resolve, reject) => {
       if (!token) {
-        return reject(new Error("No token provided"));
+        reject(new Error("No token provided"));
+        return;
       }
 
-      const isBlacklisted = await authService.isTokenBlacklisted(token);
-      if (isBlacklisted) {
-        return reject(new Error("Token is blacklisted"));
-      }
-
-      jwt.verify(token, secret, (err, decoded) => {
-        if (err) {
-          return reject(err);
+      authService.isTokenBlacklisted(token).then((isBlacklisted) => {
+        if (isBlacklisted) {
+          reject(new Error("Token is blacklisted"));
+          return;
         }
 
-        if (decoded && typeof decoded !== "string" && scopes) {
-          const jwtPayload = decoded as IJwtPayload;
-          const tokenScopes = jwtPayload.scopes as string[];
-          if (
-            !tokenScopes ||
-            !scopes.every((scope) => tokenScopes.includes(scope))
-          ) {
-            return reject(new Error("JWT does not contain required scope."));
+        verify(token, secret as Secret, (err, decoded) => {
+          if (err) {
+            reject(err);
+            return;
           }
-        }
 
-        if (decoded && typeof decoded !== "string") {
-          const jwtPayload = decoded as IJwtPayload;
-          (request as any).user = jwtPayload;
-        }
+          if (!decoded) {
+            reject(new Error("Failed to decode token"));
+            return;
+          }
 
-        resolve(decoded);
+          if (typeof decoded !== "string") {
+            const jwtPayload = decoded as IJwtPayload;
+            (request as Request & { user: IJwtPayload }).user = jwtPayload;
+
+            if (scopes && scopes.length > 0) {
+              const tokenScopes = jwtPayload.scopes as string[];
+
+              const hasRequiredScope = scopes.some((requiredScope) => {
+                const [scope1, scope2] = requiredScope.split("|");
+                return (
+                  tokenScopes.includes(scope1) ||
+                  (scope2 && tokenScopes.includes(scope2))
+                );
+              });
+
+              if (!hasRequiredScope) {
+                reject(new Error("JWT does not contain required scope."));
+                return;
+              }
+            }
+          }
+
+          resolve(decoded);
+        });
       });
     });
   }

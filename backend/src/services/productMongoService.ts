@@ -26,9 +26,23 @@ export class ProductMongoService {
 
   public async search(
     query: string | undefined,
-    facets: any
+    facets: {
+      category?: string;
+      brand?: string;
+      isPromotion?: string;
+      inStock?: string;
+      minPrice?: string;
+      maxPrice?: string;
+    }
   ): Promise<IProduct[]> {
-    const searchQuery: any = {};
+    const searchQuery: {
+      $or?: { [key: string]: { $regex: string; $options: string } }[];
+      categoryId?: string;
+      brandId?: string;
+      isPromotion?: boolean;
+      stock?: { $gt: number };
+      price?: { $gte?: number; $lte?: number };
+    } = {};
 
     if (query) {
       searchQuery.$or = [
