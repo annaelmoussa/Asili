@@ -13,8 +13,10 @@ export interface IProduct {
   isPromotion: boolean;
   brand?: IBrand;
   category?: ICategory;
-  brandName?: string; 
+  brandName?: string;
   categoryName?: string;
+  lowStockThreshold: number;
+  stockHistory: { date: Date; quantity: number }[];
 }
 
 export interface ProductCreationParams {
@@ -26,6 +28,7 @@ export interface ProductCreationParams {
   stock: number;
   image?: string;
   isPromotion: boolean;
+  lowStockThreshold: number;
 }
 
 export interface ProductAttributes extends IProduct {

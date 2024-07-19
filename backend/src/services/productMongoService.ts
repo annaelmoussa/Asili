@@ -10,6 +10,8 @@ export class ProductMongoService {
         ...productData,
         brandName: brand?.name,
         categoryName: category?.name,
+        lowStockThreshold: product.lowStockThreshold,
+        stockHistory: product.stockHistory,
       },
       {
         upsert: true,
@@ -55,5 +57,33 @@ export class ProductMongoService {
     const results = await ProductMongo.find(searchQuery);
     console.log("Search results:", results);
     return results;
+  }
+
+  public async updateStock(
+    productId: string,
+    quantity: number
+  ): Promise<IProduct | null> {
+    const product = await ProductMongo.findOne({ id: productId });
+    if (!product) return null;
+
+    product.stock += quantity;
+    product.stockHistory.push({ date: new Date(), quantity: product.stock });
+
+    await product.save();
+    return product.toObject();
+  }
+
+  public async getLowStockProducts(): Promise<IProduct[]> {
+    const products = await ProductMongo.find({
+      $expr: { $lte: ["$stock", "$lowStockThreshold"] },
+    });
+    return products.map((product) => product.toObject());
+  }
+
+  public async getStockHistory(
+    productId: string
+  ): Promise<{ date: Date; quantity: number }[]> {
+    const product = await ProductMongo.findOne({ id: productId });
+    return product ? product.stockHistory : [];
   }
 }
