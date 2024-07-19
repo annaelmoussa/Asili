@@ -3,9 +3,10 @@ import Brand from "../models/Brand";
 import Category from "../models/Category";
 import { IProduct, ProductCreationParams } from "../interfaces/IProduct";
 import { ProductMongoService } from "./productMongoService";
-import { Op, Sequelize, Transaction } from "sequelize";
+import { DataTypes, Op, Sequelize, Transaction } from "sequelize";
 import { sequelize as defaultSequelize } from "../config/dbConfigPostgres";
 import CartItem from "../models/CartItem";
+import { v4 as uuidv4 } from "uuid";
 
 const productMongoService = new ProductMongoService();
 
@@ -45,10 +46,14 @@ export class ProductService {
   ): Promise<IProduct> {
     console.time("create-product");
     try {
-      const product = await Product.create(
-        productCreationParams as any,
-        options
-      );
+      // Add missing properties to match ProductAttributes
+      const fullProductParams = {
+        ...productCreationParams,
+        id: uuidv4(), // Generate a new UUID
+        stockHistory: [], // Initialize with an empty array
+      };
+
+      const product = await Product.create(fullProductParams, options);
       const productData = await this.get(product.id, options);
       if (productData) {
         await productMongoService.syncWithPostgres(productData);
@@ -88,13 +93,11 @@ export class ProductService {
     const t = options?.transaction || (await this.sequelize.transaction());
 
     try {
-      // First, remove the product from all carts
       await CartItem.destroy({
         where: { productId: id },
         transaction: t,
       });
 
-      // Then delete the product
       const deletedRowsCount = await Product.destroy({
         where: { id },
         transaction: t,
@@ -121,7 +124,14 @@ export class ProductService {
 
   public async search(
     query: string | undefined,
-    facets: any
+    facets: {
+      category?: string;
+      brand?: string;
+      isPromotion?: string;
+      inStock?: string;
+      minPrice?: string;
+      maxPrice?: string;
+    }
   ): Promise<IProduct[]> {
     console.log("Searching with query:", query, "and facets:", facets);
     return productMongoService.search(query, facets);
@@ -133,7 +143,7 @@ export class ProductService {
       attributes: ["name"],
       raw: true,
     });
-    return categories.map((category) => category.name);
+    return categories.map((category: { name: string }) => category.name);
   }
 
   public async getBrands(): Promise<string[]> {
@@ -141,7 +151,7 @@ export class ProductService {
       attributes: ["name"],
       raw: true,
     });
-    return brands.map((brand) => brand.name);
+    return brands.map((brand: { name: string }) => brand.name);
   }
 
   public async updateStock(

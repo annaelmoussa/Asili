@@ -20,20 +20,25 @@
 </template>
 
 <script lang="ts">
-import { ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
 import { z } from 'zod'
 import { defaultApi } from '@/api/config'
-import type { IBrand, PartialIBrand } from '@/api'
+import type { IBrand } from '@/api'
 import CrudPanel from '@/components/CrudPanel.vue'
 import type { TableColumn } from '@/types/table'
 import BrandForm from '@/components/BrandForm.vue'
 import BrandDetails from '@/components/BrandDetails.vue'
 
-export default {
+interface TableItem {
+  id: string | number
+  [key: string]: any
+}
+
+export default defineComponent({
   name: 'PanelBrands',
   components: { CrudPanel, BrandForm, BrandDetails },
   setup() {
-    const brands = ref<IBrand[]>([])
+    const brands = ref<TableItem[]>([])
 
     const columns: TableColumn[] = [
       { key: 'id', label: 'ID', sortable: true, type: 'text' },
@@ -53,18 +58,16 @@ export default {
     const apiActions = {
       fetchItems: async () => {
         const response = await defaultApi.getBrands_1()
-        brands.value = response.data
+        brands.value = response.data.map((brand) => ({
+          ...brand,
+          id: brand.id || ''
+        }))
       },
-      createItem: async (data: PartialIBrand): Promise<void> => {
-        await defaultApi.createBrand(data)
+      createItem: async (data: { name: string }): Promise<void> => {
+        await defaultApi.createBrand({ name: data.name })
       },
-      updateItem: async (id: string, data: PartialIBrand): Promise<void> => {
-        // Assurez-vous que seuls id et name sont envoyés
-        const updateData: PartialIBrand = {
-          id,
-          name: data.name
-        }
-        await defaultApi.updateBrand(id, updateData)
+      updateItem: async (id: string, data: { name: string }): Promise<void> => {
+        await defaultApi.updateBrand(id, { name: data.name })
       },
       deleteItem: async (id: string): Promise<void> => {
         await defaultApi.deleteBrand(id)
@@ -84,5 +87,5 @@ export default {
       apiActions
     }
   }
-}
+})
 </script>

@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Route, Tags, Request, Query, SuccessResponse, OperationId } from "tsoa";
 import { AuthService } from "../services/authService";
 import { IUser } from "../interfaces/IUser";
+import { AuthenticatedRequest } from "../types/AuthenticatedRequest";
 
 interface ResendConfirmationRequest {
   email: string;
@@ -73,7 +74,9 @@ export class AuthController extends Controller {
 
   @Get("user")
   @OperationId("getAuthenticatedUser")
-  public async getUser(@Request() request: any): Promise<IUser | null> {
+  public async getUser(
+    @Request() request: AuthenticatedRequest
+  ): Promise<IUser | null> {
     const token = request.headers.authorization?.split(" ")[1];
     if (!token) {
       throw new Error("Token is missing");

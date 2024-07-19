@@ -54,7 +54,7 @@ export const useCartStore = defineStore('cart', {
       const userStore = useUserStore()
       if (userStore.isAuthenticated && userStore.user?.id) {
         try {
-          const response = await defaultApi.getCartItems(userStore.user.id)
+          const response = await defaultApi.getCartItems()
           this.items = response.data.map((item: ICartItem) => ({
             id: item.id || item.productId,
             productId: item.productId,
@@ -87,7 +87,7 @@ export const useCartStore = defineStore('cart', {
           existingItem.quantity++
           await this.increment(existingItem.id)
         } else {
-          await defaultApi.addItem(userStore.user.id, { productId: product.id, quantity: 1 })
+          await defaultApi.addItem({ productId: product.id, quantity: 1 })
           await this.fetchCart()
         }
       } else {

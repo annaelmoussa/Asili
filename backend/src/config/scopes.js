@@ -1,9 +1,4 @@
-const ALL_SCOPES = [
-  "read:widgets",
-  "create:widgets",
-  "update:widgets",
-  "delete:widgets",
-];
+const ALL_SCOPES = ["ROLE_ADMIN"];
 
 module.exports = {
   ALL_SCOPES,

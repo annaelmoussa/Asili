@@ -129,6 +129,12 @@
     },
     "resolveJsonModule": true
   },
-  "include": ["src/**/*", "build/routes.ts", "src/**/*.ts", "src/types.d.ts"],
+  "include": [
+    "src/**/*",
+    "build/routes.ts",
+    "src/**/*.ts",
+    "src/types.d.ts",
+    "src/types/express.d.ts"
+  ],
   "exclude": ["node_modules", "build"]
 }

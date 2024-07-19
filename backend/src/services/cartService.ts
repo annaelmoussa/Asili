@@ -219,4 +219,16 @@ export class CartService {
       });
     }
   }
+
+  async getCartItemById(itemId: string): Promise<CartItem | null> {
+    return CartItem.findByPk(itemId, {
+      include: [
+        {
+          model: Cart,
+          as: "cart",
+          attributes: ["userId"],
+        },
+      ],
+    });
+  }
 }
