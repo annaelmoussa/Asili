@@ -3,7 +3,7 @@ import Brand from "../models/Brand";
 import Category from "../models/Category";
 import { IProduct, ProductCreationParams } from "../interfaces/IProduct";
 import { ProductMongoService } from "./productMongoService";
-import { Sequelize, Transaction } from "sequelize";
+import { Op, Sequelize, Transaction } from "sequelize";
 import { sequelize as defaultSequelize } from "../config/dbConfigPostgres";
 import CartItem from "../models/CartItem";
 
@@ -142,6 +142,43 @@ export class ProductService {
       raw: true,
     });
     return brands.map((brand) => brand.name);
+  }
+
+  public async updateStock(
+    productId: string,
+    quantity: number,
+    options?: { transaction?: Transaction }
+  ): Promise<IProduct | null> {
+    const product = await Product.findByPk(productId, options);
+    if (!product) return null;
+
+    product.stock += quantity;
+    product.stockHistory.push({ date: new Date(), quantity: product.stock });
+
+    await product.save(options);
+    return product.toJSON();
+  }
+
+  public async getLowStockProducts(options?: {
+    transaction?: Transaction;
+  }): Promise<IProduct[]> {
+    const products = await Product.findAll({
+      where: {
+        stock: {
+          [Op.lte]: Sequelize.col("lowStockThreshold"),
+        },
+      },
+      ...options,
+    });
+    return products.map((product) => product.toJSON());
+  }
+
+  public async getStockHistory(
+    productId: string,
+    options?: { transaction?: Transaction }
+  ): Promise<{ date: Date; quantity: number }[]> {
+    const product = await Product.findByPk(productId, options);
+    return product ? product.stockHistory : [];
   }
 }
 

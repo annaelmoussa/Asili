@@ -51,6 +51,16 @@ module.exports = {
         allowNull: false,
         defaultValue: false,
       },
+      lowStockThreshold: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 10,
+      },
+      stockHistory: {
+        type: DataTypes.JSONB,
+        allowNull: false,
+        defaultValue: [],
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,

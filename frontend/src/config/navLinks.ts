@@ -20,6 +20,7 @@ interface NavLink {
 
 const navLinks: NavLink[] = [
   { name: 'Dashboard', path: '/panel/dashboard', icon: Home },
+  { name: 'Gestion des stocks', path: '/panel/stock', icon: Package2 },
   { name: 'Commandes', path: '/panel/orders', icon: ShoppingCart },
   { name: 'Produits', path: '/panel/products', icon: LineChart },
   { name: 'Utilisateurs', path: '/panel/users', icon: Users },

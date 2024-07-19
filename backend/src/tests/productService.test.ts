@@ -41,6 +41,7 @@ describe("ProductService", () => {
       categoryId: testCategoryId,
       stock: 100,
       isPromotion: false,
+      lowStockThreshold: 20,
     };
     return await productService.create(productCreationParams, { transaction });
   };
@@ -55,8 +56,11 @@ describe("ProductService", () => {
       categoryId: testCategoryId,
       stock: 100,
       isPromotion: false,
+      lowStockThreshold: 20,
     });
     expect(product.id).toBeDefined();
+    expect(product.stockHistory).toHaveLength(1);
+    expect(product.stockHistory[0].quantity).toBe(100);
   });
 
   it("should get all products", async () => {
@@ -90,7 +94,9 @@ describe("ProductService", () => {
       categoryId: testCategoryId,
       stock: 100,
       isPromotion: false,
+      lowStockThreshold: 20,
     });
+    expect(fetchedProduct?.stockHistory).toHaveLength(1);
   });
 
   it("should return null for a non-existing product", async () => {
@@ -106,6 +112,7 @@ describe("ProductService", () => {
     const updateParams: Partial<IProduct> = {
       name: "Updated Product",
       price: 15,
+      lowStockThreshold: 25,
     };
 
     const updatedProduct = await productService.update(
@@ -118,6 +125,9 @@ describe("ProductService", () => {
     if (updatedProduct) {
       expect(updatedProduct.name).toBe(updateParams.name);
       expect(updatedProduct.price).toBe(updateParams.price);
+      expect(updatedProduct.lowStockThreshold).toBe(
+        updateParams.lowStockThreshold
+      );
       expect(updatedProduct.id).toBe(createdProduct.id);
     }
   });
@@ -134,5 +144,50 @@ describe("ProductService", () => {
       transaction,
     });
     expect(fetchedProduct).toBeNull();
+  });
+
+  it("should update stock", async () => {
+    const createdProduct = await createTestProduct();
+    const updatedProduct = await productService.updateStock(
+      createdProduct.id,
+      50,
+      { transaction }
+    );
+
+    expect(updatedProduct).not.toBeNull();
+    if (updatedProduct) {
+      expect(updatedProduct.stock).toBe(150);
+      expect(updatedProduct.stockHistory).toHaveLength(2);
+      expect(updatedProduct.stockHistory[1].quantity).toBe(150);
+    }
+  });
+
+  it("should get low stock products", async () => {
+    const lowStockProduct = await createTestProduct("Low Stock Product");
+    await productService.updateStock(lowStockProduct.id, -90, { transaction });
+
+    const lowStockProducts = await productService.getLowStockProducts({
+      transaction,
+    });
+
+    expect(lowStockProducts).toHaveLength(1);
+    expect(lowStockProducts[0].name).toBe("Low Stock Product");
+    expect(lowStockProducts[0].stock).toBe(10);
+  });
+
+  it("should get stock history", async () => {
+    const createdProduct = await createTestProduct();
+    await productService.updateStock(createdProduct.id, 50, { transaction });
+    await productService.updateStock(createdProduct.id, -30, { transaction });
+
+    const stockHistory = await productService.getStockHistory(
+      createdProduct.id,
+      { transaction }
+    );
+
+    expect(stockHistory).toHaveLength(3);
+    expect(stockHistory[0].quantity).toBe(100);
+    expect(stockHistory[1].quantity).toBe(150);
+    expect(stockHistory[2].quantity).toBe(120);
   });
 });

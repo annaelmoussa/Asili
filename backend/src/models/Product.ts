@@ -66,8 +66,23 @@ export default class Product
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
+    defaultValue: 0,
   })
   stock!: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    defaultValue: 10,
+  })
+  lowStockThreshold!: number;
+
+  @Column({
+    type: DataType.JSONB,
+    allowNull: false,
+    defaultValue: [],
+  })
+  stockHistory!: { date: Date; quantity: number }[];
 
   @Column({
     type: DataType.STRING,
