@@ -26,21 +26,26 @@
 </template>
 
 <script lang="ts">
-import { ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
 import { z } from 'zod'
 import { defaultApi } from '@/api/config'
-import type { IProduct, ICategory, IBrand, PartialIProduct } from '@/api'
+import type { IProduct, ICategory, IBrand, ProductCreationParams } from '@/api'
 import CrudPanel from '@/components/CrudPanel.vue'
 import type { TableColumn } from '@/types/table'
 import ProductForm from '@/components/ProductForm.vue'
 import ProductDetails from '@/components/ProductDetails.vue'
 import { extractImageUrl, formatPrice, parsePrice } from '@/utils/productUtils'
 
-export default {
+interface TableItem {
+  id: string | number
+  [key: string]: any
+}
+
+export default defineComponent({
   name: 'PanelProduct',
   components: { CrudPanel, ProductForm, ProductDetails },
   setup() {
-    const products = ref<IProduct[]>([])
+    const products = ref<TableItem[]>([])
     const categories = ref<ICategory[]>([])
     const brands = ref<IBrand[]>([])
 
@@ -62,10 +67,11 @@ export default {
       brandId: z.string().min(1, 'La marque est requise'),
       stock: z.number().int().min(0, 'Le stock doit être positif'),
       image: z.string().url("L'URL de l'image est invalide").optional(),
-      isPromotion: z.boolean()
+      isPromotion: z.boolean(),
+      lowStockThreshold: z.number().int().min(0, 'Le seuil de stock bas doit être positif')
     })
 
-    const initialData = {
+    const initialData: ProductCreationParams = {
       name: '',
       description: '',
       price: 0,
@@ -73,12 +79,35 @@ export default {
       brandId: '',
       stock: 0,
       image: '',
-      isPromotion: false
+      isPromotion: false,
+      lowStockThreshold: 10 // Provide a default value
     }
 
     const transformations = {
       price: (value: string) => parseFloat(value),
-      stock: (value: string) => parseInt(value)
+      stock: (value: string) => parseInt(value),
+      lowStockThreshold: (value: string) => parseInt(value)
+    }
+
+    function cleanProductData(
+      data: Partial<ProductCreationParams>
+    ): Partial<ProductCreationParams> {
+      const cleanedData: Partial<ProductCreationParams> = {
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        categoryId: data.categoryId,
+        brandId: data.brandId,
+        stock: data.stock,
+        image: data.image,
+        isPromotion: data.isPromotion,
+        lowStockThreshold: data.lowStockThreshold
+      }
+
+      // Filtrer les propriétés undefined
+      return Object.fromEntries(
+        Object.entries(cleanedData).filter(([_, v]) => v !== undefined)
+      ) as Partial<ProductCreationParams>
     }
 
     const apiActions = {
@@ -86,29 +115,20 @@ export default {
         const response = await defaultApi.getProducts()
         products.value = response.data.map((product) => ({
           ...product,
+          id: product.id || '',
           image: extractImageUrl(product.image),
           price: parsePrice(product.price),
-          'category.name': product.category?.name ?? '',
-          'brand.name': product.brand?.name ?? ''
+          categoryName: product.category?.name ?? '',
+          brandName: product.brand?.name ?? ''
         }))
       },
-      createItem: async (data: PartialIProduct): Promise<void> => {
-        await defaultApi.createProduct(data)
+      createItem: async (data: ProductCreationParams): Promise<void> => {
+        const cleanedData = cleanProductData(data)
+        await defaultApi.createProduct(cleanedData)
       },
-      updateItem: async (id: string, data: PartialIProduct): Promise<void> => {
-        // Filtrer les champs pour n'inclure que ceux nécessaires
-        const updateData: PartialIProduct = {
-          id,
-          name: data.name,
-          description: data.description,
-          price: data.price,
-          categoryId: data.categoryId,
-          brandId: data.brandId,
-          stock: data.stock,
-          image: data.image,
-          isPromotion: data.isPromotion
-        }
-        await defaultApi.updateProduct(id, updateData)
+      updateItem: async (id: string, data: Partial<ProductCreationParams>): Promise<void> => {
+        const cleanedData = cleanProductData(data)
+        await defaultApi.updateProduct(id, cleanedData)
       },
       deleteItem: async (id: string): Promise<void> => {
         await defaultApi.deleteProduct(id)
@@ -144,5 +164,5 @@ export default {
       apiActions
     }
   }
-}
+})
 </script>

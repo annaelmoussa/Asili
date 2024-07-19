@@ -3,22 +3,25 @@ import jwt from "jsonwebtoken";
 import User from "../models/User";
 import TokenBlacklist from "../models/TokenBlacklist";
 import { IUser } from "../interfaces/IUser";
+import { IJwtPayload } from "../interfaces/IJwtPayload";
 import sendEmail from "./emailService";
-import {UserService} from "./userService";
+import { UserService } from "./userService";
 import { AlertService } from "./AlertService";
 
 export class AuthService {
   private secret = process.env.JWT_SECRET || "your_jwt_secret";
   private alertService: AlertService;
+  private userService: UserService;
 
   constructor() {
     this.alertService = new AlertService();
+    this.userService = new UserService();
   }
 
   async login(
     email: string,
     password: string
-  ): Promise<{ user: IUser; token: string, mustChangePassword: boolean }> {
+  ): Promise<{ user: IUser; token: string; mustChangePassword: boolean }> {
     const user = await User.findOne({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new Error("Invalid credentials");
@@ -28,27 +31,31 @@ export class AuthService {
       throw new Error("Please confirm your email address");
     }
 
-    const userService = new UserService();
-    const needsChange = await userService.shouldChangePassword(user.id);
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        email: user.email,
-        role: user.role,
-        scopes: user.scopes,
-      },
-      this.secret,
-      {
-        expiresIn: "1h",
-      }
-    );
+    const needsChange = await this.userService.shouldChangePassword(user.id);
 
-    return { user: user.toJSON() as IUser, token,mustChangePassword: needsChange };
+    const payload: IJwtPayload = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      scopes: user.scopes,
+    };
+
+    const token = jwt.sign(payload, this.secret, {
+      expiresIn: "1h",
+    });
+
+    return {
+      user: user.toJSON() as IUser,
+      token,
+      mustChangePassword: needsChange,
+    };
   }
 
   async signup(email: string, password: string): Promise<IUser> {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const confirmationToken = jwt.sign({ email }, this.secret, { expiresIn: "1h" });
+    const confirmationToken = jwt.sign({ email }, this.secret, {
+      expiresIn: "1h",
+    });
 
     const user = await User.create({
       email,
@@ -57,7 +64,7 @@ export class AuthService {
       isConfirmed: false,
       confirmationToken: confirmationToken,
     });
-    
+
     await this.alertService.createAlertPreference(user.id);
 
     const confirmationLink = `http://localhost:3000/auth/confirm?token=${confirmationToken}`;
@@ -73,7 +80,9 @@ export class AuthService {
   async confirmEmail(token: string): Promise<IUser | null> {
     try {
       const decoded: any = jwt.verify(token, this.secret);
-      const user = await User.findOne({ where: { confirmationToken: token, email: decoded.email } });
+      const user = await User.findOne({
+        where: { confirmationToken: token, email: decoded.email },
+      });
       if (!user) {
         throw new Error("User not found");
       }
@@ -94,11 +103,13 @@ export class AuthService {
     if (user.isConfirmed) {
       throw new Error("Account already confirmed");
     }
-  
-    const confirmationToken = jwt.sign({ email: user.email }, this.secret, { expiresIn: "1h" });
+
+    const confirmationToken = jwt.sign({ email: user.email }, this.secret, {
+      expiresIn: "1h",
+    });
     user.confirmationToken = confirmationToken;
     await user.save();
-  
+
     const confirmationLink = `http://localhost:3000/auth/confirm?token=${confirmationToken}`;
     await sendEmail(
       email,
@@ -106,16 +117,17 @@ export class AuthService {
       `Click the following link to confirm your account: ${confirmationLink}`
     );
   }
-  
 
   public async sendPasswordResetEmail(email: string): Promise<void> {
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      // Si l'utilisateur n'existe pas, ne rien faire pour éviter les fuites d'information
+      // If the user doesn't exist, do nothing to avoid information leaks
       return;
     }
 
-    const token = jwt.sign({ email: user.email, userId: user.id }, this.secret, { expiresIn: '1h' });
+    const token = jwt.sign({ email: user.email, id: user.id }, this.secret, {
+      expiresIn: "1h",
+    });
 
     const resetLink = `http://localhost:8080/reset-password?token=${token}`;
     const emailText = `Click here to reset your password: ${resetLink}`;
@@ -124,13 +136,22 @@ export class AuthService {
     await sendEmail(user.email, "Password Reset", emailText, emailHtml);
   }
 
-  public async resetPassword(token: string, password: string,confirm_password:string): Promise<void> {
-    if(password !== confirm_password){
+  public async resetPassword(
+    token: string,
+    password: string,
+    confirm_password: string
+  ): Promise<void> {
+    if (password !== confirm_password) {
       throw new Error("Passwords do not match.");
     }
     try {
-      const decoded = jwt.verify(token, this.secret) as { email: string, userId: string };
-      const user = await User.findOne({ where: { id: decoded.userId, email: decoded.email } });
+      const decoded = jwt.verify(token, this.secret) as {
+        email: string;
+        id: string;
+      };
+      const user = await User.findOne({
+        where: { id: decoded.id, email: decoded.email },
+      });
       if (!user) {
         throw new Error("Invalid token or user does not exist.");
       }
@@ -149,8 +170,8 @@ export class AuthService {
 
   async getUser(token: string): Promise<IUser | null> {
     try {
-      const decoded: any = jwt.verify(token, this.secret);
-      const user = await User.findByPk(decoded.userId);
+      const decoded = jwt.verify(token, this.secret) as IJwtPayload;
+      const user = await User.findByPk(decoded.id);
       return user ? (user.toJSON() as IUser) : null;
     } catch (error) {
       return null;

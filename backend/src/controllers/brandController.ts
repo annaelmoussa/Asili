@@ -8,6 +8,7 @@ import {
   Delete,
   Route,
   SuccessResponse,
+  Security,
 } from "tsoa";
 import { IBrand, BrandCreationParams } from "../interfaces/IBrand";
 import { BrandService } from "../services/brandService";
@@ -33,6 +34,7 @@ export class BrandController extends Controller {
   }
 
   @SuccessResponse("201", "Created")
+  @Security("jwt", ["ROLE_ADMIN"])
   @Post()
   public async createBrand(
     @Body() requestBody: BrandCreationParams
@@ -41,6 +43,7 @@ export class BrandController extends Controller {
     return this.brandService.create(requestBody);
   }
 
+  @Security("jwt", ["ROLE_ADMIN"])
   @Put("{brandId}")
   public async updateBrand(
     @Path() brandId: string,
@@ -65,6 +68,7 @@ export class BrandController extends Controller {
     }
   }
 
+  @Security("jwt", ["ROLE_ADMIN"])
   @Delete("{brandId}")
   public async deleteBrand(@Path() brandId: string): Promise<string | void> {
     const result = await this.brandService.delete(brandId);

@@ -9,6 +9,7 @@ import {
   Query,
   Route,
   SuccessResponse,
+  Security,
 } from "tsoa";
 import { IProduct, ProductCreationParams } from "../interfaces/IProduct";
 import { ProductService } from "../services/productService";
@@ -89,27 +90,59 @@ export class ProductController extends Controller {
   }
 
   @SuccessResponse("201", "Created")
+  @Security("jwt", ["ROLE_ADMIN"])
   @Post()
   public async createProduct(
     @Body() requestBody: ProductCreationParams
   ): Promise<IProduct> {
-    this.setStatus(201);
-    return this.productService.create(requestBody);
+    try {
+      console.log(
+        "Creating product with data:",
+        JSON.stringify(requestBody, null, 2)
+      );
+      const product = await this.productService.create(requestBody);
+      this.setStatus(201);
+      return product;
+    } catch (error) {
+      console.error("Error creating product:", error);
+      this.setStatus(400);
+      throw error;
+    }
   }
 
+  @Security("jwt", ["ROLE_ADMIN|ROLE_STORE_KEEPER"])
   @Put("{productId}")
   public async updateProduct(
     @Path() productId: string,
     @Body() requestBody: Partial<IProduct>
   ): Promise<IProduct | null> {
-    return this.productService.update(productId, requestBody);
+    try {
+      console.log(
+        `Updating product ${productId} with data:`,
+        JSON.stringify(requestBody, null, 2)
+      );
+      const updatedProduct = await this.productService.update(
+        productId,
+        requestBody
+      );
+      if (!updatedProduct) {
+        this.setStatus(404);
+        return null;
+      }
+      return updatedProduct;
+    } catch (error) {
+      console.error(`Error updating product ${productId}:`, error);
+      this.setStatus(400);
+      throw error;
+    }
   }
-
+  @Security("jwt", ["ROLE_ADMIN"])
   @Delete("{productId}")
   public async deleteProduct(@Path() productId: string): Promise<void> {
     await this.productService.delete(productId);
   }
 
+  @Security("jwt", ["ROLE_ADMIN|ROLE_STORE_KEEPER"])
   @Put("{productId}/stock")
   public async updateStock(
     @Path() productId: string,
@@ -118,6 +151,7 @@ export class ProductController extends Controller {
     return this.productService.updateStock(productId, body.quantity);
   }
 
+  @Security("jwt", ["ROLE_ADMIN|ROLE_STORE_KEEPER"])
   @Put("{productId}/low-stock-threshold")
   public async updateLowStockThreshold(
     @Path() productId: string,
@@ -128,6 +162,7 @@ export class ProductController extends Controller {
     });
   }
 
+  @Security("jwt", ["ROLE_ADMIN|ROLE_STORE_KEEPER"])
   @Get("{productId}/stock-history")
   public async getStockHistory(
     @Path() productId: string

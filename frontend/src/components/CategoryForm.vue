@@ -5,7 +5,7 @@
       <input
         id="name"
         v-model="formData.name"
-        @input="$emit('update-field', 'name', $event.target.value)"
+        @input="$emit('update-field', 'name', ($event.target as HTMLInputElement).value)"
         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         type="text"
         placeholder="Nom de la catégorie"
@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, type PropType } from 'vue'
 import type { PartialICategory } from '@/api'
 
 export default defineComponent({

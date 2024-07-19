@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { UnauthorizedError } from "../errors/UnauthorizedError";
 
 interface HttpError extends Error {
   status?: number;
@@ -10,8 +11,13 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  const status = err.status ?? 500;
-  const message = err.message || "Something went wrong";
+  let status = err.status ?? 500;
+  let message = err.message || "Something went wrong";
+
+  if (err instanceof UnauthorizedError) {
+    status = err.status;
+    message = err.message;
+  }
 
   console.error(`[Error] ${status} - ${message}`);
 

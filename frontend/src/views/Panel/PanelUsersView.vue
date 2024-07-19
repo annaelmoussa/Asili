@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import { ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
 import { z } from 'zod'
 import { userApi } from '@/api/config'
 import type { IUser, PartialIUser } from '@/api'
@@ -29,11 +29,16 @@ import type { TableColumn } from '@/types/table'
 import UserForm from '@/components/UserForm.vue'
 import UserDetails from '@/components/UserDetails.vue'
 
-export default {
+interface TableItem {
+  id: string | number
+  [key: string]: any
+}
+
+export default defineComponent({
   name: 'PanelUsers',
   components: { CrudPanel, UserForm, UserDetails },
   setup() {
-    const users = ref<IUser[]>([])
+    const users = ref<TableItem[]>([])
 
     const columns: TableColumn[] = [
       { key: 'id', label: 'ID', sortable: true, type: 'text' },
@@ -63,18 +68,16 @@ export default {
     const apiActions = {
       fetchItems: async () => {
         const response = await userApi.getAllUsers()
-        users.value = response.data
+        users.value = response.data.map((user) => ({
+          ...user,
+          id: user.id || ''
+        }))
       },
-      createItem: async (data: IUser): Promise<void> => {
+      createItem: async (data: Omit<IUser, 'id'>): Promise<void> => {
         await userApi.createUser(data)
       },
-      updateItem: async (id: string, data: IUser): Promise<void> => {
-        const partialUser: PartialIUser = {}
-        if (data.email !== undefined) partialUser.email = data.email
-        if (data.password !== undefined) partialUser.password = data.password
-        if (data.role !== undefined) partialUser.role = data.role
-        if (data.isConfirmed !== undefined) partialUser.isConfirmed = data.isConfirmed
-        await userApi.updateUser(id, partialUser)
+      updateItem: async (id: string, data: Partial<Omit<IUser, 'id'>>): Promise<void> => {
+        await userApi.updateUser(id, data)
       },
       deleteItem: async (id: string): Promise<void> => {
         await userApi.deleteUser(id)
@@ -94,5 +97,5 @@ export default {
       apiActions
     }
   }
-}
+})
 </script>

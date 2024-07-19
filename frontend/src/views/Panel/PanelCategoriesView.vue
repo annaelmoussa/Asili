@@ -20,20 +20,25 @@
 </template>
 
 <script lang="ts">
-import { ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
 import { z } from 'zod'
 import { defaultApi } from '@/api/config'
-import type { ICategory, PartialICategory } from '@/api'
+import type { ICategory } from '@/api'
 import CrudPanel from '@/components/CrudPanel.vue'
 import type { TableColumn } from '@/types/table'
 import CategoryForm from '@/components/CategoryForm.vue'
 import CategoryDetails from '@/components/CategoryDetails.vue'
 
-export default {
+interface TableItem {
+  id: string | number
+  [key: string]: any
+}
+
+export default defineComponent({
   name: 'PanelCategories',
   components: { CrudPanel, CategoryForm, CategoryDetails },
   setup() {
-    const categories = ref<ICategory[]>([])
+    const categories = ref<TableItem[]>([])
 
     const columns: TableColumn[] = [
       { key: 'id', label: 'ID', sortable: true, type: 'text' },
@@ -53,18 +58,16 @@ export default {
     const apiActions = {
       fetchItems: async () => {
         const response = await defaultApi.getCategories_2()
-        categories.value = response.data
+        categories.value = response.data.map((category) => ({
+          ...category,
+          id: category.id || ''
+        }))
       },
-      createItem: async (data: PartialICategory): Promise<void> => {
-        await defaultApi.createCategory(data)
+      createItem: async (data: { name: string }): Promise<void> => {
+        await defaultApi.createCategory({ name: data.name })
       },
-      updateItem: async (id: string, data: PartialICategory): Promise<void> => {
-        // Assurez-vous que seuls id et name sont envoyés
-        const updateData: PartialICategory = {
-          id,
-          name: data.name
-        }
-        await defaultApi.updateCategory(id, updateData)
+      updateItem: async (id: string, data: { name: string }): Promise<void> => {
+        await defaultApi.updateCategory(id, { name: data.name })
       },
       deleteItem: async (id: string): Promise<void> => {
         await defaultApi.deleteCategory(id)
@@ -84,5 +87,5 @@ export default {
       apiActions
     }
   }
-}
+})
 </script>
