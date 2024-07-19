@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { IProduct } from "../interfaces/IProduct";
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 import Payment from "../models/Payment";
 import { IPayment } from "../interfaces/IPayment";
 
@@ -22,12 +22,12 @@ export interface PaymentSessionRequest {
 }
 
 export class PaymentService {
-  async createPaymentSession(
-    items: PaymentSessionRequest[],
-    userId: string
-  ): Promise<string> {
-    console.log(items);
-    const lineItems = items.map((item) => ({
+  async createPayment(paymentInfo: IPayment): Promise<IPayment> {
+    return Payment.create(paymentInfo);
+  }
+
+  async createPaymentSession(items: PaymentSessionRequest[], userId: string): Promise<string> {
+    const lineItems = items.map(item => ({
       price_data: {
         currency: "eur",
         product_data: {

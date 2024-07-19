@@ -2,27 +2,27 @@
 
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('Order', {
+        await queryInterface.createTable('Shipping', {
             id: {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
                 primaryKey: true
             },
-            userId: {
+            orderId: {
                 type: Sequelize.UUID,
                 allowNull: false,
                 references: {
-                    model: 'User',
+                    model: 'Order',
                     key: 'id'
                 }
             },
-            stripeInvoiceId: {
+            address: {
                 type: Sequelize.STRING,
                 allowNull: false
             },
-            amount: {
-                type: Sequelize.DOUBLE,
-                allowNull: false
+            trackingNumber: {
+                type: Sequelize.STRING,
+                allowNull: true
             },
             status: {
                 type: Sequelize.STRING,
@@ -35,20 +35,11 @@ module.exports = {
             updatedAt: {
                 allowNull: false,
                 type: Sequelize.DATE
-            },
-            shippingAddress: {
-                allowNull: false,
-                type: Sequelize.STRING,
-                defaultValue: ''
-            },
-            trackingNumber: {
-                allowNull: true,
-                type: Sequelize.STRING
             }
         });
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('Order');
+        await queryInterface.dropTable('Shipping');
     }
 };

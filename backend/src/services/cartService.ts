@@ -18,59 +18,23 @@ export class CartService {
     return cart ? cart.id : null;
   }
 
-  async getCartItems(cartId: string): Promise<ICartItem[]> {
-    try {
-      const items = await CartItem.findAll({
-        where: {
-          cartId,
-          [Op.or]: [
-            { reservationExpires: null },
-            { reservationExpires: { [Op.gt]: new Date() } },
-          ],
-        },
-        include: [
-          {
-            model: Product,
-            as: "product",
-          },
-        ],
-      });
-      console.log("Items fetched:", JSON.stringify(items, null, 2));
-      return items;
-    } catch (error) {
-      console.error("Error fetching cart items:", error);
-      throw error;
+    async getCartItems(cartId: string): Promise<ICartItem[]> {
+        const items = await CartItem.findAll({
+            where: { cartId },
+            include: [{
+                model: Product,
+                as: 'product',
+                attributes: ['id', 'name', 'description', 'price', 'category', 'stock', 'image']  // Spécifiez les attributs que vous souhaitez inclure
+            }],
+            attributes: ['id', 'quantity'],
+        });
+        return items;
     }
-  }
 
-  async addItem(
-    userId: string,
-    productId: string,
-    quantity: number
-  ): Promise<ICartItem> {
-    return db.sequelize.transaction(async (t: Transaction) => {
-      const user = await User.findByPk(userId, { transaction: t });
-      if (!user) {
-        console.log("User not found for token 278:");
-        throw new Error("User not found");
-      }
-
-      const product = await Product.findByPk(productId, {
-        transaction: t,
-        lock: true,
-      });
-      if (!product) {
-        throw new Error("Product not found");
-      }
-
-      if (product.stock < quantity) {
-        throw new Error("Not enough stock");
-      }
-
-      const [cart] = await Cart.findOrCreate({
-        where: { userId },
-        transaction: t,
-      });
+    async addItem(userId: string, productId: string, quantity: number): Promise<ICartItem> {
+        const [cart, created] = await Cart.findOrCreate({
+            where: { userId }
+        });
 
       const [item, created] = await CartItem.findOrCreate({
         where: { cartId: cart.id, productId },
@@ -218,7 +182,6 @@ export class CartService {
 
         await item.destroy({ transaction: t });
       });
-    }
   }
 
   async getCartItemById(itemId: string): Promise<CartItem | null> {

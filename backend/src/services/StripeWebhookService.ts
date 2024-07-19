@@ -1,6 +1,9 @@
 import Stripe from 'stripe';
+import crypto from 'crypto';
 import { CartService } from './cartService';
-import Order from '../models/Order';
+import { OrderService } from './orderService';
+import { ShippingService } from './ShippingService';
+import { PaymentService } from './paymentService';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -9,6 +12,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-06
 
 export class StripeWebhookService {
   private cartService: CartService = new CartService();
+  private orderService: OrderService = new OrderService();
+  private shippingService: ShippingService = new ShippingService();
+  private paymentService: PaymentService = new PaymentService();
 
   async handleWebhook(rawBody: Buffer, signature: string): Promise<void> {
     try {
@@ -34,14 +40,74 @@ export class StripeWebhookService {
       throw new Error('User ID not found in session metadata');
     }
 
-    await Order.create({
+    const cartId = await this.cartService.getCartIdByUserId(userId);
+    if (!cartId) {
+      throw new Error('Création de commande impossible car aucun article dans le panier.');
+    }
+    const cartItems = await this.cartService.getCartItems(cartId);
+    console.log(cartItems);
+    const orderItems = cartItems.map(item => ({
+      productId: item.product?.id,
+      quantity: item.quantity,
+      priceAtPurchase: item.product?.price
+    }));
+    console.log(orderItems);
+
+    const shippingAddress = this.formatShippingAddress(session.shipping_details?.address);
+
+    console.log('creating order..');
+    const order = await this.orderService.createOrder({
       userId: userId,
       stripeInvoiceId: session.payment_intent as string,
       amount: session.amount_total! / 100,
-      status: 'paid'
+      status: 'paid',
+      shippingAddress: shippingAddress,
+    }, orderItems);
+
+    if (!order) {
+      throw new Error('Error creating Order.');
+    }
+
+    console.log('creating shipping..');
+    const trackingNumber = this.generateTrackingNumber(userId);
+    await this.shippingService.createShipping({
+      orderId: order.id!,
+      address: shippingAddress,
+      status: 'Pending',
+      trackingNumber: trackingNumber
+    });
+
+    console.log('creating payment..');
+    await this.paymentService.createPayment({
+      userId: userId,
+      stripePaymentId: session.payment_intent as string,
+      amount: session.amount_total! / 100,
+      status: 'Completed'
     });
 
     console.log('Payment successful for session:', session.id);
     await this.cartService.clearCart(userId);
+  }
+
+  private generateTrackingNumber(userId: string): string {
+    const timestamp = Date.now();
+    const randomBytes = crypto.randomBytes(4).toString('hex');
+
+    return `TRK-${userId}-${timestamp}-${randomBytes}`;
+  }
+
+  private formatShippingAddress(address?: Stripe.Address): string {
+    if (!address) return 'Address not provided';
+
+    const parts = [
+      address.line1,
+      address.line2,
+      address.city,
+      address.state,
+      address.postal_code,
+      address.country
+    ].filter(Boolean);
+
+    return parts.join(', ');
   }
 }

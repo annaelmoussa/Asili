@@ -1,21 +1,17 @@
-import {DataTypes, Model, Optional} from "sequelize";
+import { DataTypes, Model, Optional } from "sequelize";
+import { IOrder } from "../interfaces/IOrder";
 import { sequelize } from "../config/dbConfigPostgres";
-import { IOrder } from "@/interfaces/IOrder";
 
-type ProductCreationAttributes = Optional<IOrder, "id">;
+type OrderCreationAttributes = Optional<IOrder, "id">;
 
-class Order
-  extends Model<IOrder, ProductCreationAttributes>
-  implements IOrder {
+class Order extends Model<IOrder, OrderCreationAttributes> implements IOrder {
   public id!: string;
   public userId!: string;
   public stripeInvoiceId!: string;
   public amount!: number;
   public status!: string;
-
-  static associate(models: any) {
-    Order.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
-  }
+  public shippingAddress!: string;
+  public trackingNumber?: string;
 }
 
 Order.init({
@@ -43,13 +39,25 @@ Order.init({
   status: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  shippingAddress: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  trackingNumber: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
-},
-  {
+}, {
   sequelize,
   modelName: 'Order',
   tableName: 'Order',
   timestamps: true
 });
+
+export const associateOrder = (models: any) => {
+  Order.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
+  Order.hasMany(models.OrderItem, { foreignKey: 'orderId', as: 'items' });
+};
 
 export default Order;
