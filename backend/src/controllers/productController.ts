@@ -28,6 +28,11 @@ export class ProductController extends Controller {
     this.brandService = new BrandService();
   }
 
+  @Get("low-stock")
+  public async getLowStockProducts(): Promise<IProduct[]> {
+    return this.productService.getLowStockProducts();
+  }
+
   @Get("categories")
   public async getCategories(): Promise<string[]> {
     console.log("Getting categories");
@@ -103,5 +108,30 @@ export class ProductController extends Controller {
   @Delete("{productId}")
   public async deleteProduct(@Path() productId: string): Promise<void> {
     await this.productService.delete(productId);
+  }
+
+  @Put("{productId}/stock")
+  public async updateStock(
+    @Path() productId: string,
+    @Body() body: { quantity: number }
+  ): Promise<IProduct | null> {
+    return this.productService.updateStock(productId, body.quantity);
+  }
+
+  @Put("{productId}/low-stock-threshold")
+  public async updateLowStockThreshold(
+    @Path() productId: string,
+    @Body() body: { lowStockThreshold: number }
+  ): Promise<IProduct | null> {
+    return this.productService.update(productId, {
+      lowStockThreshold: body.lowStockThreshold,
+    });
+  }
+
+  @Get("{productId}/stock-history")
+  public async getStockHistory(
+    @Path() productId: string
+  ): Promise<{ date: Date; quantity: number }[]> {
+    return this.productService.getStockHistory(productId);
   }
 }

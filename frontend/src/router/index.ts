@@ -27,6 +27,7 @@ import FavoritesView from '../views/FavoritesView.vue'
 import OrdersView from '../views/OrdersView.vue'
 import ReferralsView from '../views/ReferralsView.vue'
 import MemberBenefitsView from '../views/MemberBenefitsView.vue'
+import PanelViewStock from '../views/Panel/PanelStockView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -146,6 +147,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'orders',
         name: 'PanelOrders',
         component: PanelOrder
+      },
+      {
+        path: 'stock',
+        name: 'PanelStock',
+        component: PanelViewStock
       },
       {
         path: 'payments',
