@@ -7,6 +7,8 @@ import { DataTypes, Op, Sequelize, Transaction } from "sequelize";
 import { sequelize as defaultSequelize } from "../config/dbConfigPostgres";
 import CartItem from "../models/CartItem";
 import { v4 as uuidv4 } from "uuid";
+import fs from "fs";
+import path from "path";
 
 const productMongoService = new ProductMongoService();
 
@@ -31,12 +33,10 @@ export class ProductService {
   public async getAll(options?: {
     transaction?: Transaction;
   }): Promise<IProduct[]> {
-    console.time("get-all-products");
     const products = await Product.findAll({
       include: [{ model: Brand }, { model: Category }],
       ...options,
     });
-    console.log("Products fetched:", JSON.stringify(products, null, 2));
     return products.map((product) => product.toJSON());
   }
 
@@ -46,11 +46,10 @@ export class ProductService {
   ): Promise<IProduct> {
     console.time("create-product");
     try {
-      // Add missing properties to match ProductAttributes
       const fullProductParams = {
         ...productCreationParams,
-        id: uuidv4(), // Generate a new UUID
-        stockHistory: [], // Initialize with an empty array
+        id: uuidv4(),
+        stockHistory: [],
       };
 
       const product = await Product.create(fullProductParams, options);
@@ -71,6 +70,23 @@ export class ProductService {
   ): Promise<IProduct | null> {
     console.time("update-product");
     try {
+      const existingProduct = await Product.findByPk(id);
+      if (!existingProduct) {
+        return null;
+      }
+
+      if (updates.image && existingProduct.image) {
+        const oldImagePath = path.join(
+          __dirname,
+          "..",
+          "..",
+          existingProduct.image
+        );
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+
       await Product.update(updates, {
         where: { id },
         ...options,
@@ -89,7 +105,6 @@ export class ProductService {
     id: string,
     options?: { transaction?: Transaction }
   ): Promise<boolean> {
-    console.time("delete-product");
     const t = options?.transaction || (await this.sequelize.transaction());
 
     try {
@@ -117,8 +132,6 @@ export class ProductService {
         await t.rollback();
       }
       throw error;
-    } finally {
-      console.timeEnd("delete-product");
     }
   }
 
@@ -133,12 +146,10 @@ export class ProductService {
       maxPrice?: string;
     }
   ): Promise<IProduct[]> {
-    console.log("Searching with query:", query, "and facets:", facets);
     return productMongoService.search(query, facets);
   }
 
   public async getCategories(): Promise<string[]> {
-    console.log("Getting categories");
     const categories = await Category.findAll({
       attributes: ["name"],
       raw: true,

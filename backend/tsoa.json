@@ -33,5 +33,11 @@
         }
       }
     }
+  },
+  "multer": {
+    "storage": {
+      "type": "disk",
+      "destination": "./uploads"
+    }
   }
 }

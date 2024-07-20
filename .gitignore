@@ -62,5 +62,7 @@ pnpm-lock.yaml
 .DS_Store
 Thumbs.db
 
+
+/backend/uploads/
 # fichiers auto-générés
 /frontend/src/api/api.ts
