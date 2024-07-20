@@ -1,15 +1,20 @@
 <template>
   <form @submit.prevent class="space-y-4">
     <div v-for="field in formFields" :key="field.name">
-      <label :for="field.name" class="block text-gray-700 text-sm font-bold mb-2">{{
-        field.label
-      }}</label>
+      <label :for="field.name" class="block text-gray-700 text-sm font-bold mb-2">
+        {{ field.label }}
+      </label>
       <input
-        v-if="field.type !== 'select' && field.type !== 'checkbox' && field.type !== 'textarea'"
+        v-if="
+          field.type !== 'select' &&
+          field.type !== 'checkbox' &&
+          field.type !== 'textarea' &&
+          field.type !== 'file'
+        "
         :id="field.name"
         :type="field.type"
         :value="formData[field.name]"
-        @input="$emit('update-field', field.name, ($event.target as HTMLInputElement).value)"
+        @input="handleInputChange(field.name, $event)"
         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         :placeholder="field.placeholder"
       />
@@ -37,11 +42,29 @@
         <input
           :id="field.name"
           type="checkbox"
-          :checked="formData[field.name]"
-          @change="$emit('update-field', field.name, ($event.target as HTMLInputElement).checked)"
+          :checked="formData[field.name] === 'true'"
+          @change="handleCheckboxChange(field.name, $event)"
           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
         />
         <label :for="field.name" class="ml-2 block text-sm text-gray-900">{{ field.label }}</label>
+      </div>
+      <div v-else-if="field.type === 'file'" class="flex items-center space-x-2">
+        <input
+          :id="field.name"
+          type="file"
+          @change="handleFileUpload($event, field.name)"
+          accept="image/*"
+          class="hidden"
+        />
+        <label
+          :for="field.name"
+          class="cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Choisir une image
+        </label>
+        <span v-if="formData[field.name]" class="text-sm text-gray-600">
+          {{ isFile(formData[field.name]) ? formData[field.name].name : formData[field.name] }}
+        </span>
       </div>
       <p v-if="errors[field.name]" class="text-red-500 text-xs italic">{{ errors[field.name] }}</p>
     </div>
@@ -73,7 +96,7 @@ export default defineComponent({
     }
   },
   emits: ['update-field'],
-  setup(props) {
+  setup(props, { emit }) {
     const formFields = computed(() => [
       { name: 'name', label: 'Nom', type: 'text', placeholder: 'Nom du produit' },
       {
@@ -88,15 +111,51 @@ export default defineComponent({
       { name: 'stock', label: 'Stock', type: 'number', placeholder: 'Quantité en stock' },
       {
         name: 'image',
-        label: "URL de l'image",
-        type: 'text',
-        placeholder: "URL de l'image du produit"
+        label: 'Image du produit',
+        type: 'file'
       },
-      { name: 'isPromotion', label: 'En promotion', type: 'checkbox' }
+      { name: 'isPromotion', label: 'En promotion', type: 'checkbox' },
+      {
+        name: 'lowStockThreshold',
+        label: 'Seuil de stock bas',
+        type: 'number',
+        placeholder: 'Seuil de stock bas'
+      }
     ])
 
+    const handleInputChange = (fieldName: string, event: Event) => {
+      const target = event.target as HTMLInputElement
+      let value: string | number = target.value
+
+      if (target.type === 'number') {
+        value = target.value === '' ? '' : target.value
+      }
+
+      emit('update-field', fieldName, value)
+    }
+
+    const handleCheckboxChange = (fieldName: string, event: Event) => {
+      const target = event.target as HTMLInputElement
+      emit('update-field', fieldName, target.checked ? 'true' : 'false')
+    }
+
+    const handleFileUpload = (event: Event, fieldName: string) => {
+      const file = (event.target as HTMLInputElement).files?.[0]
+      if (file) {
+        emit('update-field', fieldName, file)
+      }
+    }
+
+    const isFile = (value: any): value is File => {
+      return value instanceof File
+    }
+
     return {
-      formFields
+      formFields,
+      handleInputChange,
+      handleCheckboxChange,
+      handleFileUpload,
+      isFile
     }
   }
 })
