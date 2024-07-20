@@ -2,6 +2,7 @@
 import axios from 'axios'
 import router from '@/router'
 import { useUserStore } from '@/stores/user'
+import { useNotificationStore } from '@/stores/notification'
 
 const api = axios.create({
   baseURL: 'http://localhost:3000',
@@ -15,18 +16,29 @@ api.interceptors.response.use(
   },
   (error) => {
     console.log('API error:', error)
-    if (error.response.data.message === "Password change required") {
-      router.push('/change-password');
+    const notificationStore = useNotificationStore()
+    const userStore = useUserStore()
+
+    if (error.response) {
+      notificationStore.showNotification(
+        error.response.data.message || 'An error occurred',
+        'error'
+      )
+
+      if (error.response.data.message === 'Password change required') {
+        router.push('/change-password')
+      } else if (error.response.status === 401) {
+        console.log('Init user store')
+        userStore.clearUserData()
+        console.log('Before after and redirect')
+        router.push('/login')
+      }
+    } else if (error.request) {
+      notificationStore.showNotification('No response received from server', 'error')
     } else {
-      router.push('/login');
+      notificationStore.showNotification('Error setting up the request', 'error')
     }
-    if (error.response && error.response.status === 401) {
-      console.log('Init user store')
-      const userStore = useUserStore()
-      userStore.clearUserData()
-      console.log('Before after and redirect')
-      router.push('/login')
-    }
+
     return Promise.reject(error)
   }
 )

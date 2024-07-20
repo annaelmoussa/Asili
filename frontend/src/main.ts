@@ -4,6 +4,9 @@ import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config'
 import 'primevue/resources/themes/saga-blue/theme.css'
 import 'primeicons/primeicons.css'
+import ToastService from 'primevue/toastservice';
+
+
 
 import { createApp } from 'vue'
 import i18n from './i18n'
@@ -14,6 +17,7 @@ import router from './router'
 const app = createApp(App)
 
 app.use(PrimeVue)
+app.use(ToastService)
 app.use(createPinia())
 app.use(router)
 app.use(i18n)
