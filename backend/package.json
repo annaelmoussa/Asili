@@ -36,7 +36,7 @@
     "umzug": "^3.8.1"
   },
   "scripts": {
-    "build": "tsc && tsoa routes && tsoa spec-and-routes",
+    "build": "tsc -p tsconfig.json && tsoa spec-and-routes && cp src/config/config.js build/src/config/config.js",
     "start": "node build/server.js",
     "migrate": "sequelize-cli db:migrate",
     "seed": "sequelize-cli db:seed:all",

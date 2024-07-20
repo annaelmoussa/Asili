@@ -2,45 +2,74 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: ["**"]
+  pull_request:
+    branches: [master]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: "14"
-      - name: Install dependencies and run tests (Backend)
+          node-version: "18"
+
+      - name: Debug - Display Node.js and npm versions
+        run: |
+          node --version
+          npm --version
+
+      - name: Install dependencies (Backend)
         run: |
           cd backend
           npm ci
+
+      - name: Debug - List installed packages
+        run: |
+          cd backend
+          npm list --depth=0
+
+      - name: Generate tsoa routes
+        run: |
+          cd backend
+          npm run build
+
+      - name: Run tests (Backend)
+        run: |
+          cd backend
           npm test
-      - name: Install dependencies and run tests (Frontend)
+
+      - name: Install dependencies (Frontend)
         run: |
           cd frontend
           npm ci
-          npm test
 
-  build-and-deploy:
+      - name: Run tests (Frontend)
+        run: |
+          cd frontend
+          npm run test:unit
+
+  deploy:
     needs: test
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Build Docker images
-        run: |
-          docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
-      - name: Deploy to DigitalOcean
+      - uses: actions/checkout@v3
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: Deploy to production
         env:
-          PRIVATE_KEY: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
-          HOST: ${{ secrets.DIGITALOCEAN_HOST }}
-          USER: ${{ secrets.DIGITALOCEAN_USER }}
+          HOST: ${{ secrets.HOST }}
+          USER: ${{ secrets.USER }}
         run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          scp -i private_key -o StrictHostKeyChecking=no docker-compose.yml docker-compose.prod.yml $USER@$HOST:~/
-          ssh -i private_key -o StrictHostKeyChecking=no $USER@$HOST '
-            docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
-            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-          '
+          ssh $USER@$HOST << EOF
+            cd /home/annael/asili
+            git pull origin master
+            docker-compose -f docker-compose.prod.yml up -d --build
+          EOF

@@ -1,14 +1,37 @@
-// src/stores/productStore.ts
-
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { defaultApi } from '@/api/config'
 import type {
   IProduct,
-  PartialIProduct,
-  ProductCreationParams,
   UpdateLowStockThresholdRequest
 } from '@/api'
+
+// Define ProductCreationParams type
+interface ProductCreationParams {
+  name: string;
+  description: string;
+  price: string;
+  categoryId: string;
+  brandId: string;
+  stock: string;
+  isPromotion: string;
+  lowStockThreshold: string;
+  image?: File;
+}
+
+// Define ProductUpdateParams type
+interface ProductUpdateParams {
+  name?: string;
+  description?: string;
+  price?: string;
+  categoryId?: string;
+  brandId?: string;
+  stock?: string;
+  isPromotion?: string;
+  lowStockThreshold?: string;
+  image?: File;
+  existingImageUrl?: string;
+}
 
 export const useProductStore = defineStore('product', () => {
   const products = ref<IProduct[]>([])
@@ -37,7 +60,17 @@ export const useProductStore = defineStore('product', () => {
     isLoading.value = true
     error.value = null
     try {
-      const response = await defaultApi.createProduct(productData)
+      const response = await defaultApi.createProduct(
+        productData.name,
+        productData.description,
+        productData.price,
+        productData.categoryId,
+        productData.brandId,
+        productData.stock,
+        productData.isPromotion,
+        productData.lowStockThreshold,
+        productData.image
+      )
       products.value.push(response.data)
     } catch (err) {
       error.value = 'Failed to create product'
@@ -47,9 +80,21 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
-  const updateProduct = async (productId: string, updates: Partial<IProduct>) => {
+  const updateProduct = async (productId: string, updates: ProductUpdateParams) => {
     try {
-      const response = await defaultApi.updateProduct(productId, updates)
+      const response = await defaultApi.updateProduct(
+        productId,
+        updates.name,
+        updates.description,
+        updates.price,
+        updates.categoryId,
+        updates.brandId,
+        updates.stock,
+        updates.isPromotion,
+        updates.lowStockThreshold,
+        updates.image,
+        updates.existingImageUrl
+      )
       const index = products.value.findIndex((p) => p.id === productId)
       if (index !== -1) {
         products.value[index] = response.data
@@ -96,7 +141,15 @@ export const useProductStore = defineStore('product', () => {
     isLoading.value = true
     error.value = null
     try {
-      const response = await defaultApi.updateProduct(productId, { stock: quantity })
+      const response = await defaultApi.updateProduct(
+        productId,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        quantity.toString() // Convert number to string
+      )
       const index = products.value.findIndex((p) => p.id === productId)
       if (index !== -1) {
         products.value[index] = response.data

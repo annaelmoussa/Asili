@@ -13,7 +13,6 @@ yarn-error.log*
 /dist/
 /build/
 /frontend/build/
-/backend/build/
 
 # Dossiers spécifiques à Vue.js
 /frontend/dist/
@@ -48,10 +47,6 @@ yarn-error.log*
 /mongo_data/
 /db-data/
 
-# Fichiers de dépendances verrouillées
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
 
 # Fichiers compilés
 *.tsbuildinfo
