@@ -4,7 +4,7 @@ import { AuthApi, Configuration, type IUser, type LoginRequest, type LogoutReque
 import { useCartStore } from '@/stores/cart'
 
 const configuration = new Configuration({
-  basePath: 'http://localhost:3000',
+  basePath: import.meta.env.VITE_API_BASE_URL as string,
   baseOptions: {
     withCredentials: true
   }

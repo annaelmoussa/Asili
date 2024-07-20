@@ -7,13 +7,28 @@ import { loginRateLimiter } from "./middlewares/rateLimiter";
 import path from "path";
 
 export const app = express();
+
+const isProd = process.env.NODE_ENV === "production";
 const corsOptions = {
-  origin: "http://localhost:8080",
+  origin: isProd ? "https://littleyarns.org" : "http://localhost:8080",
   credentials: true,
 };
-
 // Middleware Configuration
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "img-src": [
+          "'self'",
+          "data:",
+          "https://flagcdn.com",
+          "https://cdn.midjourney.com",
+        ],
+      },
+    },
+  })
+);
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
