@@ -37,21 +37,27 @@ import ProductDetails from '@/components/ProductDetails.vue'
 import { extractImageUrl, formatPrice, parsePrice } from '@/utils/productUtils'
 
 interface TableItem {
-  id: string | number
+  id: string
   [key: string]: any
 }
 
-interface ProductCreationParams {
-  name: string
-  description: string
-  price: string
-  categoryId: string
-  brandId: string
-  stock: string
-  isPromotion: string
-  lowStockThreshold: string
-  image?: File
-}
+// Define the product schema
+const productSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, 'Le nom est requis'),
+  description: z.string().min(1, 'La description est requise'),
+  price: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+    message: 'Le prix doit être un nombre positif'
+  }),
+  categoryId: z.string().min(1, 'La catégorie est requise'),
+  brandId: z.string().min(1, 'La marque est requise'),
+  stock: z.number().min(0, 'Le stock doit être positif'),
+  image: z.union([z.instanceof(File), z.string()]).optional(),
+  isPromotion: z.boolean(),
+  lowStockThreshold: z.number().min(0, 'Le seuil de stock bas doit être positif')
+})
+
+type ProductFormData = z.infer<typeof productSchema>
 
 export default defineComponent({
   name: 'PanelProduct',
@@ -71,32 +77,19 @@ export default defineComponent({
       { key: 'isPromotion', label: 'Promotion', sortable: true, type: 'boolean' }
     ]
 
-    const productSchema = z.object({
-      name: z.string().min(1, 'Le nom est requis'),
-      description: z.string().min(1, 'La description est requise'),
-      price: z.number().min(0, 'Le prix doit être positif'),
-      categoryId: z.string().min(1, 'La catégorie est requise'),
-      brandId: z.string().min(1, 'La marque est requise'),
-      stock: z.number().min(0, 'Le stock doit être positif'),
-      image: z.any(),
-      isPromotion: z.boolean(),
-      lowStockThreshold: z.number().min(0, 'Le seuil de stock bas doit être positif')
-    })
-
-    const initialData: ProductCreationParams = {
+    const initialData: ProductFormData = {
       name: '',
       description: '',
       price: '0',
       categoryId: '',
       brandId: '',
-      stock: '0',
-      image: undefined,
-      isPromotion: 'false',
-      lowStockThreshold: '10'
+      stock: 0,
+      isPromotion: false,
+      lowStockThreshold: 10
     }
 
     const transformations = {
-      price: (value: string) => parseFloat(value),
+      price: (value: string) => value, // Keep as string
       stock: (value: string) => parseInt(value, 10),
       lowStockThreshold: (value: string) => parseInt(value, 10),
       isPromotion: (value: string) => value === 'true'
@@ -109,12 +102,12 @@ export default defineComponent({
           ...product,
           id: product.id || '',
           image: extractImageUrl(product.image),
-          price: parsePrice(product.price),
+          price: formatPrice(product.price), // Format price for display
           categoryName: product.category?.name ?? '',
           brandName: product.brand?.name ?? ''
         }))
       },
-      createItem: async (data: ProductCreationParams): Promise<void> => {
+      createItem: async (data: ProductFormData): Promise<void> => {
         try {
           console.log('Creating product with data:', data)
           const formData = new FormData()
@@ -144,14 +137,18 @@ export default defineComponent({
           throw error
         }
       },
-      updateItem: async (id: string, data: Partial<ProductCreationParams>): Promise<void> => {
+      updateItem: async (id: string, data: Partial<ProductFormData>): Promise<void> => {
         try {
           console.log('Updating product with data:', data)
           const formData = new FormData()
           Object.entries(data).forEach(([key, value]) => {
             if (value !== undefined) {
-              if (key === 'image' && value instanceof File) {
-                formData.append(key, value, value.name)
+              if (key === 'image') {
+                if (value instanceof File) {
+                  formData.append(key, value, value.name)
+                } else {
+                  formData.append('existingImageUrl', value as string)
+                }
               } else {
                 formData.append(key, value.toString())
               }
@@ -168,7 +165,8 @@ export default defineComponent({
             formData.get('stock') as string | undefined,
             formData.get('isPromotion') as string | undefined,
             formData.get('lowStockThreshold') as string | undefined,
-            formData.get('image') as File | undefined
+            formData.get('image') as File | undefined,
+            formData.get('existingImageUrl') as string | undefined
           )
         } catch (error) {
           console.error('Error updating product:', error)

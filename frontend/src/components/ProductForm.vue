@@ -5,12 +5,7 @@
         {{ field.label }}
       </label>
       <input
-        v-if="
-          field.type !== 'select' &&
-          field.type !== 'checkbox' &&
-          field.type !== 'textarea' &&
-          field.type !== 'file'
-        "
+        v-if="field.type === 'text' || field.type === 'number'"
         :id="field.name"
         :type="field.type"
         :value="formData[field.name]"
@@ -42,7 +37,7 @@
         <input
           :id="field.name"
           type="checkbox"
-          :checked="formData[field.name] === 'true'"
+          :checked="formData[field.name] === true"
           @change="handleCheckboxChange(field.name, $event)"
           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
         />
@@ -105,15 +100,11 @@ export default defineComponent({
         type: 'textarea',
         placeholder: 'Description du produit'
       },
-      { name: 'price', label: 'Prix', type: 'number', placeholder: 'Prix du produit' },
+      { name: 'price', label: 'Prix', type: 'text', placeholder: 'Prix du produit' },
       { name: 'categoryId', label: 'Catégorie', type: 'select', options: props.categories },
       { name: 'brandId', label: 'Marque', type: 'select', options: props.brands },
       { name: 'stock', label: 'Stock', type: 'number', placeholder: 'Quantité en stock' },
-      {
-        name: 'image',
-        label: 'Image du produit',
-        type: 'file'
-      },
+      { name: 'image', label: 'Image du produit', type: 'file' },
       { name: 'isPromotion', label: 'En promotion', type: 'checkbox' },
       {
         name: 'lowStockThreshold',
@@ -126,17 +117,15 @@ export default defineComponent({
     const handleInputChange = (fieldName: string, event: Event) => {
       const target = event.target as HTMLInputElement
       let value: string | number = target.value
-
-      if (target.type === 'number') {
-        value = target.value === '' ? '' : target.value
+      if (target.type === 'number' && value !== '') {
+        value = parseFloat(value)
       }
-
       emit('update-field', fieldName, value)
     }
 
     const handleCheckboxChange = (fieldName: string, event: Event) => {
       const target = event.target as HTMLInputElement
-      emit('update-field', fieldName, target.checked ? 'true' : 'false')
+      emit('update-field', fieldName, target.checked)
     }
 
     const handleFileUpload = (event: Event, fieldName: string) => {
