@@ -47,7 +47,6 @@ function togglePasswordVisibility(field: 'password' | 'confirmPassword') {
     showConfirmPassword.value = !showConfirmPassword.value
   }
 }
-console.log(userStore.token)
 async function changePassword() {
   if (errors.value.length > 0 || passwordMismatch.value) {
     return

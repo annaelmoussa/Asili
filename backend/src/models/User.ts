@@ -1,10 +1,9 @@
 import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 import { sequelize } from "../config/dbConfigPostgres";
 import { IUser } from "../interfaces/IUser";
-import EmailNotification from "./EmailNotification";
-import UserPreferences from "./UserPreferences";
 import Widget from "./Widget";
 import { ALL_SCOPES } from "../config/scopes";
+import AlertPreference from "./AlertPreference";
 
 type UserCreationAttributes = Optional<IUser, "id" | "isConfirmed" | "confirmationToken">;
 
@@ -21,12 +20,8 @@ class User extends Model<IUser, UserCreationAttributes> implements IUser {
   public lastPasswordChange!: Date;
 
   static associate() {
-    User.hasMany(EmailNotification, {
-      foreignKey: "userId",
-      as: "notifications",
-    });
-    User.hasOne(UserPreferences, { foreignKey: "userId", as: "preferences" });
     User.hasMany(Widget, { foreignKey: "userId" });
+    User.hasOne(AlertPreference, { foreignKey: "userId", as: "alertPreferences" });
   }
 }
 

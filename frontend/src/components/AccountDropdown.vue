@@ -12,6 +12,7 @@
       <div v-else>
         <ul class="menu-list">
           <li v-if="isAdmin" @click="goToDashboard">{{ $t('app.auth.dashboard') }}</li>
+          <li v-if="!isAdmin" @click="goToProfile">{{ $t('app.profile.profile') }}</li>
           <li v-if="!isAdmin" @click="goToFavorites">{{ $t('app.auth.favorites') }}</li>
           <li v-if="!isAdmin" @click="goToOrders">{{ $t('app.auth.orders') }}</li>
           <li v-if="!isAdmin" @click="goToReferrals">{{ $t('app.auth.referrals') }}</li>
@@ -97,6 +98,11 @@ const goToMemberBenefits = () => {
 const logout = async () => {
   await userStore.logout()
 }
+
+const goToProfile = () => {
+  router.push('/profile')
+}
+
 </script>
 
 <style scoped>

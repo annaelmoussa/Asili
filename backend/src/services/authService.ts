@@ -5,9 +5,15 @@ import { TokenBlacklist } from "../models/TokenBlacklist";
 import { IUser } from "../interfaces/IUser";
 import sendEmail from "./emailService";
 import {UserService} from "./userService";
+import { AlertService } from "./AlertService";
 
 export class AuthService {
   private secret = process.env.JWT_SECRET || "your_jwt_secret";
+  private alertService: AlertService;
+
+  constructor() {
+    this.alertService = new AlertService();
+  }
 
   async login(
     email: string,
@@ -51,6 +57,8 @@ export class AuthService {
       isConfirmed: false,
       confirmationToken: confirmationToken,
     });
+    
+    await this.alertService.createAlertPreference(user.id);
 
     const confirmationLink = `http://localhost:3000/auth/confirm?token=${confirmationToken}`;
     await sendEmail(

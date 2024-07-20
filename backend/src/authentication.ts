@@ -14,7 +14,7 @@ export function expressAuthentication(
 ): Promise<any> {
   if (securityName === "jwt") {
     const token = request.headers["authorization"]?.split(" ")[1];
-
+    
     return new Promise(async (resolve, reject) => {
       if (!token) {
         return reject(new Error("No token provided"));

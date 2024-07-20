@@ -84,6 +84,11 @@
       "successTitle": "Merci !",
       "successMessage": "Votre paiement est en cours de traitement.",
       "backToHome": "Retourner à l'accueil"
+    },
+    "profile" : {
+      "profile": "Profil",
+      "data": "Mes données",
+      "notifications": "Mes notifications"
     }
   }
 }

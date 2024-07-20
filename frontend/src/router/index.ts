@@ -18,6 +18,9 @@ import PanelPayment from "../views/Panel/PanelPaymentsView.vue";
 import StripeCheckoutRedirect from "../components/StripeCheckoutRedirect.vue";
 import PaymentSuccess from "../views/PaymentSuccessView.vue"
 import ChangePasswordView from '../views/ChangePasswordView.vue'
+import UserProfile from '../views/ProfileView.vue'
+import UserData from '../views/UserDataView.vue'
+import UserNotification from '../views/UserNotificationView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -139,7 +142,30 @@ const routes: Array<RouteRecordRaw> = [
     path: '/change-password',
     name: 'change-password',
     component : ChangePasswordView
-  }
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'profile',
+        component: UserProfile,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'data',
+        name: 'data',
+        component: UserData,
+      },
+      {
+        path: 'notifications',
+        name: 'notifications',
+        component: UserNotification,
+      }
+    ],
+  },
 ]
 
 const router = createRouter({

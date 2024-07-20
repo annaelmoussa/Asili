@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-import { AuthApi, Configuration, type IUser, type LoginRequest, type LogoutRequest, type ResetPasswordRequest, type UpdatePasswordRequest } from '@/api';
+import { AuthApi,UserApi, Configuration, type IUser, type LoginRequest, type LogoutRequest, type ResetPasswordRequest, type UpdatePasswordRequest,type User } from '@/api';
 import { useCartStore } from "@/stores/cart";
 
 const configuration = new Configuration({
@@ -11,6 +11,7 @@ const configuration = new Configuration({
 });
 
 const authApi = new AuthApi(configuration);
+const userApi = new UserApi(configuration);
 
 export const useUserStore = defineStore('user', () => {
   const user = ref<IUser | null>(null)
@@ -116,6 +117,36 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  async function updateEmail(newEmail: string) {
+    try {
+      if (!user.value || !token.value) {
+        throw new Error('User not authenticated');
+      }
+      
+      // Créez un objet avec les données mises à jour
+      const updatedUserData: Partial<IUser> = {
+        ...user.value,
+        email: newEmail
+      };
+      console.log(updatedUserData);
+      
+      // Utilisez la méthode updateUser de l'API
+      const response = await userApi.updateUser(user.value.id, updatedUserData);
+      
+      if (response.data) {
+        user.value = response.data;
+        saveUserData();
+      }
+      
+      message.value = 'Email updated successfully.';
+    } catch (error) {
+      console.error('Failed to update email:', error);
+      message.value = error.response?.data?.message || 'An error occurred while updating email.';
+      throw error;
+    }
+  }
+
+
   function setUser(newUser: IUser) {
     user.value = newUser;
     saveUserData();
@@ -135,8 +166,10 @@ export const useUserStore = defineStore('user', () => {
     loading,
     message,
     clearUserData,
+    updateEmail,
     isAuthenticated: computed(() => !!user.value),
     hasScope: (requiredScope: string) => scopes.value.includes(requiredScope),
     mustChangePassword
+    
   }
 })
