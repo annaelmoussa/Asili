@@ -189,7 +189,8 @@ export class ProductController extends Controller {
     @FormField() stock?: string,
     @FormField() isPromotion?: string,
     @FormField() lowStockThreshold?: string,
-    @UploadedFile() image?: Express.Multer.File
+    @UploadedFile() image?: Express.Multer.File,
+    @FormField() existingImageUrl?: string
   ): Promise<IProduct | null> {
     const updates: Partial<IProduct> = {};
 
@@ -213,6 +214,8 @@ export class ProductController extends Controller {
         this.setStatus(500);
         throw new Error("Failed to save new image");
       }
+    } else if (existingImageUrl) {
+      updates.image = existingImageUrl;
     }
 
     try {
@@ -230,7 +233,12 @@ export class ProductController extends Controller {
         return null;
       }
 
-      if (newImagePath && oldProduct && oldProduct.image) {
+      if (
+        newImagePath &&
+        oldProduct &&
+        oldProduct.image &&
+        oldProduct.image !== existingImageUrl
+      ) {
         try {
           await this.deleteFile(oldProduct.image);
         } catch (deleteError) {

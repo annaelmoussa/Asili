@@ -1900,10 +1900,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {string} [isPromotion] 
          * @param {string} [lowStockThreshold] 
          * @param {File} [image] 
+         * @param {string} [existingImageUrl] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateProduct: async (productId: string, name?: string, description?: string, price?: string, categoryId?: string, brandId?: string, stock?: string, isPromotion?: string, lowStockThreshold?: string, image?: File, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateProduct: async (productId: string, name?: string, description?: string, price?: string, categoryId?: string, brandId?: string, stock?: string, isPromotion?: string, lowStockThreshold?: string, image?: File, existingImageUrl?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'productId' is not null or undefined
             assertParamExists('updateProduct', 'productId', productId)
             const localVarPath = `/products/{productId}`
@@ -1958,6 +1959,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             if (image !== undefined) { 
                 localVarFormParams.append('image', image as any);
+            }
+    
+            if (existingImageUrl !== undefined) { 
+                localVarFormParams.append('existingImageUrl', existingImageUrl as any);
             }
     
     
@@ -2347,11 +2352,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {string} [isPromotion] 
          * @param {string} [lowStockThreshold] 
          * @param {File} [image] 
+         * @param {string} [existingImageUrl] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateProduct(productId: string, name?: string, description?: string, price?: string, categoryId?: string, brandId?: string, stock?: string, isPromotion?: string, lowStockThreshold?: string, image?: File, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IProduct>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateProduct(productId, name, description, price, categoryId, brandId, stock, isPromotion, lowStockThreshold, image, options);
+        async updateProduct(productId: string, name?: string, description?: string, price?: string, categoryId?: string, brandId?: string, stock?: string, isPromotion?: string, lowStockThreshold?: string, image?: File, existingImageUrl?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IProduct>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateProduct(productId, name, description, price, categoryId, brandId, stock, isPromotion, lowStockThreshold, image, existingImageUrl, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateProduct']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -2626,11 +2632,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {string} [isPromotion] 
          * @param {string} [lowStockThreshold] 
          * @param {File} [image] 
+         * @param {string} [existingImageUrl] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateProduct(productId: string, name?: string, description?: string, price?: string, categoryId?: string, brandId?: string, stock?: string, isPromotion?: string, lowStockThreshold?: string, image?: File, options?: any): AxiosPromise<IProduct> {
-            return localVarFp.updateProduct(productId, name, description, price, categoryId, brandId, stock, isPromotion, lowStockThreshold, image, options).then((request) => request(axios, basePath));
+        updateProduct(productId: string, name?: string, description?: string, price?: string, categoryId?: string, brandId?: string, stock?: string, isPromotion?: string, lowStockThreshold?: string, image?: File, existingImageUrl?: string, options?: any): AxiosPromise<IProduct> {
+            return localVarFp.updateProduct(productId, name, description, price, categoryId, brandId, stock, isPromotion, lowStockThreshold, image, existingImageUrl, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2949,12 +2956,13 @@ export class DefaultApi extends BaseAPI {
      * @param {string} [isPromotion] 
      * @param {string} [lowStockThreshold] 
      * @param {File} [image] 
+     * @param {string} [existingImageUrl] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public updateProduct(productId: string, name?: string, description?: string, price?: string, categoryId?: string, brandId?: string, stock?: string, isPromotion?: string, lowStockThreshold?: string, image?: File, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).updateProduct(productId, name, description, price, categoryId, brandId, stock, isPromotion, lowStockThreshold, image, options).then((request) => request(this.axios, this.basePath));
+    public updateProduct(productId: string, name?: string, description?: string, price?: string, categoryId?: string, brandId?: string, stock?: string, isPromotion?: string, lowStockThreshold?: string, image?: File, existingImageUrl?: string, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).updateProduct(productId, name, description, price, categoryId, brandId, stock, isPromotion, lowStockThreshold, image, existingImageUrl, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
