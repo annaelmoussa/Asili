@@ -4,7 +4,7 @@ import api from './axiosConfig'
 import { useUserStore } from '@/stores/user'
 
 const configuration = new Configuration({
-  basePath: 'http://localhost:3000',
+  basePath: import.meta.env.VITE_API_BASE_URL as string,
   baseOptions: {
     withCredentials: true,
     axios: api

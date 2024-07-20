@@ -13,11 +13,15 @@
 import { LineChart } from '@/components/ui/chart-line'
 import { defineProps, computed } from 'vue'
 
+interface ChartData {
+  [key: string]: any
+}
+
 const props = defineProps({
-  data: { type: Array, required: true },
+  data: { type: Array as () => ChartData[], required: true },
   index: { type: String, required: true },
-  categories: { type: Array, required: true },
-  colors: { type: Array, required: true },
+  categories: { type: Array as () => string[], required: true },
+  colors: { type: Array as () => string[], required: true },
   keyElement: { type: String, required: true }
 })
 

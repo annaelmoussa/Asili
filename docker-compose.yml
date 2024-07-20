@@ -1,6 +1,8 @@
+version: "3.8"
+
 services:
   mongo:
-    image: mongo
+    image: mongo:latest
     volumes:
       - mongo_data:/data/db
     networks:
@@ -58,7 +60,9 @@ services:
       - backend
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -69,7 +73,7 @@ services:
       MONGO_URI: mongodb://mongo:27017/${MONGO_INITDB_DATABASE}
       POSTGRES_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
-      REDIS_URL: ${REDIS_URL}
+      REDIS_URL: redis://redis:6379
     depends_on:
       mongo:
         condition: service_started
@@ -81,7 +85,9 @@ services:
       - backend
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
     volumes:
       - ./frontend:/app
       - /app/node_modules

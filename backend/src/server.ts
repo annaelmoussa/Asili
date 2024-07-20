@@ -9,7 +9,7 @@ import { syncPostgresToMongo } from "./utils/syncPostgresToMongo";
 import { reservationExpirationQueue, stockReleaseQueue } from "./queues";
 import "./queues/processors";
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 8000;
 
 async function initializeDatabase() {
   try {
@@ -40,7 +40,7 @@ async function initializeDatabase() {
     console.log("Seeders executed");
   } catch (error) {
     console.error("Error initializing database:", error);
-    process.exit(1);
+    throw error;
   }
 }
 
@@ -51,7 +51,6 @@ async function startServer() {
     await connectPostgresDB();
     await syncPostgresToMongo();
 
-    // Ajoutez ces gestionnaires d'erreurs
     reservationExpirationQueue.on("error", (error) => {
       console.error("Reservation expiration queue error:", error);
     });
@@ -60,13 +59,36 @@ async function startServer() {
       console.error("Stock release queue error:", error);
     });
 
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
+    return new Promise((resolve) => {
+      const server = app.listen(port, "0.0.0.0", () => {
+        console.log(`Server is running on port ${port}`);
+        resolve(server);
+      });
+
+      server.on("error", (error) => {
+        console.error("Server error:", error);
+        process.exit(1);
+      });
     });
   } catch (error) {
     console.error("Failed to start the server:", error);
-    process.exit(1);
+    throw error;
   }
 }
 
-startServer();
+startServer().catch((error) => {
+  console.error("Unhandled error during server startup:", error);
+  process.exit(1);
+});
+
+// Gestion des erreurs non capturées
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+  // Application specific logging, throwing an error, or other logic here
+});
+
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception thrown:", error);
+  // Application specific logging, throwing an error, or other logic here
+  process.exit(1);
+});

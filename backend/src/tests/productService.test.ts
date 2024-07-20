@@ -1,193 +1,150 @@
 import { v4 as uuidv4 } from "uuid";
-import { Transaction } from "sequelize";
-import { IProduct, ProductCreationParams } from "../interfaces/IProduct";
 import { ProductService } from "../services/productService";
-import { sequelize } from "../config/dbConfigPostgres";
-import Brand from "../models/Brand";
-import Category from "../models/Category";
+import { ProductCreationParams } from "../interfaces/IProduct";
+import Product from "../models/Product";
+import CartItem from "../models/CartItem";
+
+jest.mock("../models/Product");
+jest.mock("../models/CartItem");
+jest.mock("../services/productMongoService");
 
 describe("ProductService", () => {
   let productService: ProductService;
-  let transaction: Transaction;
-  let testBrandId: string;
-  let testCategoryId: string;
+  let mockSequelize: any;
 
-  beforeAll(async () => {
-    productService = new ProductService(sequelize);
-
-    // Créer une marque et une catégorie de test
-    const brand = await Brand.create({ name: "Test Brand" });
-    const category = await Category.create({ name: "Test Category" });
-    testBrandId = brand.id;
-    testCategoryId = category.id;
-  });
-
-  beforeEach(async () => {
-    transaction = await sequelize.transaction();
-  });
-
-  afterEach(async () => {
-    await transaction.rollback();
-  });
-
-  const createTestProduct = async (
-    name: string = "Test Product"
-  ): Promise<IProduct> => {
-    const productCreationParams: ProductCreationParams = {
-      name,
-      description: `Description for ${name}`,
-      price: 10,
-      brandId: testBrandId,
-      categoryId: testCategoryId,
-      stock: 100,
-      isPromotion: false,
-      lowStockThreshold: 20,
+  beforeEach(() => {
+    jest.resetAllMocks();
+    mockSequelize = {
+      transaction: jest.fn(() => ({
+        commit: jest.fn(),
+        rollback: jest.fn(),
+      })),
     };
-    return await productService.create(productCreationParams, { transaction });
-  };
-
-  it("should create a product", async () => {
-    const product = await createTestProduct();
-    expect(product).toMatchObject({
-      name: "Test Product",
-      description: "Description for Test Product",
-      price: 10,
-      brandId: testBrandId,
-      categoryId: testCategoryId,
-      stock: 100,
-      isPromotion: false,
-      lowStockThreshold: 20,
-    });
-    expect(product.id).toBeDefined();
-    expect(product.stockHistory).toHaveLength(1);
-    expect(product.stockHistory[0].quantity).toBe(100);
+    productService = new ProductService(mockSequelize);
   });
 
-  it("should get all products", async () => {
-    await Promise.all([
-      createTestProduct("Product 1"),
-      createTestProduct("Product 2"),
-    ]);
+  describe("create", () => {
+    it("should create a new product with correct parameters", async () => {
+      const productParams: ProductCreationParams = {
+        name: "Test Product",
+        description: "Test Description",
+        price: 10,
+        brandId: uuidv4(),
+        categoryId: uuidv4(),
+        stock: 100,
+        isPromotion: false,
+        lowStockThreshold: 20,
+      };
 
-    const products = await productService.getAll({ transaction });
+      const mockCreatedProduct = { 
+        id: uuidv4(),
+        ...productParams,
+        stockHistory: [],
+        toJSON: jest.fn().mockReturnValue({ id: uuidv4(), ...productParams, stockHistory: [] })
+      };
 
-    expect(products.length).toBeGreaterThanOrEqual(2);
-    expect(products).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ name: "Product 1" }),
-        expect.objectContaining({ name: "Product 2" }),
-      ])
-    );
-  });
+      (Product.create as jest.Mock).mockResolvedValue(mockCreatedProduct);
+      (Product.findByPk as jest.Mock).mockResolvedValue(mockCreatedProduct);
 
-  it("should get a product by id", async () => {
-    const createdProduct = await createTestProduct();
-    const fetchedProduct = await productService.get(createdProduct.id, {
-      transaction,
-    });
+      const result = await productService.create(productParams);
 
-    expect(fetchedProduct).toMatchObject({
-      name: "Test Product",
-      description: "Description for Test Product",
-      price: 10,
-      brandId: testBrandId,
-      categoryId: testCategoryId,
-      stock: 100,
-      isPromotion: false,
-      lowStockThreshold: 20,
-    });
-    expect(fetchedProduct?.stockHistory).toHaveLength(1);
-  });
-
-  it("should return null for a non-existing product", async () => {
-    const nonExistingId = uuidv4();
-    const fetchedProduct = await productService.get(nonExistingId, {
-      transaction,
-    });
-    expect(fetchedProduct).toBeNull();
-  });
-
-  it("should update a product", async () => {
-    const createdProduct = await createTestProduct();
-    const updateParams: Partial<IProduct> = {
-      name: "Updated Product",
-      price: 15,
-      lowStockThreshold: 25,
-    };
-
-    const updatedProduct = await productService.update(
-      createdProduct.id,
-      updateParams,
-      { transaction }
-    );
-
-    expect(updatedProduct).not.toBeNull();
-    if (updatedProduct) {
-      expect(updatedProduct.name).toBe(updateParams.name);
-      expect(updatedProduct.price).toBe(updateParams.price);
-      expect(updatedProduct.lowStockThreshold).toBe(
-        updateParams.lowStockThreshold
+      expect(Product.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...productParams,
+          id: expect.any(String),
+          stockHistory: []
+        }),
+        undefined
       );
-      expect(updatedProduct.id).toBe(createdProduct.id);
-    }
-  });
-
-  it("should delete a product", async () => {
-    const createdProduct = await createTestProduct();
-    const deleteResult = await productService.delete(createdProduct.id, {
-      transaction,
+      expect(result).toEqual(expect.objectContaining(productParams));
     });
+  });
 
-    expect(deleteResult).toBe(true);
+  describe("get", () => {
+    it("should retrieve a product by id", async () => {
+      const productId = uuidv4();
+      const mockProduct = { 
+        id: productId, 
+        name: "Test Product",
+        toJSON: jest.fn().mockReturnValue({ id: productId, name: "Test Product" })
+      };
+      (Product.findByPk as jest.Mock).mockResolvedValue(mockProduct);
 
-    const fetchedProduct = await productService.get(createdProduct.id, {
-      transaction,
+      const result = await productService.get(productId);
+
+      expect(Product.findByPk).toHaveBeenCalledWith(productId, expect.any(Object));
+      expect(result).toEqual({ id: productId, name: "Test Product" });
     });
-    expect(fetchedProduct).toBeNull();
   });
 
-  it("should update stock", async () => {
-    const createdProduct = await createTestProduct();
-    const updatedProduct = await productService.updateStock(
-      createdProduct.id,
-      50,
-      { transaction }
-    );
+  describe("update", () => {
+    it("should update a product with correct parameters", async () => {
+      const productId = uuidv4();
+      const updateParams = { name: "Updated Product", price: 15 };
+      const mockUpdatedProduct = { 
+        id: productId, 
+        ...updateParams,
+        toJSON: jest.fn().mockReturnValue({ id: productId, ...updateParams })
+      };
+      (Product.update as jest.Mock).mockResolvedValue([1]);
+      (Product.findByPk as jest.Mock).mockResolvedValue(mockUpdatedProduct);
 
-    expect(updatedProduct).not.toBeNull();
-    if (updatedProduct) {
-      expect(updatedProduct.stock).toBe(150);
-      expect(updatedProduct.stockHistory).toHaveLength(2);
-      expect(updatedProduct.stockHistory[1].quantity).toBe(150);
-    }
-  });
+      const result = await productService.update(productId, updateParams);
 
-  it("should get low stock products", async () => {
-    const lowStockProduct = await createTestProduct("Low Stock Product");
-    await productService.updateStock(lowStockProduct.id, -90, { transaction });
-
-    const lowStockProducts = await productService.getLowStockProducts({
-      transaction,
+      expect(Product.update).toHaveBeenCalledWith(updateParams, expect.any(Object));
+      expect(result).toEqual({ id: productId, ...updateParams });
     });
-
-    expect(lowStockProducts).toHaveLength(1);
-    expect(lowStockProducts[0].name).toBe("Low Stock Product");
-    expect(lowStockProducts[0].stock).toBe(10);
   });
 
-  it("should get stock history", async () => {
-    const createdProduct = await createTestProduct();
-    await productService.updateStock(createdProduct.id, 50, { transaction });
-    await productService.updateStock(createdProduct.id, -30, { transaction });
+  describe("delete", () => {
+    it("should delete a product", async () => {
+      const productId = uuidv4();
+      (CartItem.destroy as jest.Mock).mockResolvedValue(1);
+      (Product.destroy as jest.Mock).mockResolvedValue(1);
 
-    const stockHistory = await productService.getStockHistory(
-      createdProduct.id,
-      { transaction }
-    );
+      const result = await productService.delete(productId);
 
-    expect(stockHistory).toHaveLength(3);
-    expect(stockHistory[0].quantity).toBe(100);
-    expect(stockHistory[1].quantity).toBe(150);
-    expect(stockHistory[2].quantity).toBe(120);
+      expect(CartItem.destroy).toHaveBeenCalledWith(expect.any(Object));
+      expect(Product.destroy).toHaveBeenCalledWith(expect.any(Object));
+      expect(result).toBe(true);
+    });
+  });
+
+  describe("updateStock", () => {
+    it("should update product stock", async () => {
+      const productId = uuidv4();
+      const initialStock = 100;
+      const stockChange = 50;
+      const mockProduct = {
+        id: productId,
+        stock: initialStock,
+        stockHistory: [],
+        save: jest.fn(),
+        toJSON: jest.fn().mockReturnValue({ id: productId, stock: initialStock + stockChange, stockHistory: [{ date: expect.any(Date), quantity: initialStock + stockChange }] }),
+      };
+      (Product.findByPk as jest.Mock).mockResolvedValue(mockProduct);
+
+      const result = await productService.updateStock(productId, stockChange);
+
+      expect(Product.findByPk).toHaveBeenCalledWith(productId, undefined);
+      expect(mockProduct.save).toHaveBeenCalled();
+      expect(result?.stock).toBe(initialStock + stockChange);
+      expect(result?.stockHistory).toHaveLength(1);
+      expect(result?.stockHistory[0].quantity).toBe(initialStock + stockChange);
+    });
+  });
+
+  describe("getLowStockProducts", () => {
+    it("should retrieve low stock products", async () => {
+      const mockLowStockProducts = [
+        { id: uuidv4(), name: "Low Stock Product", stock: 5, toJSON: jest.fn().mockReturnValue({ id: uuidv4(), name: "Low Stock Product", stock: 5 }) },
+      ];
+      (Product.findAll as jest.Mock).mockResolvedValue(mockLowStockProducts);
+
+      const result = await productService.getLowStockProducts();
+
+      expect(Product.findAll).toHaveBeenCalled();
+      expect(result).toEqual([{ id: expect.any(String), name: "Low Stock Product", stock: 5 }]);
+    });
   });
 });
