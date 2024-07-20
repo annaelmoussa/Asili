@@ -1,7 +1,7 @@
-// axiosConfig.ts
 import axios from 'axios'
 import router from '@/router'
 import { useUserStore } from '@/stores/user'
+import { useNotificationStore } from '@/stores/notification'
 
 const api = axios.create({
   baseURL: 'http://localhost:3000',
@@ -15,6 +15,16 @@ api.interceptors.response.use(
   },
   (error) => {
     console.log('API error:', error)
+    const notificationStore = useNotificationStore()
+    
+    if (error.response) {
+      notificationStore.showNotification(error.response.data.message || 'An error occurred', 'error')
+    } else if (error.request) {
+      notificationStore.showNotification('No response received from server', 'error')
+    } else {
+      notificationStore.showNotification('Error setting up the request', 'error')
+    }
+
     if (error.response && error.response.status === 401) {
       console.log('Init user store')
       const userStore = useUserStore()
