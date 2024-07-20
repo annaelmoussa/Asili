@@ -42,12 +42,12 @@ const ProductMongoSchema: Schema = new Schema(
   }
 );
 
-// Création d'index pour améliorer les performances des requêtes
 ProductMongoSchema.index({ name: "text", description: "text" });
 ProductMongoSchema.index({ categoryId: 1, brandId: 1 });
 ProductMongoSchema.index({ price: 1 });
 ProductMongoSchema.index({ stock: 1 });
 ProductMongoSchema.index({ isPromotion: 1 });
+ProductMongoSchema.index({ brandName: 1, categoryName: 1 });
 
 const ProductMongo = mongoose.model<IProductMongo>(
   "Product",
