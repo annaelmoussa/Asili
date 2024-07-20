@@ -16,5 +16,11 @@
   "routes": {
     "routesDir": "build",
     "authenticationModule": "./src/authentication.ts"
+  },
+  "multer": {
+    "storage": {
+      "type": "disk",
+      "destination": "./uploads"
+    }
   }
 }

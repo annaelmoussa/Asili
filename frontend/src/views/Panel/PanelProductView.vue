@@ -29,7 +29,7 @@
 import { defineComponent, ref, onMounted } from 'vue'
 import { z } from 'zod'
 import { defaultApi } from '@/api/config'
-import type { IProduct, ICategory, IBrand, ProductCreationParams } from '@/api'
+import type { IProduct, ICategory, IBrand } from '@/api'
 import CrudPanel from '@/components/CrudPanel.vue'
 import type { TableColumn } from '@/types/table'
 import ProductForm from '@/components/ProductForm.vue'
@@ -39,6 +39,18 @@ import { extractImageUrl, formatPrice, parsePrice } from '@/utils/productUtils'
 interface TableItem {
   id: string | number
   [key: string]: any
+}
+
+interface ProductCreationParams {
+  name: string
+  description: string
+  price: string
+  categoryId: string
+  brandId: string
+  stock: string
+  isPromotion: string
+  lowStockThreshold: string
+  image?: File
 }
 
 export default defineComponent({
@@ -54,8 +66,8 @@ export default defineComponent({
       { key: 'name', label: 'Nom', sortable: true, type: 'text' },
       { key: 'price', label: 'Prix', sortable: true, type: 'text' },
       { key: 'stock', label: 'Stock', sortable: true, type: 'text' },
-      { key: 'category.name', label: 'Catégorie', sortable: true, type: 'text' },
-      { key: 'brand.name', label: 'Marque', sortable: true, type: 'text' },
+      { key: 'categoryName', label: 'Catégorie', sortable: true, type: 'text' },
+      { key: 'brandName', label: 'Marque', sortable: true, type: 'text' },
       { key: 'isPromotion', label: 'Promotion', sortable: true, type: 'boolean' }
     ]
 
@@ -65,49 +77,29 @@ export default defineComponent({
       price: z.number().min(0, 'Le prix doit être positif'),
       categoryId: z.string().min(1, 'La catégorie est requise'),
       brandId: z.string().min(1, 'La marque est requise'),
-      stock: z.number().int().min(0, 'Le stock doit être positif'),
-      image: z.string().url("L'URL de l'image est invalide").optional(),
+      stock: z.number().min(0, 'Le stock doit être positif'),
+      image: z.any(),
       isPromotion: z.boolean(),
-      lowStockThreshold: z.number().int().min(0, 'Le seuil de stock bas doit être positif')
+      lowStockThreshold: z.number().min(0, 'Le seuil de stock bas doit être positif')
     })
 
     const initialData: ProductCreationParams = {
       name: '',
       description: '',
-      price: 0,
+      price: '0',
       categoryId: '',
       brandId: '',
-      stock: 0,
-      image: '',
-      isPromotion: false,
-      lowStockThreshold: 10 // Provide a default value
+      stock: '0',
+      image: undefined,
+      isPromotion: 'false',
+      lowStockThreshold: '10'
     }
 
     const transformations = {
       price: (value: string) => parseFloat(value),
-      stock: (value: string) => parseInt(value),
-      lowStockThreshold: (value: string) => parseInt(value)
-    }
-
-    function cleanProductData(
-      data: Partial<ProductCreationParams>
-    ): Partial<ProductCreationParams> {
-      const cleanedData: Partial<ProductCreationParams> = {
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        categoryId: data.categoryId,
-        brandId: data.brandId,
-        stock: data.stock,
-        image: data.image,
-        isPromotion: data.isPromotion,
-        lowStockThreshold: data.lowStockThreshold
-      }
-
-      // Filtrer les propriétés undefined
-      return Object.fromEntries(
-        Object.entries(cleanedData).filter(([_, v]) => v !== undefined)
-      ) as Partial<ProductCreationParams>
+      stock: (value: string) => parseInt(value, 10),
+      lowStockThreshold: (value: string) => parseInt(value, 10),
+      isPromotion: (value: string) => value === 'true'
     }
 
     const apiActions = {
@@ -123,12 +115,65 @@ export default defineComponent({
         }))
       },
       createItem: async (data: ProductCreationParams): Promise<void> => {
-        const cleanedData = cleanProductData(data)
-        await defaultApi.createProduct(cleanedData)
+        try {
+          console.log('Creating product with data:', data)
+          const formData = new FormData()
+          Object.entries(data).forEach(([key, value]) => {
+            if (value !== undefined) {
+              if (key === 'image' && value instanceof File) {
+                formData.append(key, value, value.name)
+              } else {
+                formData.append(key, value.toString())
+              }
+            }
+          })
+
+          await defaultApi.createProduct(
+            formData.get('name') as string,
+            formData.get('description') as string,
+            formData.get('price') as string,
+            formData.get('categoryId') as string,
+            formData.get('brandId') as string,
+            formData.get('stock') as string,
+            formData.get('isPromotion') as string,
+            formData.get('lowStockThreshold') as string,
+            formData.get('image') as File | undefined
+          )
+        } catch (error) {
+          console.error('Error creating product:', error)
+          throw error
+        }
       },
       updateItem: async (id: string, data: Partial<ProductCreationParams>): Promise<void> => {
-        const cleanedData = cleanProductData(data)
-        await defaultApi.updateProduct(id, cleanedData)
+        try {
+          console.log('Updating product with data:', data)
+          const formData = new FormData()
+          Object.entries(data).forEach(([key, value]) => {
+            if (value !== undefined) {
+              if (key === 'image' && value instanceof File) {
+                formData.append(key, value, value.name)
+              } else {
+                formData.append(key, value.toString())
+              }
+            }
+          })
+
+          await defaultApi.updateProduct(
+            id,
+            formData.get('name') as string | undefined,
+            formData.get('description') as string | undefined,
+            formData.get('price') as string | undefined,
+            formData.get('categoryId') as string | undefined,
+            formData.get('brandId') as string | undefined,
+            formData.get('stock') as string | undefined,
+            formData.get('isPromotion') as string | undefined,
+            formData.get('lowStockThreshold') as string | undefined,
+            formData.get('image') as File | undefined
+          )
+        } catch (error) {
+          console.error('Error updating product:', error)
+          throw error
+        }
       },
       deleteItem: async (id: string): Promise<void> => {
         await defaultApi.deleteProduct(id)

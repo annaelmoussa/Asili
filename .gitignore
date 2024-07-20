@@ -59,3 +59,6 @@ pnpm-lock.yaml
 # Autres fichiers et répertoires ignorés
 .DS_Store
 Thumbs.db
+
+
+/backend/uploads/

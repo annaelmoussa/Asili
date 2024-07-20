@@ -4,6 +4,7 @@ import cors from "cors";
 import { RegisterRoutes } from "../build/routes";
 import { errorHandler } from "./middlewares/errorHandler";
 import { loginRateLimiter } from "./middlewares/rateLimiter";
+import path from "path";
 
 export const app = express();
 const corsOptions = {
@@ -17,6 +18,18 @@ app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/auth/login", loginRateLimiter);
+
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "..", "uploads"), {
+    dotfiles: "deny",
+    index: false,
+    setHeaders: (res) => {
+      res.set("Cache-Control", "public, max-age=3600");
+      res.set("Cross-Origin-Resource-Policy", "cross-origin");
+    },
+  })
+);
 
 // Registering the routes
 RegisterRoutes(app);
