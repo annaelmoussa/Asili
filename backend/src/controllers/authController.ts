@@ -45,7 +45,7 @@ export class AuthController extends Controller {
   @OperationId("loginUser")
   public async login(
     @Body() body: LoginRequest
-  ): Promise<{ user: IUser; token: string,mustChangePassword : boolean }> {
+  ): Promise<{ user: IUser; token: string }> {
     const authService = new AuthService();
     try {
       return await authService.login(body.email, body.password);

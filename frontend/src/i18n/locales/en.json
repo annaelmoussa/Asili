@@ -86,6 +86,11 @@
       "successTitle": "Thank's !",
       "successMessage": "your payment is in process.",
       "backToHome": "Back to home"
+    },
+    "profile" : {
+      "profile": "Profil",
+      "data":"My data",
+      "notifications": "My notifications"
     }
   }
 }

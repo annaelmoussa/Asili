@@ -9,6 +9,7 @@ const scopes_1 = require("../config/scopes");
 const uuid_1 = require("uuid");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const Widget_1 = __importDefault(require("../models/Widget"));
+const date_fns_1 = require("date-fns");
 class UserService {
     async get(userId, options) {
         try {
@@ -129,6 +130,14 @@ class UserService {
     // Remplacer la méthode de suppression dure par la suppression douce
     async delete(userId, options) {
         return this.softDelete(userId, options);
+    }
+    async shouldChangePassword(userId) {
+        const user = await User_1.default.findByPk(userId);
+        if (!user) {
+            throw new Error("User not found");
+        }
+        const daysSinceLastChange = (0, date_fns_1.differenceInDays)(new Date(), user.lastPasswordChange);
+        return daysSinceLastChange >= 60;
     }
 }
 exports.UserService = UserService;

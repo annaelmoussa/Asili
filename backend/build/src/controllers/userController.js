@@ -60,6 +60,11 @@ let UserController = class UserController extends tsoa_1.Controller {
             throw new UnauthorizedError_1.UnauthorizedError("You are not authorized to perform this action on another user's account");
         }
     }
+    async getPasswordStatus(request) {
+        const userId = request.user.id;
+        const needsChange = await new userService_1.UserService().shouldChangePassword(userId);
+        return { needsChange };
+    }
 };
 exports.UserController = UserController;
 __decorate([
@@ -111,6 +116,15 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "deleteUser", null);
+__decorate([
+    (0, tsoa_1.Security)("jwt"),
+    (0, tsoa_1.Get)("password-status"),
+    (0, tsoa_1.OperationId)("getPasswordStatus"),
+    __param(0, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getPasswordStatus", null);
 exports.UserController = UserController = __decorate([
     (0, tsoa_1.Security)("jwt"),
     (0, tsoa_1.Route)("users"),

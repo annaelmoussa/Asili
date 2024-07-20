@@ -24,8 +24,10 @@ import OrdersView from '../views/OrdersView.vue'
 import ReferralsView from '../views/ReferralsView.vue'
 import MemberBenefitsView from '../views/MemberBenefitsView.vue'
 import PanelViewStock from '../views/Panel/PanelStockView.vue'
-import PanelDashboard from '../views/Panel/PanelDashboardView.vue';
 import ChangePasswordView from '../views/ChangePasswordView.vue'
+import UserProfile from '../views/ProfileView.vue'
+import UserData from '../views/UserDataView.vue'
+import UserNotification from '../views/UserNotificationView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -162,7 +164,30 @@ const routes: Array<RouteRecordRaw> = [
     path: '/change-password',
     name: 'change-password',
     component : ChangePasswordView
-  }
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        name: 'profile',
+        component: UserProfile,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'data',
+        name: 'data',
+        component: UserData,
+      },
+      {
+        path: 'notifications',
+        name: 'notifications',
+        component: UserNotification,
+      }
+    ],
+  },
 ]
 
 const router = createRouter({

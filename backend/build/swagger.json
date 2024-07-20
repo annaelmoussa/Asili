@@ -38,6 +38,10 @@
 					},
 					"isDeleted": {
 						"type": "boolean"
+					},
+					"lastPasswordChange": {
+						"type": "string",
+						"format": "date-time"
 					}
 				},
 				"required": [
@@ -79,6 +83,10 @@
 					},
 					"isDeleted": {
 						"type": "boolean"
+					},
+					"lastPasswordChange": {
+						"type": "string",
+						"format": "date-time"
 					}
 				},
 				"type": "object",
@@ -695,6 +703,62 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"IAlertPreference": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"userId": {
+						"type": "string"
+					},
+					"newProductInCategory": {
+						"type": "boolean"
+					},
+					"productRestock": {
+						"type": "boolean"
+					},
+					"priceChange": {
+						"type": "boolean"
+					},
+					"newsletter": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"id",
+					"userId",
+					"newProductInCategory",
+					"productRestock",
+					"priceChange",
+					"newsletter"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Partial_IAlertPreference_": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"userId": {
+						"type": "string"
+					},
+					"newProductInCategory": {
+						"type": "boolean"
+					},
+					"productRestock": {
+						"type": "boolean"
+					},
+					"priceChange": {
+						"type": "boolean"
+					},
+					"newsletter": {
+						"type": "boolean"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
 			}
 		},
 		"securitySchemes": {
@@ -891,6 +955,40 @@
 						}
 					}
 				}
+			}
+		},
+		"/users/password-status": {
+			"get": {
+				"operationId": "getPasswordStatus",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"needsChange": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"needsChange"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": []
 			}
 		},
 		"/products/low-stock": {
@@ -2551,6 +2649,70 @@
 					}
 				],
 				"parameters": []
+			}
+		},
+		"/alerts/preferences": {
+			"get": {
+				"operationId": "GetAlertPreferences",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/IAlertPreference"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": []
+			},
+			"put": {
+				"operationId": "UpdateAlertPreferences",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/IAlertPreference"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Partial_IAlertPreference_"
+							}
+						}
+					}
+				}
 			}
 		}
 	},

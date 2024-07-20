@@ -14,6 +14,7 @@ import { ALL_SCOPES } from "../config/scopes";
 import EmailNotification from "./EmailNotification";
 import UserPreferences from "./UserPreferences";
 import Widget from "./Widget";
+import AlertPreference from "./AlertPreference";
 
 type UserCreationAttributes = Optional<IUser, "id" | "isConfirmed" | "confirmationToken" | "lastPasswordChange">;
 
@@ -107,11 +108,7 @@ export default class User extends Model<IUser, UserCreationAttributes> implement
   }
 
   static associate() {
-    User.hasMany(EmailNotification, {
-      foreignKey: "userId",
-      as: "notifications",
-    });
-    User.hasOne(UserPreferences, { foreignKey: "userId", as: "preferences" });
     User.hasMany(Widget, { foreignKey: "userId" });
+    User.hasOne(AlertPreference, { foreignKey: "userId", as: "alertPreferences" });
   }
 }

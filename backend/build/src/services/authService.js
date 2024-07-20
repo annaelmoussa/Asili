@@ -9,9 +9,11 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const User_1 = __importDefault(require("../models/User"));
 const TokenBlacklist_1 = __importDefault(require("../models/TokenBlacklist"));
 const emailService_1 = __importDefault(require("./emailService"));
+const AlertService_1 = require("./AlertService");
 class AuthService {
     constructor() {
         this.secret = process.env.JWT_SECRET || "your_jwt_secret";
+        this.alertService = new AlertService_1.AlertService();
     }
     async login(email, password) {
         const user = await User_1.default.findOne({ where: { email } });
@@ -45,6 +47,7 @@ class AuthService {
             isConfirmed: false,
             confirmationToken: confirmationToken,
         });
+        await this.alertService.createAlertPreference(user.id);
         const confirmationLink = `http://localhost:3000/auth/confirm?token=${confirmationToken}`;
         await (0, emailService_1.default)(email, "Please confirm your account", `Click the following link to confirm your account: ${confirmationLink}`);
         return user.toJSON();
@@ -89,9 +92,7 @@ class AuthService {
             // If the user doesn't exist, do nothing to avoid information leaks
             return;
         }
-        const token = jsonwebtoken_1.default.sign({ email: user.email, id: user.id }, this.secret, {
-            expiresIn: "1h",
-        });
+        const token = jsonwebtoken_1.default.sign({ email: user.email, userId: user.id }, this.secret, { expiresIn: '1h' });
         const resetLink = `http://localhost:8080/reset-password?token=${token}`;
         const emailText = `Click here to reset your password: ${resetLink}`;
         const emailHtml = `<a href="${resetLink}">Click here to reset your password</a>`;
@@ -103,9 +104,7 @@ class AuthService {
         }
         try {
             const decoded = jsonwebtoken_1.default.verify(token, this.secret);
-            const user = await User_1.default.findOne({
-                where: { id: decoded.id, email: decoded.email },
-            });
+            const user = await User_1.default.findOne({ where: { id: decoded.userId, email: decoded.email } });
             if (!user) {
                 throw new Error("Invalid token or user does not exist.");
             }

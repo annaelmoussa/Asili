@@ -23,7 +23,7 @@ let AuthController = class AuthController extends tsoa_1.Controller {
         }
         catch (error) {
             this.setStatus(401);
-            throw new Error("Invalid email or password");
+            throw new Error(error.message);
         }
     }
     async signup(body) {
@@ -66,7 +66,6 @@ let AuthController = class AuthController extends tsoa_1.Controller {
         return { message: "If an account with that email exists, a password reset link has been sent." };
     }
     async resetPassword(body) {
-        console.log(body);
         const authService = new authService_1.AuthService();
         await authService.resetPassword(body.token, body.password, body.confirm_password);
         return { message: "Password has been reset successfully." };
