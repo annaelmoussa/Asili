@@ -1,15 +1,26 @@
-import ProductMongo from "../models/ProductMongo";
+import ProductMongo, { IProductMongo } from "../models/ProductMongo";
 import { IProduct } from "../interfaces/IProduct";
+import { FilterQuery } from "mongoose";
+import Brand from "../models/Brand";
+import Category from "../models/Category";
 
 export class ProductMongoService {
   public async syncWithPostgres(product: IProduct): Promise<void> {
     const { brand, category, ...productData } = product;
+
+    const brandName = brand
+      ? brand.name
+      : await this.getBrandName(product.brandId);
+    const categoryName = category
+      ? category.name
+      : await this.getCategoryName(product.categoryId);
+
     await ProductMongo.findOneAndUpdate(
       { id: product.id },
       {
         ...productData,
-        brandName: brand?.name,
-        categoryName: category?.name,
+        brandName,
+        categoryName,
         lowStockThreshold: product.lowStockThreshold,
         stockHistory: product.stockHistory,
       },
@@ -18,6 +29,31 @@ export class ProductMongoService {
         new: true,
       }
     );
+  }
+
+  private async getBrandName(brandId: string): Promise<string | undefined> {
+    const brand = await Brand.findByPk(brandId);
+    return brand?.name;
+  }
+
+  private async getCategoryName(
+    categoryId: string
+  ): Promise<string | undefined> {
+    const category = await Category.findByPk(categoryId);
+    return category?.name;
+  }
+
+  public async updateAllProductsWithBrandAndCategoryNames(): Promise<void> {
+    const products = await ProductMongo.find();
+    for (const product of products) {
+      const brandName = await this.getBrandName(product.brandId);
+      const categoryName = await this.getCategoryName(product.categoryId);
+      await ProductMongo.updateOne(
+        { id: product.id },
+        { $set: { brandName, categoryName } }
+      );
+    }
+    console.log("All products updated with brand and category names");
   }
 
   public async delete(id: string): Promise<void> {
@@ -35,14 +71,7 @@ export class ProductMongoService {
       maxPrice?: string;
     }
   ): Promise<IProduct[]> {
-    const searchQuery: {
-      $or?: { [key: string]: { $regex: string; $options: string } }[];
-      categoryId?: string;
-      brandId?: string;
-      isPromotion?: boolean;
-      stock?: { $gt: number };
-      price?: { $gte?: number; $lte?: number };
-    } = {};
+    const searchQuery: FilterQuery<IProductMongo> = {};
 
     if (query) {
       searchQuery.$or = [
@@ -53,8 +82,8 @@ export class ProductMongoService {
 
     console.log("Facets:", facets);
 
-    if (facets.category) searchQuery.categoryId = facets.category;
-    if (facets.brand) searchQuery.brandId = facets.brand;
+    if (facets.category) searchQuery.categoryName = facets.category;
+    if (facets.brand) searchQuery.brandName = facets.brand;
     if (facets.isPromotion !== undefined)
       searchQuery.isPromotion = facets.isPromotion === "true";
     if (facets.inStock === "true") searchQuery.stock = { $gt: 0 };
@@ -68,9 +97,10 @@ export class ProductMongoService {
       "Final MongoDB search query:",
       JSON.stringify(searchQuery, null, 2)
     );
-    const results = await ProductMongo.find(searchQuery);
+
+    const results = await ProductMongo.find(searchQuery).lean();
     console.log("Search results:", results);
-    return results;
+    return results as IProduct[];
   }
 
   public async updateStock(
@@ -90,8 +120,8 @@ export class ProductMongoService {
   public async getLowStockProducts(): Promise<IProduct[]> {
     const products = await ProductMongo.find({
       $expr: { $lte: ["$stock", "$lowStockThreshold"] },
-    });
-    return products.map((product) => product.toObject());
+    }).lean();
+    return products as IProduct[];
   }
 
   public async getStockHistory(
