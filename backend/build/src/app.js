@@ -9,6 +9,7 @@ const helmet_1 = __importDefault(require("helmet"));
 const cors_1 = __importDefault(require("cors"));
 const routes_1 = require("../build/routes");
 const errorHandler_1 = require("./middlewares/errorHandler");
+const body_parser_1 = __importDefault(require("body-parser"));
 const rateLimiter_1 = require("./middlewares/rateLimiter");
 const path_1 = __importDefault(require("path"));
 exports.app = (0, express_1.default)();
@@ -17,6 +18,9 @@ const corsOptions = {
     origin: isProd ? "https://littleyarns.org" : "http://localhost:8080",
     credentials: true,
 };
+exports.app.use("/stripe-webhook", body_parser_1.default.raw({ type: 'application/json' }));
+exports.app.use(body_parser_1.default.json());
+exports.app.use(body_parser_1.default.urlencoded({ extended: true }));
 // Middleware Configuration
 exports.app.use((0, helmet_1.default)({
     contentSecurityPolicy: {

@@ -8,13 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
-const User_1 = __importDefault(require("./User"));
-let EmailNotification = class EmailNotification extends sequelize_typescript_1.Model {
+let SentEmail = class SentEmail extends sequelize_typescript_1.Model {
 };
 __decorate([
     (0, sequelize_typescript_1.Column)({
@@ -23,44 +19,47 @@ __decorate([
         primaryKey: true,
     }),
     __metadata("design:type", String)
-], EmailNotification.prototype, "id", void 0);
-__decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => User_1.default),
-    (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.UUID,
-        allowNull: false,
-    }),
-    __metadata("design:type", String)
-], EmailNotification.prototype, "userId", void 0);
+], SentEmail.prototype, "id", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
         allowNull: false,
     }),
     __metadata("design:type", String)
-], EmailNotification.prototype, "type", void 0);
+], SentEmail.prototype, "to", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.UUID,
+        type: sequelize_typescript_1.DataType.STRING,
+        allowNull: false,
+    }),
+    __metadata("design:type", String)
+], SentEmail.prototype, "subject", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.TEXT,
         allowNull: true,
     }),
     __metadata("design:type", String)
-], EmailNotification.prototype, "productId", void 0);
+], SentEmail.prototype, "text", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.UUID,
+        type: sequelize_typescript_1.DataType.TEXT,
         allowNull: true,
     }),
     __metadata("design:type", String)
-], EmailNotification.prototype, "categoryId", void 0);
+], SentEmail.prototype, "html", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => User_1.default),
-    __metadata("design:type", User_1.default)
-], EmailNotification.prototype, "user", void 0);
-EmailNotification = __decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.DATE,
+        allowNull: false,
+        defaultValue: sequelize_typescript_1.DataType.NOW,
+    }),
+    __metadata("design:type", Date)
+], SentEmail.prototype, "sentAt", void 0);
+SentEmail = __decorate([
     (0, sequelize_typescript_1.Table)({
-        tableName: "EmailNotifications",
-        timestamps: true,
+        tableName: "SentEmail",
+        timestamps: false,
     })
-], EmailNotification);
-exports.default = EmailNotification;
+], SentEmail);
+exports.default = SentEmail;

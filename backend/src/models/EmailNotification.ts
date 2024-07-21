@@ -1,56 +1,54 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import { sequelize } from "../config/dbConfigPostgres";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+} from "sequelize-typescript";
 import { IEmailNotification } from "../interfaces/IEmailNotification";
 import User from "./User";
 
-type EmailNotificationCreationAttributes = Optional<IEmailNotification, "id">;
-
-class EmailNotification
-  extends Model<IEmailNotification, EmailNotificationCreationAttributes>
+@Table({
+  tableName: "EmailNotifications",
+  timestamps: true,
+})
+export default class EmailNotification
+  extends Model<IEmailNotification>
   implements IEmailNotification
 {
-  public id!: string;
-  public userId!: string;
-  public type!: string;
-  public productId?: string;
-  public categoryId?: string;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
 
-  static associate(models: any) {
-    EmailNotification.belongsTo(models.User, { as: "user" });
-  }
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  userId!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  type!: string;
+
+  @Column({
+    type: DataType.UUID,
+    allowNull: true,
+  })
+  productId?: string;
+
+  @Column({
+    type: DataType.UUID,
+    allowNull: true,
+  })
+  categoryId?: string;
+
+  @BelongsTo(() => User)
+  user!: User;
 }
-
-EmailNotification.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    userId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
-    type: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    productId: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
-    categoryId: {
-      type: DataTypes.UUID,
-      allowNull: true,
-    },
-  },
-  {
-    sequelize,
-    modelName: "EmailNotification",
-    timestamps: true,
-  }
-);
-
-export default EmailNotification;

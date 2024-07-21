@@ -63,7 +63,7 @@ export class AuthService {
 
   async confirmEmail(token: string): Promise<IUser | null> {
     try {
-      const decoded: any = jwt.verify(token, this.secret);
+      const decoded = jwt.verify(token, this.secret) as { email: string };
       const user = await User.findOne({
         where: { confirmationToken: token, email: decoded.email },
       });

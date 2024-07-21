@@ -1,53 +1,55 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import { sequelize } from '../config/dbConfigPostgres';
-import User from './User';
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+  CreatedAt,
+} from "sequelize-typescript";
 import { IPayment } from "../interfaces/IPayment";
+import User from "./User";
 
-type PaymentCreationAttributes = Optional<IPayment, 'id'>;
+@Table({
+  tableName: "Payment",
+  timestamps: true,
+})
+export default class Payment extends Model<IPayment> implements IPayment {
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
 
-class Payment extends Model<IPayment, PaymentCreationAttributes> implements IPayment {
-  public id!: string;
-  public userId!: string;
-  public stripePaymentId!: string;
-  public amount!: number;
-  public status!: string;
-
-  static associate(models: any) {
-    Payment.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
-  }
-}
-
-Payment.init({
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-    primaryKey: true
-  },
-  userId: {
-    type: DataTypes.UUID,
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.UUID,
     allowNull: false,
-    references: {
-      model: 'User',
-      key: 'id'
-    }
-  },
-  stripePaymentId: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  amount: {
-    type: DataTypes.DOUBLE,
-    allowNull: false
-  },
-  status: {
-    type: DataTypes.STRING,
-    allowNull: false
-  }
-}, {
-  sequelize,
-  modelName: 'Payment',
-  tableName: 'Payment',
-  timestamps: true
-});
+  })
+  userId!: string;
 
-export default Payment;
+  @BelongsTo(() => User)
+  user!: User;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  stripePaymentId!: string;
+
+  @Column({
+    type: DataType.DOUBLE,
+    allowNull: false,
+  })
+  amount!: number;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  status!: string;
+
+  @CreatedAt
+  createdAt!: Date;
+}

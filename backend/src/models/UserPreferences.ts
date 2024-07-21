@@ -1,63 +1,54 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import { sequelize } from "../config/dbConfigPostgres";
-import { IUserPreferences } from "../interfaces/IUserPreferences";
-import User from "./User";
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { IUserPreferences } from '../interfaces/IUserPreferences';
+import User from './User';
 
-type UserPreferencesCreationAttributes = Optional<IUserPreferences, "id">;
+@Table({
+  tableName: 'UserPreferences',
+  timestamps: true,
+})
+export default class UserPreferences extends Model<IUserPreferences> implements IUserPreferences {
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
 
-class UserPreferences
-  extends Model<IUserPreferences, UserPreferencesCreationAttributes>
-  implements IUserPreferences
-{
-  public id!: string;
-  public userId!: string;
-  public alertNewProduct!: boolean;
-  public alertRestock!: boolean;
-  public alertPriceChange!: boolean;
-  public newsletterSubscription!: boolean;
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  userId!: string;
 
-  static associate() {
-    UserPreferences.belongsTo(User, { foreignKey: "userId", as: "user" });
-  }
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  })
+  alertNewProduct!: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  })
+  alertRestock!: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  })
+  alertPriceChange!: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  })
+  newsletterSubscription!: boolean;
+
+  @BelongsTo(() => User)
+  user!: User;
 }
-
-UserPreferences.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    userId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
-    alertNewProduct: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: true,
-    },
-    alertRestock: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: true,
-    },
-    alertPriceChange: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: true,
-    },
-    newsletterSubscription: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: true,
-    },
-  },
-  {
-    sequelize,
-    modelName: "UserPreferences",
-    timestamps: true,
-  }
-);
-
-export default UserPreferences;

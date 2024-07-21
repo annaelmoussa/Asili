@@ -101,16 +101,6 @@ const routes: Array<RouteRecordRaw> = [
     component: PaymentSuccess
   },
   {
-    path: '/stripe-checkout',
-    name: 'StripeCheckoutRedirect',
-    component: StripeCheckoutRedirect
-  },
-  {
-    path: '/payment-success',
-    name: 'PaymentSuccess',
-    component: PaymentSuccess
-  },
-  {
     path: '/panel',
     component: PanelLayout,
     meta: { requiresAuth: true, requiresAdmin: true },

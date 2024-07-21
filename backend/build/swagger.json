@@ -24,7 +24,10 @@
 					"isConfirmed": {
 						"type": "boolean"
 					},
-					"token": {
+					"confirmationToken": {
+						"type": "string"
+					},
+					"stripeCustomerId": {
 						"type": "string"
 					},
 					"scopes": {
@@ -62,7 +65,10 @@
 					"isConfirmed": {
 						"type": "boolean"
 					},
-					"token": {
+					"confirmationToken": {
+						"type": "string"
+					},
+					"stripeCustomerId": {
 						"type": "string"
 					},
 					"scopes": {
@@ -191,6 +197,29 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"SendEmailRequest": {
+				"properties": {
+					"to": {
+						"type": "string"
+					},
+					"subject": {
+						"type": "string"
+					},
+					"text": {
+						"type": "string"
+					},
+					"html": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"to",
+					"subject",
+					"text"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"CategoryCreationParams": {
 				"properties": {
 					"name": {
@@ -255,6 +284,18 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"RegisterResponse": {
+				"properties": {
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"message"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"SignupRequest": {
 				"properties": {
 					"email": {
@@ -279,6 +320,50 @@
 				},
 				"required": [
 					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ResendConfirmationRequest": {
+				"properties": {
+					"email": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ResetPasswordRequest": {
+				"properties": {
+					"email": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"email"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdatePasswordRequest": {
+				"properties": {
+					"token": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"confirm_password": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"token",
+					"password",
+					"confirm_password"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -370,6 +455,190 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Partial_IProduct_": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"price": {
+						"type": "number",
+						"format": "double"
+					},
+					"categoryId": {
+						"type": "string"
+					},
+					"brandId": {
+						"type": "string"
+					},
+					"stock": {
+						"type": "number",
+						"format": "double"
+					},
+					"image": {
+						"type": "string"
+					},
+					"isPromotion": {
+						"type": "boolean"
+					},
+					"brand": {
+						"$ref": "#/components/schemas/IBrand"
+					},
+					"category": {
+						"$ref": "#/components/schemas/ICategory"
+					},
+					"brandName": {
+						"type": "string"
+					},
+					"categoryName": {
+						"type": "string"
+					},
+					"lowStockThreshold": {
+						"type": "number",
+						"format": "double"
+					},
+					"stockHistory": {
+						"items": {
+							"properties": {
+								"quantity": {
+									"type": "number",
+									"format": "double"
+								},
+								"date": {
+									"type": "string",
+									"format": "date-time"
+								}
+							},
+							"required": [
+								"quantity",
+								"date"
+							],
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			},
+			"PaymentSessionRequest": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"product": {
+						"$ref": "#/components/schemas/Partial_IProduct_"
+					},
+					"quantity": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"product",
+					"quantity"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IPayment": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"userId": {
+						"type": "string"
+					},
+					"stripePaymentId": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"status": {
+						"type": "string"
+					},
+					"createdAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					}
+				},
+				"required": [
+					"userId",
+					"stripePaymentId",
+					"amount",
+					"status",
+					"createdAt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IInvoice": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"userId": {
+						"type": "string"
+					},
+					"stripeInvoiceId": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"status": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"userId",
+					"stripeInvoiceId",
+					"amount",
+					"status"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"InvoiceCreationRequest": {
+				"properties": {
+					"userId": {
+						"type": "string"
+					},
+					"stripeInvoiceId": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"status": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"userId",
+					"stripeInvoiceId",
+					"amount",
+					"status"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"ICartItem": {
 				"properties": {
 					"id": {
@@ -392,6 +661,14 @@
 					},
 					"product": {
 						"$ref": "#/components/schemas/IProduct"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
 					}
 				},
 				"required": [
@@ -1161,6 +1438,43 @@
 				]
 			}
 		},
+		"/email/send": {
+			"post": {
+				"operationId": "SendEmail",
+				"responses": {
+					"200": {
+						"description": "Email sent successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SendEmailRequest"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/categories": {
 			"get": {
 				"operationId": "GetCategories",
@@ -1548,12 +1862,12 @@
 			"post": {
 				"operationId": "signupUser",
 				"responses": {
-					"200": {
-						"description": "Ok",
+					"201": {
+						"description": "Created",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/IUser"
+									"$ref": "#/components/schemas/RegisterResponse"
 								}
 							}
 						}
@@ -1626,6 +1940,165 @@
 				],
 				"security": [],
 				"parameters": []
+			}
+		},
+		"/auth/confirm": {
+			"get": {
+				"operationId": "ConfirmEmail",
+				"responses": {
+					"200": {
+						"description": "Email confirmed successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/auth/resend-confirmation-email": {
+			"post": {
+				"operationId": "ResendConfirmationEmail",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ResendConfirmationRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/reset-password-request": {
+			"post": {
+				"operationId": "ResetPasswordRequest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ResetPasswordRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/reset-password": {
+			"post": {
+				"operationId": "ResetPassword",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdatePasswordRequest"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/widgets": {
@@ -1773,6 +2246,169 @@
 						}
 					}
 				]
+			}
+		},
+		"/stripe-webhook": {
+			"post": {
+				"operationId": "HandleWebhook",
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "stripe-signature",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "string",
+								"format": "byte"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/payments/create-session/{userId}": {
+			"post": {
+				"operationId": "CreatePaymentSession",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"sessionId": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"sessionId"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/PaymentSessionRequest"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/payments": {
+			"get": {
+				"operationId": "GetPayments",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/IPayment"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/invoices/{userId}": {
+			"get": {
+				"operationId": "GetUserInvoices",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/IInvoice"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/invoices/create": {
+			"post": {
+				"operationId": "CreateInvoice",
+				"responses": {
+					"201": {
+						"description": "Invoice Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IInvoice"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/InvoiceCreationRequest"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/carts/get-cart-items": {

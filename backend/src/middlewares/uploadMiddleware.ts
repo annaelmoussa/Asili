@@ -24,7 +24,7 @@ export const upload = multer({
       cb(null, true);
     } else {
       cb(null, false);
-      return cb(new Error("Not an image! Please upload an image.") as any);
+      return cb(new Error("Not an image! Please upload an image.") as Error);
     }
   },
 });

@@ -97,7 +97,11 @@ export const useUserStore = defineStore('user', () => {
 
   async function resetPassword(token: string, newPassword: string) {
     try {
-      const updateRequest: UpdatePasswordRequest = { token, newPassword }
+      const updateRequest: UpdatePasswordRequest = {
+        token,
+        password: newPassword,
+        confirm_password: newPassword
+      }
       const response = await authApi.resetPassword(updateRequest)
       message.value = response.data.message
     } catch (error) {
@@ -109,10 +113,14 @@ export const useUserStore = defineStore('user', () => {
     try {
       await authApi.resendConfirmationEmail({ email })
       message.value = 'A new confirmation email has been sent. Please check your email.'
-    } catch (error) {
-      message.value =
-        error.response?.data?.message ||
-        "Une errur est survenue lors de l'envoi de l'email de confirmation."
+    } catch (error: unknown) {
+      if (error instanceof Error && 'response' in error) {
+        message.value =
+          (error as any).response?.data?.message ||
+          "Une erreur est survenue lors de l'envoi de l'email de confirmation."
+      } else {
+        message.value = "Une erreur est survenue lors de l'envoi de l'email de confirmation."
+      }
     }
   }
 

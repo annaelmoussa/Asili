@@ -4,4 +4,5 @@ export interface IPayment {
   stripePaymentId: string;
   amount: number;
   status: string;
+  createdAt: Date | string;
 }

@@ -10,6 +10,8 @@ const userController_1 = require("./../src/controllers/userController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const productController_1 = require("./../src/controllers/productController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+const emailController_1 = require("./../src/controllers/emailController");
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const categoryController_1 = require("./../src/controllers/categoryController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const brandController_1 = require("./../src/controllers/brandController");
@@ -17,6 +19,12 @@ const brandController_1 = require("./../src/controllers/brandController");
 const authController_1 = require("./../src/controllers/authController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const WidgetsController_1 = require("./../src/controllers/WidgetsController");
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+const StripeWebhookController_1 = require("./../src/controllers/StripeWebhookController");
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+const PaymentController_1 = require("./../src/controllers/PaymentController");
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+const InvoiceController_1 = require("./../src/controllers/InvoiceController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const CartController_1 = require("./../src/controllers/CartController");
 const authentication_1 = require("./../src/authentication");
@@ -32,7 +40,8 @@ const models = {
             "password": { "dataType": "string", "required": true },
             "role": { "dataType": "string", "required": true },
             "isConfirmed": { "dataType": "boolean" },
-            "token": { "dataType": "string" },
+            "confirmationToken": { "dataType": "string" },
+            "stripeCustomerId": { "dataType": "string" },
             "scopes": { "dataType": "array", "array": { "dataType": "string" } },
             "isDeleted": { "dataType": "boolean" },
         },
@@ -41,7 +50,7 @@ const models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Partial_IUser_": {
         "dataType": "refAlias",
-        "type": { "dataType": "nestedObjectLiteral", "nestedProperties": { "id": { "dataType": "string" }, "email": { "dataType": "string" }, "password": { "dataType": "string" }, "role": { "dataType": "string" }, "isConfirmed": { "dataType": "boolean" }, "token": { "dataType": "string" }, "scopes": { "dataType": "array", "array": { "dataType": "string" } }, "isDeleted": { "dataType": "boolean" } }, "validators": {} },
+        "type": { "dataType": "nestedObjectLiteral", "nestedProperties": { "id": { "dataType": "string" }, "email": { "dataType": "string" }, "password": { "dataType": "string" }, "role": { "dataType": "string" }, "isConfirmed": { "dataType": "boolean" }, "confirmationToken": { "dataType": "string" }, "stripeCustomerId": { "dataType": "string" }, "scopes": { "dataType": "array", "array": { "dataType": "string" } }, "isDeleted": { "dataType": "boolean" } }, "validators": {} },
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "IBrand": {
@@ -84,6 +93,17 @@ const models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SendEmailRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "to": { "dataType": "string", "required": true },
+            "subject": { "dataType": "string", "required": true },
+            "text": { "dataType": "string", "required": true },
+            "html": { "dataType": "string" },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CategoryCreationParams": {
         "dataType": "refObject",
         "properties": {
@@ -119,6 +139,14 @@ const models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "RegisterResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "message": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SignupRequest": {
         "dataType": "refObject",
         "properties": {
@@ -132,6 +160,32 @@ const models = {
         "dataType": "refObject",
         "properties": {
             "token": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ResendConfirmationRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "email": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ResetPasswordRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "email": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UpdatePasswordRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "token": { "dataType": "string", "required": true },
+            "password": { "dataType": "string", "required": true },
+            "confirm_password": { "dataType": "string", "required": true },
         },
         "additionalProperties": false,
     },
@@ -167,6 +221,57 @@ const models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Partial_IProduct_": {
+        "dataType": "refAlias",
+        "type": { "dataType": "nestedObjectLiteral", "nestedProperties": { "id": { "dataType": "string" }, "name": { "dataType": "string" }, "description": { "dataType": "string" }, "price": { "dataType": "double" }, "categoryId": { "dataType": "string" }, "brandId": { "dataType": "string" }, "stock": { "dataType": "double" }, "image": { "dataType": "string" }, "isPromotion": { "dataType": "boolean" }, "brand": { "ref": "IBrand" }, "category": { "ref": "ICategory" }, "brandName": { "dataType": "string" }, "categoryName": { "dataType": "string" }, "lowStockThreshold": { "dataType": "double" }, "stockHistory": { "dataType": "array", "array": { "dataType": "nestedObjectLiteral", "nestedProperties": { "quantity": { "dataType": "double", "required": true }, "date": { "dataType": "datetime", "required": true } } } } }, "validators": {} },
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PaymentSessionRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "id": { "dataType": "string" },
+            "product": { "ref": "Partial_IProduct_", "required": true },
+            "quantity": { "dataType": "double", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "IPayment": {
+        "dataType": "refObject",
+        "properties": {
+            "id": { "dataType": "string" },
+            "userId": { "dataType": "string", "required": true },
+            "stripePaymentId": { "dataType": "string", "required": true },
+            "amount": { "dataType": "double", "required": true },
+            "status": { "dataType": "string", "required": true },
+            "createdAt": { "dataType": "union", "subSchemas": [{ "dataType": "datetime" }, { "dataType": "string" }], "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "IInvoice": {
+        "dataType": "refObject",
+        "properties": {
+            "id": { "dataType": "string" },
+            "userId": { "dataType": "string", "required": true },
+            "stripeInvoiceId": { "dataType": "string", "required": true },
+            "amount": { "dataType": "double", "required": true },
+            "status": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "InvoiceCreationRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "userId": { "dataType": "string", "required": true },
+            "stripeInvoiceId": { "dataType": "string", "required": true },
+            "amount": { "dataType": "double", "required": true },
+            "status": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "ICartItem": {
         "dataType": "refObject",
         "properties": {
@@ -176,6 +281,8 @@ const models = {
             "quantity": { "dataType": "double", "required": true },
             "reservationExpires": { "dataType": "union", "subSchemas": [{ "dataType": "datetime" }, { "dataType": "enum", "enums": [null] }] },
             "product": { "ref": "IProduct" },
+            "createdAt": { "dataType": "datetime" },
+            "updatedAt": { "dataType": "datetime" },
         },
         "additionalProperties": false,
     },
@@ -611,6 +718,29 @@ function RegisterRoutes(app, opts) {
         }
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/email/send', ...((0, runtime_1.fetchMiddlewares)(emailController_1.EmailController)), ...((0, runtime_1.fetchMiddlewares)(emailController_1.EmailController.prototype.sendEmail)), async function EmailController_sendEmail(request, response, next) {
+        const args = {
+            requestBody: { "in": "body", "name": "requestBody", "required": true, "ref": "SendEmailRequest" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new emailController_1.EmailController();
+            await templateService.apiHandler({
+                methodName: 'sendEmail',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     app.get('/categories', ...((0, runtime_1.fetchMiddlewares)(categoryController_1.CategoryController)), ...((0, runtime_1.fetchMiddlewares)(categoryController_1.CategoryController.prototype.getCategories)), async function CategoryController_getCategories(request, response, next) {
         const args = {};
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -877,7 +1007,7 @@ function RegisterRoutes(app, opts) {
                 response,
                 next,
                 validatedArgs,
-                successStatus: undefined,
+                successStatus: 201,
             });
         }
         catch (err) {
@@ -919,6 +1049,98 @@ function RegisterRoutes(app, opts) {
             const controller = new authController_1.AuthController();
             await templateService.apiHandler({
                 methodName: 'getUser',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/auth/confirm', ...((0, runtime_1.fetchMiddlewares)(authController_1.AuthController)), ...((0, runtime_1.fetchMiddlewares)(authController_1.AuthController.prototype.confirmEmail)), async function AuthController_confirmEmail(request, response, next) {
+        const args = {
+            token: { "in": "query", "name": "token", "required": true, "dataType": "string" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new authController_1.AuthController();
+            await templateService.apiHandler({
+                methodName: 'confirmEmail',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/auth/resend-confirmation-email', ...((0, runtime_1.fetchMiddlewares)(authController_1.AuthController)), ...((0, runtime_1.fetchMiddlewares)(authController_1.AuthController.prototype.resendConfirmationEmail)), async function AuthController_resendConfirmationEmail(request, response, next) {
+        const args = {
+            body: { "in": "body", "name": "body", "required": true, "ref": "ResendConfirmationRequest" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new authController_1.AuthController();
+            await templateService.apiHandler({
+                methodName: 'resendConfirmationEmail',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/auth/reset-password-request', ...((0, runtime_1.fetchMiddlewares)(authController_1.AuthController)), ...((0, runtime_1.fetchMiddlewares)(authController_1.AuthController.prototype.resetPasswordRequest)), async function AuthController_resetPasswordRequest(request, response, next) {
+        const args = {
+            body: { "in": "body", "name": "body", "required": true, "ref": "ResetPasswordRequest" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new authController_1.AuthController();
+            await templateService.apiHandler({
+                methodName: 'resetPasswordRequest',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/auth/reset-password', ...((0, runtime_1.fetchMiddlewares)(authController_1.AuthController)), ...((0, runtime_1.fetchMiddlewares)(authController_1.AuthController.prototype.resetPassword)), async function AuthController_resetPassword(request, response, next) {
+        const args = {
+            body: { "in": "body", "name": "body", "required": true, "ref": "UpdatePasswordRequest" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new authController_1.AuthController();
+            await templateService.apiHandler({
+                methodName: 'resetPassword',
                 controller,
                 response,
                 next,
@@ -1018,6 +1240,121 @@ function RegisterRoutes(app, opts) {
                 next,
                 validatedArgs,
                 successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/stripe-webhook', ...((0, runtime_1.fetchMiddlewares)(StripeWebhookController_1.StripeWebhookController)), ...((0, runtime_1.fetchMiddlewares)(StripeWebhookController_1.StripeWebhookController.prototype.handleWebhook)), async function StripeWebhookController_handleWebhook(request, response, next) {
+        const args = {
+            rawBody: { "in": "body", "name": "rawBody", "required": true, "dataType": "buffer" },
+            signature: { "in": "header", "name": "stripe-signature", "required": true, "dataType": "string" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new StripeWebhookController_1.StripeWebhookController();
+            await templateService.apiHandler({
+                methodName: 'handleWebhook',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 200,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/payments/create-session/:userId', ...((0, runtime_1.fetchMiddlewares)(PaymentController_1.PaymentController)), ...((0, runtime_1.fetchMiddlewares)(PaymentController_1.PaymentController.prototype.createPaymentSession)), async function PaymentController_createPaymentSession(request, response, next) {
+        const args = {
+            userId: { "in": "path", "name": "userId", "required": true, "dataType": "string" },
+            items: { "in": "body", "name": "items", "required": true, "dataType": "array", "array": { "dataType": "refObject", "ref": "PaymentSessionRequest" } },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new PaymentController_1.PaymentController();
+            await templateService.apiHandler({
+                methodName: 'createPaymentSession',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/payments', ...((0, runtime_1.fetchMiddlewares)(PaymentController_1.PaymentController)), ...((0, runtime_1.fetchMiddlewares)(PaymentController_1.PaymentController.prototype.getPayments)), async function PaymentController_getPayments(request, response, next) {
+        const args = {};
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new PaymentController_1.PaymentController();
+            await templateService.apiHandler({
+                methodName: 'getPayments',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/invoices/:userId', ...((0, runtime_1.fetchMiddlewares)(InvoiceController_1.InvoiceController)), ...((0, runtime_1.fetchMiddlewares)(InvoiceController_1.InvoiceController.prototype.getUserInvoices)), async function InvoiceController_getUserInvoices(request, response, next) {
+        const args = {
+            userId: { "in": "path", "name": "userId", "required": true, "dataType": "string" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new InvoiceController_1.InvoiceController();
+            await templateService.apiHandler({
+                methodName: 'getUserInvoices',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/invoices/create', ...((0, runtime_1.fetchMiddlewares)(InvoiceController_1.InvoiceController)), ...((0, runtime_1.fetchMiddlewares)(InvoiceController_1.InvoiceController.prototype.createInvoice)), async function InvoiceController_createInvoice(request, response, next) {
+        const args = {
+            requestBody: { "in": "body", "name": "requestBody", "required": true, "ref": "InvoiceCreationRequest" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new InvoiceController_1.InvoiceController();
+            await templateService.apiHandler({
+                methodName: 'createInvoice',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 201,
             });
         }
         catch (err) {

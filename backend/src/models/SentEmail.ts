@@ -1,53 +1,46 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import { sequelize } from "../config/dbConfigPostgres";
+import { Table, Column, Model, DataType } from "sequelize-typescript";
 import { ISentEmail } from "../interfaces/ISentEmail";
 
+@Table({
+  tableName: "SentEmail",
+  timestamps: false,
+})
+export default class SentEmail extends Model<ISentEmail> implements ISentEmail {
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
 
-type SentEmailCreationAttributes = Optional<ISentEmail, "id" | "sentAt">;
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  to!: string;
 
-class SentEmail extends Model<ISentEmail, SentEmailCreationAttributes> implements ISentEmail {
-  public id!: string;
-  public to!: string;
-  public subject!: string;
-  public text?: string;
-  public html?: string;
-  public sentAt!: Date;
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  subject!: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  text?: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  html?: string;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+    defaultValue: DataType.NOW,
+  })
+  sentAt!: Date;
 }
-
-SentEmail.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    to: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    subject: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    text: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    html: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    sentAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
-  },
-  {
-    sequelize,
-    modelName: "SentEmail",
-    timestamps: false,
-  }
-);
-
-export default SentEmail;

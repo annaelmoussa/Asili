@@ -67,7 +67,7 @@ services:
       - ./backend:/app
       - /app/node_modules
     ports:
-      - "8000:8000"
+      - "3000:3000"
     environment:
       NODE_ENV: development
       MONGO_URI: mongodb://mongo:27017/${MONGO_INITDB_DATABASE}
