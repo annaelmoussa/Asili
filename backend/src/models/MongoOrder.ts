@@ -14,8 +14,10 @@ const MongoOrderSchema = new mongoose.Schema({
     id: String,
     productId: String,
     productName: String,
+    productDescription: String,
     quantity: Number,
-    priceAtPurchase: Number
+    priceAtPurchase: Number,
+    productImage: String,
   }],
   shipping: {
     id: String,

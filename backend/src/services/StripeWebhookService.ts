@@ -102,10 +102,12 @@ export class StripeWebhookService {
       orderedAt: new Date(),
       items: orderItemsObject.map(item => ({
         id: item.id,
-        productId: item.productId,
+        productId: item?.product?.id,
         productName: item?.product?.name,
+        productDescription: item?.product?.description,
+        priceAtPurchase: item?.product?.price,
+        productImage: item?.product?.image,
         quantity: item.quantity,
-        priceAtPurchase: item.priceAtPurchase
       })),
       shipping: {
         id: shipping.id,

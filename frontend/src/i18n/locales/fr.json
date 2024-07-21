@@ -91,6 +91,11 @@
       "profile": "Profil",
       "data": "Mes données",
       "notifications": "Mes notifications"
+    },
+    "orders": {
+      "title": "Mes commandes",
+      "loading": "Chargement...",
+      "noOrder": "Aucune commande"
     }
   }
 }

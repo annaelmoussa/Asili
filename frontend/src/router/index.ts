@@ -28,6 +28,8 @@ import OrdersView from '../views/OrdersView.vue'
 import ReferralsView from '../views/ReferralsView.vue'
 import MemberBenefitsView from '../views/MemberBenefitsView.vue'
 import PanelViewStock from '../views/Panel/PanelStockView.vue'
+import PanelDashboard from '../views/Panel/PanelDashboardView.vue';
+import OrderSingleView from "../views/OrderSingleView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -66,12 +68,6 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/orders',
-    name: 'orders',
-    component: OrdersView,
-    meta: { requiresAuth: true }
-  },
-  {
     path: '/referrals',
     name: 'referrals',
     component: ReferralsView,
@@ -87,6 +83,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/product/:productId',
     name: 'ProductSingleView',
     component: ProductSingleView
+  },
+  {
+    path: '/order/:orderId',
+    name: 'OrderSingleView',
+    component: OrderSingleView
   },
   {
     path: '/cart',

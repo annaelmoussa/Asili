@@ -22,12 +22,11 @@ export class OrderController extends Controller {
   private orderService: OrderService = new OrderService();
   private mongoOrderService: MongoOrderService = new MongoOrderService();
 
-  /*
-  @Get("{userId}")
-  public async getUserOrders(@Path() userId: string): Promise<IOrder[]> {
+  @Get("get-orders/{userId}")
+  public async getOrders(@Path() userId: string): Promise<IOrder[]> {
     return this.orderService.getOrdersByUserId(userId);
   }
-  */
+
   @SuccessResponse("201", "Order Created")
   @Post("create")
   public async createOrder(@Body() requestBody: OrderCreationRequest): Promise<IOrder | null> {
@@ -46,8 +45,13 @@ export class OrderController extends Controller {
     return this.orderService.updateOrderStatus(orderId, status);
   }
 
-  @Get("/panel/orders/{userId}")
-  public async getUserOrders(@Path() userId: string): Promise<any> {
+  @Get("get-mongo-orders/{userId}")
+  public async getMongoOrders(@Path() userId: string): Promise<any> {
     return this.mongoOrderService.getOrdersByUserId(userId);
+  }
+
+  @Get("get-mongo-order/{orderId}")
+  public async getMongoOrder(@Path() orderId: string): Promise<any> {
+    return this.mongoOrderService.getOrderById(orderId);
   }
 }
