@@ -7,4 +7,6 @@ export interface ICartItem {
   quantity: number;
   reservationExpires?: Date | null;
   product?: IProduct;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

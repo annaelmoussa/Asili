@@ -14,6 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const scopes_1 = require("../config/scopes");
+const EmailNotification_1 = __importDefault(require("./EmailNotification"));
+const UserPreferences_1 = __importDefault(require("./UserPreferences"));
 const Widget_1 = __importDefault(require("./Widget"));
 let User = class User extends sequelize_typescript_1.Model {
     static setAdminScopes(instance) {
@@ -66,12 +68,34 @@ __decorate([
 ], User.prototype, "isConfirmed", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING,
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], User.prototype, "confirmationToken", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING,
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], User.prototype, "stripeCustomerId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.ARRAY(sequelize_typescript_1.DataType.STRING),
         allowNull: false,
         defaultValue: [],
     }),
     __metadata("design:type", Array)
 ], User.prototype, "scopes", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => EmailNotification_1.default),
+    __metadata("design:type", Array)
+], User.prototype, "notifications", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => UserPreferences_1.default),
+    __metadata("design:type", UserPreferences_1.default)
+], User.prototype, "preferences", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasMany)(() => Widget_1.default),
     __metadata("design:type", Array)

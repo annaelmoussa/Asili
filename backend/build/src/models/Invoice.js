@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_typescript_1 = require("sequelize-typescript");
 const User_1 = __importDefault(require("./User"));
-let EmailNotification = class EmailNotification extends sequelize_typescript_1.Model {
+let Invoice = class Invoice extends sequelize_typescript_1.Model {
 };
 __decorate([
     (0, sequelize_typescript_1.Column)({
@@ -23,7 +23,7 @@ __decorate([
         primaryKey: true,
     }),
     __metadata("design:type", String)
-], EmailNotification.prototype, "id", void 0);
+], Invoice.prototype, "id", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => User_1.default),
     (0, sequelize_typescript_1.Column)({
@@ -31,36 +31,36 @@ __decorate([
         allowNull: false,
     }),
     __metadata("design:type", String)
-], EmailNotification.prototype, "userId", void 0);
+], Invoice.prototype, "userId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => User_1.default),
+    __metadata("design:type", User_1.default)
+], Invoice.prototype, "user", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
         allowNull: false,
     }),
     __metadata("design:type", String)
-], EmailNotification.prototype, "type", void 0);
+], Invoice.prototype, "stripeInvoiceId", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.UUID,
-        allowNull: true,
+        type: sequelize_typescript_1.DataType.DOUBLE,
+        allowNull: false,
     }),
-    __metadata("design:type", String)
-], EmailNotification.prototype, "productId", void 0);
+    __metadata("design:type", Number)
+], Invoice.prototype, "amount", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.UUID,
-        allowNull: true,
+        type: sequelize_typescript_1.DataType.STRING,
+        allowNull: false,
     }),
     __metadata("design:type", String)
-], EmailNotification.prototype, "categoryId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => User_1.default),
-    __metadata("design:type", User_1.default)
-], EmailNotification.prototype, "user", void 0);
-EmailNotification = __decorate([
+], Invoice.prototype, "status", void 0);
+Invoice = __decorate([
     (0, sequelize_typescript_1.Table)({
-        tableName: "EmailNotifications",
+        tableName: "Invoice",
         timestamps: true,
     })
-], EmailNotification);
-exports.default = EmailNotification;
+], Invoice);
+exports.default = Invoice;

@@ -1,55 +1,51 @@
-import {DataTypes, Model, Optional} from "sequelize";
-import { sequelize } from "../config/dbConfigPostgres";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+} from "sequelize-typescript";
 import { IInvoice } from "@/interfaces/IInvoice";
+import User from "./User";
 
-type ProductCreationAttributes = Optional<IInvoice, "id">;
+@Table({
+  tableName: "Invoice",
+  timestamps: true,
+})
+export default class Invoice extends Model<IInvoice> implements IInvoice {
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
 
-class Invoice
-  extends Model<IInvoice, ProductCreationAttributes>
-  implements IInvoice {
-  public id!: string;
-  public userId!: string;
-  public stripeInvoiceId!: string;
-  public amount!: number;
-  public status!: string;
-
-  static associate(models: any) {
-    Invoice.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
-  }
-}
-
-Invoice.init({
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-    primaryKey: true
-  },
-  userId: {
-    type: DataTypes.UUID,
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.UUID,
     allowNull: false,
-    references: {
-      model: 'User',
-      key: 'id'
-    }
-  },
-  stripeInvoiceId: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  amount: {
-    type: DataTypes.DOUBLE,
-    allowNull: false
-  },
-  status: {
-    type: DataTypes.STRING,
-    allowNull: false
-  }
-},
-  {
-  sequelize,
-  modelName: 'Invoice',
-  tableName: 'Invoice',
-  timestamps: true
-});
+  })
+  userId!: string;
 
-export default Invoice;
+  @BelongsTo(() => User)
+  user!: User;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  stripeInvoiceId!: string;
+
+  @Column({
+    type: DataType.DOUBLE,
+    allowNull: false,
+  })
+  amount!: number;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  status!: string;
+}
