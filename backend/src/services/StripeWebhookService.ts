@@ -4,6 +4,7 @@ import { CartService } from './cartService';
 import { OrderService } from './orderService';
 import { ShippingService } from './ShippingService';
 import { PaymentService } from './paymentService';
+import { MongoOrder } from '../models/MongoOrder';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -70,7 +71,7 @@ export class StripeWebhookService {
 
     console.log('creating shipping..');
     const trackingNumber = this.generateTrackingNumber(userId);
-    await this.shippingService.createShipping({
+    const shipping = await this.shippingService.createShipping({
       orderId: order.id!,
       address: shippingAddress,
       status: 'Pending',
@@ -78,11 +79,46 @@ export class StripeWebhookService {
     });
 
     console.log('creating payment..');
-    await this.paymentService.createPayment({
+    const payment = await this.paymentService.createPayment({
       userId: userId,
       stripePaymentId: session.payment_intent as string,
       amount: session.amount_total! / 100,
       status: 'Completed'
+    });
+
+    if (!order.id) {
+      throw new Error('Something went wrong.');
+    }
+
+    const orderItemsObject = await this.orderService.getOrderItems(order.id);
+    await MongoOrder.create({
+      id: order.id,
+      userId: order.userId,
+      stripeInvoiceId: order.stripeInvoiceId,
+      amount: order.amount,
+      status: order.status,
+      shippingAddress: order.shippingAddress,
+      trackingNumber: trackingNumber,
+      orderedAt: new Date(),
+      items: orderItemsObject.map(item => ({
+        id: item.id,
+        productId: item.productId,
+        productName: item?.product?.name,
+        quantity: item.quantity,
+        priceAtPurchase: item.priceAtPurchase
+      })),
+      shipping: {
+        id: shipping.id,
+        address: shipping.address,
+        status: shipping.status,
+        trackingNumber: shipping.trackingNumber
+      },
+      payment: {
+        id: payment.id,
+        stripePaymentId: payment.stripePaymentId,
+        amount: payment.amount,
+        status: payment.status
+      }
     });
 
     console.log('Payment successful for session:', session.id);

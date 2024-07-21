@@ -2,6 +2,7 @@ import { Body, Controller, Get, Path, Post, Route, SuccessResponse } from "tsoa"
 import { OrderService } from "../services/orderService";
 import { IOrder } from "../interfaces/IOrder";
 import { IOrderItem } from "../interfaces/IOrderItem";
+import { MongoOrderService } from "../services/mongoOrderService";
 
 interface OrderCreationRequest {
   userId: string;
@@ -19,12 +20,14 @@ interface OrderCreationRequest {
 @Route("orders")
 export class OrderController extends Controller {
   private orderService: OrderService = new OrderService();
+  private mongoOrderService: MongoOrderService = new MongoOrderService();
 
+  /*
   @Get("{userId}")
   public async getUserOrders(@Path() userId: string): Promise<IOrder[]> {
     return this.orderService.getOrdersByUserId(userId);
   }
-
+  */
   @SuccessResponse("201", "Order Created")
   @Post("create")
   public async createOrder(@Body() requestBody: OrderCreationRequest): Promise<IOrder | null> {
@@ -43,8 +46,8 @@ export class OrderController extends Controller {
     return this.orderService.updateOrderStatus(orderId, status);
   }
 
-  @Post("update-tracking/{orderId}")
-  public async updateTrackingNumber(@Path() orderId: string, @Body() trackingNumber: string): Promise<IOrder | null> {
-    return this.orderService.updateTrackingNumber(orderId, trackingNumber);
+  @Get("/panel/orders/{userId}")
+  public async getUserOrders(@Path() userId: string): Promise<any> {
+    return this.mongoOrderService.getOrdersByUserId(userId);
   }
 }

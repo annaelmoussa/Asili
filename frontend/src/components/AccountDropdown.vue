@@ -73,7 +73,7 @@ const goToFavorites = () => {
 
 const goToOrders = () => {
   if (userStore.isAuthenticated) {
-    router.push('/orders')
+    router.push('/panel/orders')
   } else {
     router.push('/login')
   }

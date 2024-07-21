@@ -41,10 +41,6 @@ module.exports = {
                 type: Sequelize.STRING,
                 defaultValue: ''
             },
-            trackingNumber: {
-                allowNull: true,
-                type: Sequelize.STRING
-            }
         });
     },
 

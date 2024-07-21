@@ -44,10 +44,6 @@ Order.init({
     type: DataTypes.STRING,
     allowNull: false
   },
-  trackingNumber: {
-    type: DataTypes.STRING,
-    allowNull: true
-  }
 }, {
   sequelize,
   modelName: 'Order',

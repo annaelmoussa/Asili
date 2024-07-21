@@ -1,6 +1,6 @@
 <template>
     <div>
-      <h1>Admin Order</h1>
+      <h1>Mes dernières commandes</h1>
       <p>Manage your order here.</p>
     </div>
   </template>

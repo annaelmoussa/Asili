@@ -3,6 +3,9 @@ import OrderItem, { associateOrderItem } from './OrderItem';
 import User from './User';
 import Product from './Product';
 
+/**
+ * TODO Lotfi : faire une méthode générique associate
+ */
 export const setupAssociations = () => {
   const models = {
     Order,

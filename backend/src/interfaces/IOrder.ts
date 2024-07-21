@@ -7,6 +7,5 @@ export interface IOrder {
   amount: number;
   status: string;
   shippingAddress: string;
-  trackingNumber?: string;
   items?: IOrderItem[];
 }

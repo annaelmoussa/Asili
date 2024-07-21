@@ -3,6 +3,8 @@ import OrderItem from "../models/OrderItem";
 import { IOrder } from "../interfaces/IOrder";
 import { IOrderItem } from "../interfaces/IOrderItem";
 import Product from "../models/Product";
+import {ICartItem} from "@/interfaces/ICartItem";
+import CartItem from "@/models/CartItem";
 
 export class OrderService {
   async getOrdersByUserId(userId: string): Promise<IOrder[]> {
@@ -17,6 +19,22 @@ export class OrderService {
         }]
       }]
     });
+  }
+
+  async getOrderItems(orderId: string): Promise<IOrderItem[]> {
+    const items = await OrderItem.findAll({
+      where: { orderId },
+      include: [{
+        model: Product,
+        as: 'product',
+        attributes: ['id', 'name', 'description', 'price', 'category', 'stock', 'image']
+      }],
+      attributes: ['id', 'quantity'],
+      order: [
+        [{ model: Product, as: 'product' }, 'name', 'ASC']
+      ]
+    });
+    return items;
   }
 
   async createOrder(orderInfo: IOrder, orderItems: any[]): Promise<IOrder | null> {
@@ -49,8 +67,4 @@ export class OrderService {
     return this.getOrderById(orderId);
   }
 
-  async updateTrackingNumber(orderId: string, trackingNumber: string): Promise<IOrder | null> {
-    await Order.update({ trackingNumber }, { where: { id: orderId } });
-    return this.getOrderById(orderId);
-  }
 }
