@@ -21,11 +21,11 @@ let AlertController = class AlertController extends tsoa_1.Controller {
         this.alertService = new AlertService_1.AlertService();
     }
     async getAlertPreferences(request) {
-        const userId = request.user.userId;
+        const userId = request.user.id;
         return this.alertService.getAlertPreference(userId);
     }
     async updateAlertPreferences(request, preferences) {
-        const userId = request.user.userId;
+        const userId = request.user.id;
         console.log("Received preferences:", JSON.stringify(preferences));
         return this.alertService.updateAlertPreference(userId, preferences);
     }
