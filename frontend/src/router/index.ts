@@ -170,7 +170,7 @@ const routes: Array<RouteRecordRaw & { meta?: CustomRouteMeta }> = [
         path: '/rgpd-manager',
         name: 'RGPDManager',
         component: RGPDManager,
-        meta: { requiresAdmin: true }
+        meta: { requiresAuth: true, requiresAdmin: true }
       },
       {
         path: 'payments',
