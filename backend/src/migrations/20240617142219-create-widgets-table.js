@@ -17,8 +17,12 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      modelType: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       settings: {
-        type: Sequelize.JSON,
+        type: Sequelize.JSONB,
         allowNull: true,
       },
       x: {
@@ -58,6 +62,8 @@ module.exports = {
         defaultValue: Sequelize.fn("now"),
       },
     });
+
+    await queryInterface.addIndex("Widget", ["modelType"]);
   },
 
   async down(queryInterface, Sequelize) {

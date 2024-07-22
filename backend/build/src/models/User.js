@@ -21,6 +21,9 @@ let User = class User extends sequelize_typescript_1.Model {
         if (instance.role === "ROLE_ADMIN") {
             instance.scopes = scopes_1.ALL_SCOPES;
         }
+        else if (instance.role === "ROLE_STORE_KEEPER") {
+            instance.scopes.push("ROLE_STORE_KEEPER");
+        }
         if (instance.changed("password")) {
             instance.lastPasswordChange = new Date();
         }

@@ -19,6 +19,8 @@ import { WidgetsController } from './../src/controllers/WidgetsController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { StripeWebhookController } from './../src/controllers/StripeWebhookController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { RGPDController } from './../src/controllers/RGPDController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { PaymentController } from './../src/controllers/PaymentController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { OrderController } from './../src/controllers/OrderController';
@@ -235,6 +237,25 @@ const models: TsoaRoute.Models = {
             "w": {"dataType":"double","required":true},
             "h": {"dataType":"double","required":true},
             "userId": {"dataType":"string","required":true},
+            "modelType": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "IWidgetWithData": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"string"},
+            "name": {"dataType":"string","required":true},
+            "type": {"dataType":"string","required":true},
+            "settings": {"dataType":"any","required":true},
+            "x": {"dataType":"double","required":true},
+            "y": {"dataType":"double","required":true},
+            "w": {"dataType":"double","required":true},
+            "h": {"dataType":"double","required":true},
+            "userId": {"dataType":"string","required":true},
+            "modelType": {"dataType":"string","required":true},
+            "data": {"dataType":"any"},
         },
         "additionalProperties": false,
     },
@@ -250,8 +271,48 @@ const models: TsoaRoute.Models = {
             "w": {"dataType":"double","required":true},
             "h": {"dataType":"double","required":true},
             "userId": {"dataType":"string","required":true},
+            "modelType": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "IRGPDModule": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"string","required":true},
+            "name": {"dataType":"string","required":true},
+            "content": {"dataType":"string","required":true},
+            "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["popup"]},{"dataType":"enum","enums":["text_block"]}],"required":true},
+            "requiresAcceptance": {"dataType":"boolean","required":true},
+            "createdAt": {"dataType":"datetime","required":true},
+            "updatedAt": {"dataType":"datetime","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Pick_IRGPDModule.Exclude_keyofIRGPDModule.id-or-createdAt-or-updatedAt__": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"name":{"dataType":"string","required":true},"content":{"dataType":"string","required":true},"type":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":["popup"]},{"dataType":"enum","enums":["text_block"]}],"required":true},"requiresAcceptance":{"dataType":"boolean","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Omit_IRGPDModule.id-or-createdAt-or-updatedAt_": {
+        "dataType": "refAlias",
+        "type": {"ref":"Pick_IRGPDModule.Exclude_keyofIRGPDModule.id-or-createdAt-or-updatedAt__","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CreateRGPDModuleDTO": {
+        "dataType": "refAlias",
+        "type": {"ref":"Omit_IRGPDModule.id-or-createdAt-or-updatedAt_","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Partial_CreateRGPDModuleDTO_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"name":{"dataType":"string"},"content":{"dataType":"string"},"type":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":["popup"]},{"dataType":"enum","enums":["text_block"]}]},"requiresAcceptance":{"dataType":"boolean"}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UpdateRGPDModuleDTO": {
+        "dataType": "refAlias",
+        "type": {"ref":"Partial_CreateRGPDModuleDTO_","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Partial_IProduct_": {
@@ -1645,6 +1706,37 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/widgets/:widgetId',
+            authenticateMiddleware([{"jwt":["ROLE_ADMIN"]}]),
+            ...(fetchMiddlewares<RequestHandler>(WidgetsController)),
+            ...(fetchMiddlewares<RequestHandler>(WidgetsController.prototype.getWidget)),
+
+            async function WidgetsController_getWidget(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    widgetId: {"in":"path","name":"widgetId","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new WidgetsController();
+
+              await templateService.apiHandler({
+                methodName: 'getWidget',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/widgets',
             authenticateMiddleware([{"jwt":["ROLE_ADMIN"]}]),
             ...(fetchMiddlewares<RequestHandler>(WidgetsController)),
@@ -1740,6 +1832,37 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/widgets/data/:modelType',
+            authenticateMiddleware([{"jwt":["ROLE_ADMIN"]}]),
+            ...(fetchMiddlewares<RequestHandler>(WidgetsController)),
+            ...(fetchMiddlewares<RequestHandler>(WidgetsController.prototype.getWidgetData)),
+
+            async function WidgetsController_getWidgetData(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    modelType: {"in":"path","name":"modelType","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new WidgetsController();
+
+              await templateService.apiHandler({
+                methodName: 'getWidgetData',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/stripe-webhook',
             ...(fetchMiddlewares<RequestHandler>(StripeWebhookController)),
             ...(fetchMiddlewares<RequestHandler>(StripeWebhookController.prototype.handleWebhook)),
@@ -1765,6 +1888,189 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
                 next,
                 validatedArgs,
                 successStatus: 200,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/rgpd',
+            authenticateMiddleware([{"jwt":["ROLE_ADMIN"]}]),
+            ...(fetchMiddlewares<RequestHandler>(RGPDController)),
+            ...(fetchMiddlewares<RequestHandler>(RGPDController.prototype.createModule)),
+
+            async function RGPDController_createModule(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    moduleData: {"in":"body","name":"moduleData","required":true,"ref":"CreateRGPDModuleDTO"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new RGPDController();
+
+              await templateService.apiHandler({
+                methodName: 'createModule',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/rgpd/:id',
+            ...(fetchMiddlewares<RequestHandler>(RGPDController)),
+            ...(fetchMiddlewares<RequestHandler>(RGPDController.prototype.getModule)),
+
+            async function RGPDController_getModule(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    id: {"in":"path","name":"id","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new RGPDController();
+
+              await templateService.apiHandler({
+                methodName: 'getModule',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/rgpd',
+            ...(fetchMiddlewares<RequestHandler>(RGPDController)),
+            ...(fetchMiddlewares<RequestHandler>(RGPDController.prototype.getAllModules)),
+
+            async function RGPDController_getAllModules(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new RGPDController();
+
+              await templateService.apiHandler({
+                methodName: 'getAllModules',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.put('/rgpd/:id',
+            authenticateMiddleware([{"jwt":["ROLE_ADMIN"]}]),
+            ...(fetchMiddlewares<RequestHandler>(RGPDController)),
+            ...(fetchMiddlewares<RequestHandler>(RGPDController.prototype.updateModule)),
+
+            async function RGPDController_updateModule(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    id: {"in":"path","name":"id","required":true,"dataType":"string"},
+                    moduleData: {"in":"body","name":"moduleData","required":true,"ref":"UpdateRGPDModuleDTO"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new RGPDController();
+
+              await templateService.apiHandler({
+                methodName: 'updateModule',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.delete('/rgpd/:id',
+            authenticateMiddleware([{"jwt":["ROLE_ADMIN"]}]),
+            ...(fetchMiddlewares<RequestHandler>(RGPDController)),
+            ...(fetchMiddlewares<RequestHandler>(RGPDController.prototype.deleteModule)),
+
+            async function RGPDController_deleteModule(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    id: {"in":"path","name":"id","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new RGPDController();
+
+              await templateService.apiHandler({
+                methodName: 'deleteModule',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/rgpd/export',
+            authenticateMiddleware([{"jwt":["ROLE_ADMIN"]}]),
+            ...(fetchMiddlewares<RequestHandler>(RGPDController)),
+            ...(fetchMiddlewares<RequestHandler>(RGPDController.prototype.exportModules)),
+
+            async function RGPDController_exportModules(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new RGPDController();
+
+              await templateService.apiHandler({
+                methodName: 'exportModules',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
               });
             } catch (err) {
                 return next(err);

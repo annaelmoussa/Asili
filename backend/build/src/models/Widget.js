@@ -74,6 +74,13 @@ __decorate([
     __metadata("design:type", Number)
 ], Widget.prototype, "h", void 0);
 __decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING,
+        allowNull: false,
+    }),
+    __metadata("design:type", String)
+], Widget.prototype, "modelType", void 0);
+__decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => User_1.default),
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.UUID,

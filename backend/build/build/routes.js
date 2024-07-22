@@ -22,6 +22,8 @@ const WidgetsController_1 = require("./../src/controllers/WidgetsController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const StripeWebhookController_1 = require("./../src/controllers/StripeWebhookController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+const RGPDController_1 = require("./../src/controllers/RGPDController");
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const PaymentController_1 = require("./../src/controllers/PaymentController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const OrderController_1 = require("./../src/controllers/OrderController");
@@ -231,6 +233,25 @@ const models = {
             "w": { "dataType": "double", "required": true },
             "h": { "dataType": "double", "required": true },
             "userId": { "dataType": "string", "required": true },
+            "modelType": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "IWidgetWithData": {
+        "dataType": "refObject",
+        "properties": {
+            "id": { "dataType": "string" },
+            "name": { "dataType": "string", "required": true },
+            "type": { "dataType": "string", "required": true },
+            "settings": { "dataType": "any", "required": true },
+            "x": { "dataType": "double", "required": true },
+            "y": { "dataType": "double", "required": true },
+            "w": { "dataType": "double", "required": true },
+            "h": { "dataType": "double", "required": true },
+            "userId": { "dataType": "string", "required": true },
+            "modelType": { "dataType": "string", "required": true },
+            "data": { "dataType": "any" },
         },
         "additionalProperties": false,
     },
@@ -246,8 +267,48 @@ const models = {
             "w": { "dataType": "double", "required": true },
             "h": { "dataType": "double", "required": true },
             "userId": { "dataType": "string", "required": true },
+            "modelType": { "dataType": "string", "required": true },
         },
         "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "IRGPDModule": {
+        "dataType": "refObject",
+        "properties": {
+            "id": { "dataType": "string", "required": true },
+            "name": { "dataType": "string", "required": true },
+            "content": { "dataType": "string", "required": true },
+            "type": { "dataType": "union", "subSchemas": [{ "dataType": "enum", "enums": ["popup"] }, { "dataType": "enum", "enums": ["text_block"] }], "required": true },
+            "requiresAcceptance": { "dataType": "boolean", "required": true },
+            "createdAt": { "dataType": "datetime", "required": true },
+            "updatedAt": { "dataType": "datetime", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Pick_IRGPDModule.Exclude_keyofIRGPDModule.id-or-createdAt-or-updatedAt__": {
+        "dataType": "refAlias",
+        "type": { "dataType": "nestedObjectLiteral", "nestedProperties": { "name": { "dataType": "string", "required": true }, "content": { "dataType": "string", "required": true }, "type": { "dataType": "union", "subSchemas": [{ "dataType": "enum", "enums": ["popup"] }, { "dataType": "enum", "enums": ["text_block"] }], "required": true }, "requiresAcceptance": { "dataType": "boolean", "required": true } }, "validators": {} },
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Omit_IRGPDModule.id-or-createdAt-or-updatedAt_": {
+        "dataType": "refAlias",
+        "type": { "ref": "Pick_IRGPDModule.Exclude_keyofIRGPDModule.id-or-createdAt-or-updatedAt__", "validators": {} },
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CreateRGPDModuleDTO": {
+        "dataType": "refAlias",
+        "type": { "ref": "Omit_IRGPDModule.id-or-createdAt-or-updatedAt_", "validators": {} },
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Partial_CreateRGPDModuleDTO_": {
+        "dataType": "refAlias",
+        "type": { "dataType": "nestedObjectLiteral", "nestedProperties": { "name": { "dataType": "string" }, "content": { "dataType": "string" }, "type": { "dataType": "union", "subSchemas": [{ "dataType": "enum", "enums": ["popup"] }, { "dataType": "enum", "enums": ["text_block"] }] }, "requiresAcceptance": { "dataType": "boolean" } }, "validators": {} },
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UpdateRGPDModuleDTO": {
+        "dataType": "refAlias",
+        "type": { "ref": "Partial_CreateRGPDModuleDTO_", "validators": {} },
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Partial_IProduct_": {
@@ -1325,6 +1386,29 @@ function RegisterRoutes(app, opts) {
         }
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/widgets/:widgetId', authenticateMiddleware([{ "jwt": ["ROLE_ADMIN"] }]), ...((0, runtime_1.fetchMiddlewares)(WidgetsController_1.WidgetsController)), ...((0, runtime_1.fetchMiddlewares)(WidgetsController_1.WidgetsController.prototype.getWidget)), async function WidgetsController_getWidget(request, response, next) {
+        const args = {
+            widgetId: { "in": "path", "name": "widgetId", "required": true, "dataType": "string" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new WidgetsController_1.WidgetsController();
+            await templateService.apiHandler({
+                methodName: 'getWidget',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     app.post('/widgets', authenticateMiddleware([{ "jwt": ["ROLE_ADMIN"] }]), ...((0, runtime_1.fetchMiddlewares)(WidgetsController_1.WidgetsController)), ...((0, runtime_1.fetchMiddlewares)(WidgetsController_1.WidgetsController.prototype.createWidget)), async function WidgetsController_createWidget(request, response, next) {
         const args = {
             requestBody: { "in": "body", "name": "requestBody", "required": true, "ref": "WidgetCreationParams" },
@@ -1396,6 +1480,29 @@ function RegisterRoutes(app, opts) {
         }
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/widgets/data/:modelType', authenticateMiddleware([{ "jwt": ["ROLE_ADMIN"] }]), ...((0, runtime_1.fetchMiddlewares)(WidgetsController_1.WidgetsController)), ...((0, runtime_1.fetchMiddlewares)(WidgetsController_1.WidgetsController.prototype.getWidgetData)), async function WidgetsController_getWidgetData(request, response, next) {
+        const args = {
+            modelType: { "in": "path", "name": "modelType", "required": true, "dataType": "string" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new WidgetsController_1.WidgetsController();
+            await templateService.apiHandler({
+                methodName: 'getWidgetData',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     app.post('/stripe-webhook', ...((0, runtime_1.fetchMiddlewares)(StripeWebhookController_1.StripeWebhookController)), ...((0, runtime_1.fetchMiddlewares)(StripeWebhookController_1.StripeWebhookController.prototype.handleWebhook)), async function StripeWebhookController_handleWebhook(request, response, next) {
         const args = {
             rawBody: { "in": "body", "name": "rawBody", "required": true, "dataType": "buffer" },
@@ -1413,6 +1520,141 @@ function RegisterRoutes(app, opts) {
                 next,
                 validatedArgs,
                 successStatus: 200,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/rgpd', authenticateMiddleware([{ "jwt": ["ROLE_ADMIN"] }]), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController)), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController.prototype.createModule)), async function RGPDController_createModule(request, response, next) {
+        const args = {
+            moduleData: { "in": "body", "name": "moduleData", "required": true, "ref": "CreateRGPDModuleDTO" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new RGPDController_1.RGPDController();
+            await templateService.apiHandler({
+                methodName: 'createModule',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/rgpd/:id', ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController)), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController.prototype.getModule)), async function RGPDController_getModule(request, response, next) {
+        const args = {
+            id: { "in": "path", "name": "id", "required": true, "dataType": "string" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new RGPDController_1.RGPDController();
+            await templateService.apiHandler({
+                methodName: 'getModule',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/rgpd', ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController)), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController.prototype.getAllModules)), async function RGPDController_getAllModules(request, response, next) {
+        const args = {};
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new RGPDController_1.RGPDController();
+            await templateService.apiHandler({
+                methodName: 'getAllModules',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.put('/rgpd/:id', authenticateMiddleware([{ "jwt": ["ROLE_ADMIN"] }]), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController)), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController.prototype.updateModule)), async function RGPDController_updateModule(request, response, next) {
+        const args = {
+            id: { "in": "path", "name": "id", "required": true, "dataType": "string" },
+            moduleData: { "in": "body", "name": "moduleData", "required": true, "ref": "UpdateRGPDModuleDTO" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new RGPDController_1.RGPDController();
+            await templateService.apiHandler({
+                methodName: 'updateModule',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.delete('/rgpd/:id', authenticateMiddleware([{ "jwt": ["ROLE_ADMIN"] }]), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController)), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController.prototype.deleteModule)), async function RGPDController_deleteModule(request, response, next) {
+        const args = {
+            id: { "in": "path", "name": "id", "required": true, "dataType": "string" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new RGPDController_1.RGPDController();
+            await templateService.apiHandler({
+                methodName: 'deleteModule',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/rgpd/export', authenticateMiddleware([{ "jwt": ["ROLE_ADMIN"] }]), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController)), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController.prototype.exportModules)), async function RGPDController_exportModules(request, response, next) {
+        const args = {};
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new RGPDController_1.RGPDController();
+            await templateService.apiHandler({
+                methodName: 'exportModules',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
             });
         }
         catch (err) {

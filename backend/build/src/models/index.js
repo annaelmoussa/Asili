@@ -17,6 +17,7 @@ const AlertPreference_1 = __importDefault(require("./AlertPreference"));
 const Shipping_1 = __importDefault(require("./Shipping"));
 const Order_1 = __importDefault(require("./Order"));
 const OrderItem_1 = __importDefault(require("./OrderItem"));
+const RGPDModule_1 = __importDefault(require("./RGPDModule"));
 const env = process.env.NODE_ENV || "development";
 const config = require("../config/config.js")[env];
 const sequelize = new sequelize_typescript_1.Sequelize({
@@ -36,6 +37,7 @@ const sequelize = new sequelize_typescript_1.Sequelize({
         Shipping_1.default,
         Order_1.default,
         OrderItem_1.default,
+        RGPDModule_1.default,
     ],
 });
 const db = {
@@ -55,5 +57,6 @@ const db = {
     Shipping: Shipping_1.default,
     Order: Order_1.default,
     OrderItem: OrderItem_1.default,
+    RGPDModule: RGPDModule_1.default,
 };
 module.exports = db;

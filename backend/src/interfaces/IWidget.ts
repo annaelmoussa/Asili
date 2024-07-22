@@ -8,6 +8,7 @@ export interface IWidget {
   w: number;
   h: number;
   userId: string;
+  modelType: string;
 }
 
 export interface WidgetCreationParams {
@@ -19,4 +20,9 @@ export interface WidgetCreationParams {
   w: number;
   h: number;
   userId: string;
+  modelType: string;
+}
+
+export interface IWidgetWithData extends IWidget {
+  data?: any;
 }

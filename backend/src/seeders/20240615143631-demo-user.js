@@ -32,6 +32,18 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        id: uuidv4(),
+        email: "storekeeper@example.com",
+        password: hashedPassword,
+        role: "ROLE_STORE_KEEPER",
+        isConfirmed: true,
+        scopes: ["read:inventory"],
+        isDeleted: false,
+        lastPasswordChange: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ];
 
     for (const user of users) {
@@ -50,7 +62,6 @@ module.exports = {
       }
     }
   },
-
   async down(queryInterface, Sequelize) {
     return queryInterface.bulkDelete("User", null, {});
   },

@@ -13,6 +13,7 @@ import AlertPreference from "./AlertPreference";
 import Shipping from "./Shipping";
 import Order from "./Order";
 import OrderItem from "./OrderItem";
+import RGPDModule from "./RGPDModule";
 
 const env = process.env.NODE_ENV || "development";
 const config = require("../config/config.js")[env];
@@ -34,6 +35,7 @@ const sequelize = new Sequelize({
     Shipping,
     Order,
     OrderItem,
+    RGPDModule,
   ],
 });
 
@@ -54,6 +56,7 @@ const db = {
   Shipping,
   Order,
   OrderItem,
+  RGPDModule,
 };
 
 export = db;

@@ -30,7 +30,8 @@ const navLinks: NavLink[] = [
   { name: 'Marques', path: '/panel/brands', icon: Package },
   { name: 'Paramètres', path: '/panel/settings', icon: Bell },
   { name: 'Recherche', path: '/search', icon: Search },
-  { name: 'Panier', path: '/cart', icon: ShoppingCart }
+  { name: 'Panier', path: '/cart', icon: ShoppingCart },
+  { name: 'RGPD Manager', path: '/rgpd-manager', icon: CircleUser }
 ]
 
 export default navLinks
