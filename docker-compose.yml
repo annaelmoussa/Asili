@@ -1,5 +1,4 @@
 version: "3.8"
-
 services:
   mongo:
     image: mongo:latest
@@ -97,6 +96,20 @@ services:
       NODE_ENV: development
     networks:
       - frontend
+
+  fakeapilaposte:
+    build:
+      context: ./fakeApiLaPoste
+      dockerfile: Dockerfile
+    volumes:
+      - ./fakeApiLaPoste:/app
+      - /app/node_modules
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: development
+    networks:
+      - backend
 
 volumes:
   mongo_data:

@@ -137,7 +137,7 @@ async function handleSearch() {
 
 function goToProductPage(productId: string | undefined) {
   if (productId) {
-    router.push({ name: 'ProductSingleView', params: { productId } })
+    router.push({ name: 'ProductSingleView', params: { productId: productId } })
     searchQuery.value = ''
     showResults.value = false
   } else {

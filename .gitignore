@@ -8,11 +8,13 @@ yarn-error.log*
 /node_modules/
 /frontend/node_modules/
 /backend/node_modules/
+/fakeApiLaPoste/node_modules/
 
 # Dossier de build
 /dist/
 /build/
 /frontend/build/
+/fakeApiLaPoste/dist/
 
 # Dossiers spécifiques à Vue.js
 /frontend/dist/

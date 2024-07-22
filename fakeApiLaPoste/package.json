@@ -1,0 +1,27 @@
+{
+  "name": "fakeapilaposte",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^4.17.21",
+    "@types/mongodb": "^4.0.7",
+    "@types/uuid": "^10.0.0",
+    "express": "^4.19.2",
+    "mongodb": "^6.8.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
