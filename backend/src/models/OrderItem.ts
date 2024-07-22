@@ -1,57 +1,61 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import { sequelize } from "../config/dbConfigPostgres";
-import { IOrderItem } from "../interfaces/IOrderItem";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+} from "sequelize-typescript";
+import { IOrderItem } from "../interfaces/IOrder";
+import Order from "./Order";
+import Product from "./Product";
 
-type OrderItemCreationAttributes = Optional<IOrderItem, "id">;
+@Table({
+  tableName: "OrderItem",
+  timestamps: true,
+})
+export default class OrderItem extends Model<IOrderItem> implements IOrderItem {
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
 
-class OrderItem extends Model<IOrderItem, OrderItemCreationAttributes> implements IOrderItem {
-  public id!: string;
-  public orderId!: string;
-  public productId!: string;
-  public quantity!: number;
-  public priceAtPurchase!: number;
+  @ForeignKey(() => Order)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  orderId!: string;
+
+  @ForeignKey(() => Product)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  productId!: string;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  quantity!: number;
+
+  @Column({
+    type: DataType.DOUBLE,
+    allowNull: false,
+  })
+  priceAtPurchase!: number;
+
+  @BelongsTo(() => Order)
+  order!: Order;
+
+  @BelongsTo(() => Product)
+  product!: Product;
 }
-
-OrderItem.init({
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-    primaryKey: true
-  },
-  orderId: {
-    type: DataTypes.UUID,
-    allowNull: false,
-    references: {
-      model: 'Order',
-      key: 'id'
-    }
-  },
-  productId: {
-    type: DataTypes.UUID,
-    allowNull: false,
-    references: {
-      model: 'Product',
-      key: 'id'
-    }
-  },
-  quantity: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  priceAtPurchase: {
-    type: DataTypes.DOUBLE,
-    allowNull: false
-  }
-}, {
-  sequelize,
-  modelName: 'OrderItem',
-  tableName: 'OrderItem',
-  timestamps: true
-});
 
 export const associateOrderItem = (models: any) => {
   OrderItem.belongsTo(models.Order, { foreignKey: 'orderId', as: 'order' });
   OrderItem.belongsTo(models.Product, { foreignKey: 'productId', as: 'product' });
 };
-
-export default OrderItem;

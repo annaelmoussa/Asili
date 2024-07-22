@@ -67,6 +67,8 @@ export class StripeWebhookService {
 
     if (!order) {
       throw new Error('Error creating Order.');
+    } else if (!order.id) {
+      throw new Error('Something went wrong.');
     }
 
     console.log('creating shipping..');
@@ -81,46 +83,11 @@ export class StripeWebhookService {
     console.log('creating payment..');
     const payment = await this.paymentService.createPayment({
       userId: userId,
+      orderId: order.id,
       stripePaymentId: session.payment_intent as string,
       amount: session.amount_total! / 100,
-      status: 'Completed'
-    });
-
-    if (!order.id) {
-      throw new Error('Something went wrong.');
-    }
-
-    const orderItemsObject = await this.orderService.getOrderItems(order.id);
-    await MongoOrder.create({
-      id: order.id,
-      userId: order.userId,
-      stripeInvoiceId: order.stripeInvoiceId,
-      amount: order.amount,
-      status: order.status,
-      shippingAddress: order.shippingAddress,
-      trackingNumber: trackingNumber,
-      orderedAt: new Date(),
-      items: orderItemsObject.map(item => ({
-        id: item.id,
-        productId: item?.product?.id,
-        productName: item?.product?.name,
-        productDescription: item?.product?.description,
-        priceAtPurchase: item?.product?.price,
-        productImage: item?.product?.image,
-        quantity: item.quantity,
-      })),
-      shipping: {
-        id: shipping.id,
-        address: shipping.address,
-        status: shipping.status,
-        trackingNumber: shipping.trackingNumber
-      },
-      payment: {
-        id: payment.id,
-        stripePaymentId: payment.stripePaymentId,
-        amount: payment.amount,
-        status: payment.status
-      }
+      status: 'Completed',
+      createdAt: Date()
     });
 
     console.log('Payment successful for session:', session.id);

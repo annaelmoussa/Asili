@@ -11,10 +11,12 @@ const TokenBlacklist_1 = __importDefault(require("./TokenBlacklist"));
 const Widget_1 = __importDefault(require("./Widget"));
 const Brand_1 = __importDefault(require("./Brand"));
 const Category_1 = __importDefault(require("./Category"));
-const Invoice_1 = __importDefault(require("./Invoice"));
 const Payment_1 = __importDefault(require("./Payment"));
 const SentEmail_1 = __importDefault(require("./SentEmail"));
 const AlertPreference_1 = __importDefault(require("./AlertPreference"));
+const Shipping_1 = __importDefault(require("./Shipping"));
+const Order_1 = __importDefault(require("./Order"));
+const OrderItem_1 = __importDefault(require("./OrderItem"));
 const env = process.env.NODE_ENV || "development";
 const config = require("../config/config.js")[env];
 const sequelize = new sequelize_typescript_1.Sequelize({
@@ -28,10 +30,12 @@ const sequelize = new sequelize_typescript_1.Sequelize({
         Widget_1.default,
         Brand_1.default,
         Category_1.default,
-        Invoice_1.default,
         Payment_1.default,
         SentEmail_1.default,
         AlertPreference_1.default,
+        Shipping_1.default,
+        Order_1.default,
+        OrderItem_1.default,
     ],
 });
 const db = {
@@ -45,9 +49,11 @@ const db = {
     Widget: Widget_1.default,
     Brand: Brand_1.default,
     Category: Category_1.default,
-    Invoice: Invoice_1.default,
     Payment: Payment_1.default,
     SentEmail: SentEmail_1.default,
     AlertPreference: AlertPreference_1.default,
+    Shipping: Shipping_1.default,
+    Order: Order_1.default,
+    OrderItem: OrderItem_1.default,
 };
 module.exports = db;

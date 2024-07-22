@@ -7,10 +7,12 @@ import TokenBlacklist from "./TokenBlacklist";
 import Widget from "./Widget";
 import Brand from "./Brand";
 import Category from "./Category";
-import Invoice from "./Invoice";
 import Payment from "./Payment";
 import SentEmail from "./SentEmail";
 import AlertPreference from "./AlertPreference";
+import Shipping from "./Shipping";
+import Order from "./Order";
+import OrderItem from "./OrderItem";
 
 const env = process.env.NODE_ENV || "development";
 const config = require("../config/config.js")[env];
@@ -26,10 +28,12 @@ const sequelize = new Sequelize({
     Widget,
     Brand,
     Category,
-    Invoice,
     Payment,
     SentEmail,
     AlertPreference,
+    Shipping,
+    Order,
+    OrderItem,
   ],
 });
 
@@ -44,10 +48,12 @@ const db = {
   Widget,
   Brand,
   Category,
-  Invoice,
   Payment,
   SentEmail,
   AlertPreference,
+  Shipping,
+  Order,
+  OrderItem,
 };
 
 export = db;

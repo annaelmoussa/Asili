@@ -24,11 +24,9 @@ import SearchView from '../views/SearchView.vue'
 import PanelCategories from '../views/Panel/PanelCategoriesView.vue'
 import PanelBrands from '../views/Panel/PanelBrandsView.vue'
 import FavoritesView from '../views/FavoritesView.vue'
-import OrdersView from '../views/OrdersView.vue'
 import ReferralsView from '../views/ReferralsView.vue'
 import MemberBenefitsView from '../views/MemberBenefitsView.vue'
 import PanelViewStock from '../views/Panel/PanelStockView.vue'
-import PanelDashboard from '../views/Panel/PanelDashboardView.vue';
 import OrderSingleView from "../views/OrderSingleView.vue";
 
 const routes: Array<RouteRecordRaw> = [
@@ -112,37 +110,43 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/panel',
     component: PanelLayout,
-    meta: { requiresAuth: true, requiresAdmin: true },
+    meta: { requiresAuth: true },
     children: [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: DashboardView
+        component: DashboardView,
+        requiresAdmin: true
       },
       {
         path: 'users',
         name: 'PanelUsers',
-        component: PanelUsers
+        component: PanelUsers,
+        requiresAdmin: true
       },
       {
         path: 'settings',
         name: 'PanelSettings',
-        component: PanelSettings
+        component: PanelSettings,
+        requiresAdmin: true
       },
       {
         path: 'products',
         name: 'PanelProducts',
-        component: PanelProduct
+        component: PanelProduct,
+        requiresAdmin: true
       },
       {
         path: 'categories',
         name: 'PanelCategories',
-        component: PanelCategories
+        component: PanelCategories,
+        requiresAdmin: true
       },
       {
         path: 'brands',
         name: 'PanelBrands',
-        component: PanelBrands
+        component: PanelBrands,
+        requiresAdmin: true
       },
       {
         path: 'orders',
@@ -152,12 +156,14 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'stock',
         name: 'PanelStock',
-        component: PanelViewStock
+        component: PanelViewStock,
+        requiresAdmin: true
       },
       {
         path: 'payments',
         name: 'PanelPayments',
-        component: PanelPayment
+        component: PanelPayment,
+        requiresAdmin: true
       }
     ]
   },

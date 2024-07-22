@@ -30,6 +30,8 @@ exports.setupAssociations = void 0;
 const Order_1 = __importStar(require("./Order"));
 const OrderItem_1 = __importStar(require("./OrderItem"));
 const User_1 = __importDefault(require("./User"));
+const Shipping_1 = __importStar(require("./Shipping"));
+const Payment_1 = __importStar(require("./Payment"));
 const Product_1 = __importDefault(require("./Product"));
 /**
  * TODO Lotfi : faire une méthode générique associate
@@ -39,9 +41,13 @@ const setupAssociations = () => {
         Order: Order_1.default,
         OrderItem: OrderItem_1.default,
         User: User_1.default,
-        Product: Product_1.default
+        Product: Product_1.default,
+        Shipping: Shipping_1.default,
+        Payment: Payment_1.default
     };
     (0, Order_1.associateOrder)(models);
     (0, OrderItem_1.associateOrderItem)(models);
+    (0, Shipping_1.associateShipping)(models);
+    (0, Payment_1.associatePayment)(models);
 };
 exports.setupAssociations = setupAssociations;

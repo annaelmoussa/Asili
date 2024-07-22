@@ -1,52 +1,79 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import { sequelize } from "../config/dbConfigPostgres";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+  AfterCreate,
+} from "sequelize-typescript";
 import { IShipping } from "../interfaces/IShipping";
+import { MongoOrder } from "./MongoOrder";
+import Order from "./Order";
 
-type ShippingCreationAttributes = Optional<IShipping, "id">;
+@Table({
+  tableName: "Shipping",
+  timestamps: true,
+})
+export default class Shipping extends Model<IShipping> implements IShipping {
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
 
-class Shipping extends Model<IShipping, ShippingCreationAttributes> implements IShipping {
-  public id!: string;
-  public orderId!: string;
-  public address!: string;
-  public trackingNumber?: string;
-  public status!: string;
+  @ForeignKey(() => Order)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  orderId!: string;
 
-  static associate(models: any) {
-    Shipping.belongsTo(models.Order, { foreignKey: 'orderId', as: 'order' });
+  @BelongsTo(() => Order)
+  order!: Order;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  address!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  trackingNumber?: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  status!: string;
+
+  @AfterCreate
+  static async updateMongoOrder(shipping: Shipping): Promise<void> {
+    try {
+      await MongoOrder.findOneAndUpdate(
+        { id: shipping.orderId },
+        {
+          $set: {
+            shipping: {
+              id: shipping.id,
+              address: shipping.address,
+              status: shipping.status,
+              trackingNumber: shipping.trackingNumber
+            },
+          }
+        },
+        { new: true }
+      );
+    } catch (error) {
+      console.error('Error updating MongoOrder with shipping info:', error);
+    }
   }
 }
 
-Shipping.init({
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-    primaryKey: true
-  },
-  orderId: {
-    type: DataTypes.UUID,
-    allowNull: false,
-    references: {
-      model: 'Order',
-      key: 'id'
-    }
-  },
-  address: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  trackingNumber: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  status: {
-    type: DataTypes.STRING,
-    allowNull: false
-  }
-}, {
-  sequelize,
-  modelName: 'Shipping',
-  tableName: 'Shipping',
-  timestamps: true
-});
-
-export default Shipping;
+export const associateShipping = (models: any) => {
+  Shipping.belongsTo(models.Order, { foreignKey: 'orderId', as: 'order' });
+};

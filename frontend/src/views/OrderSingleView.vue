@@ -74,7 +74,7 @@ onMounted(async () => {
     const orderId = route.params.orderId as string;
     const response = await defaultApi.getMongoOrder(orderId);
     order.value = response.data;
-    console.log('Order data:', order.value); // Pour le débogage
+    console.log('Order data:', order.value);
   } catch (error) {
     console.error('Failed to fetch order details:', error);
   } finally {

@@ -24,7 +24,7 @@ const StripeWebhookController_1 = require("./../src/controllers/StripeWebhookCon
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const PaymentController_1 = require("./../src/controllers/PaymentController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-const InvoiceController_1 = require("./../src/controllers/InvoiceController");
+const OrderController_1 = require("./../src/controllers/OrderController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const CartController_1 = require("./../src/controllers/CartController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -270,6 +270,7 @@ const models = {
         "properties": {
             "id": { "dataType": "string" },
             "userId": { "dataType": "string", "required": true },
+            "orderId": { "dataType": "string", "required": true },
             "stripePaymentId": { "dataType": "string", "required": true },
             "amount": { "dataType": "double", "required": true },
             "status": { "dataType": "string", "required": true },
@@ -278,7 +279,32 @@ const models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "IInvoice": {
+    "IOrderItem": {
+        "dataType": "refObject",
+        "properties": {
+            "id": { "dataType": "string" },
+            "orderId": { "dataType": "string" },
+            "productId": { "dataType": "string", "required": true },
+            "quantity": { "dataType": "double", "required": true },
+            "priceAtPurchase": { "dataType": "double", "required": true },
+            "product": { "ref": "IProduct" },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "IShipping": {
+        "dataType": "refObject",
+        "properties": {
+            "id": { "dataType": "string" },
+            "orderId": { "dataType": "string", "required": true },
+            "address": { "dataType": "string", "required": true },
+            "trackingNumber": { "dataType": "string" },
+            "status": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "IOrder": {
         "dataType": "refObject",
         "properties": {
             "id": { "dataType": "string" },
@@ -286,17 +312,23 @@ const models = {
             "stripeInvoiceId": { "dataType": "string", "required": true },
             "amount": { "dataType": "double", "required": true },
             "status": { "dataType": "string", "required": true },
+            "shippingAddress": { "dataType": "string", "required": true },
+            "items": { "dataType": "array", "array": { "dataType": "refObject", "ref": "IOrderItem" } },
+            "shipping": { "ref": "IShipping" },
+            "payment": { "ref": "IPayment" },
         },
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "InvoiceCreationRequest": {
+    "OrderCreationRequest": {
         "dataType": "refObject",
         "properties": {
             "userId": { "dataType": "string", "required": true },
             "stripeInvoiceId": { "dataType": "string", "required": true },
             "amount": { "dataType": "double", "required": true },
             "status": { "dataType": "string", "required": true },
+            "shippingAddress": { "dataType": "string", "required": true },
+            "items": { "dataType": "array", "array": { "dataType": "nestedObjectLiteral", "nestedProperties": { "priceAtPurchase": { "dataType": "double", "required": true }, "quantity": { "dataType": "double", "required": true }, "productId": { "dataType": "string", "required": true } } }, "required": true },
         },
         "additionalProperties": false,
     },
@@ -1433,7 +1465,7 @@ function RegisterRoutes(app, opts) {
         }
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    app.get('/invoices/:userId', ...((0, runtime_1.fetchMiddlewares)(InvoiceController_1.InvoiceController)), ...((0, runtime_1.fetchMiddlewares)(InvoiceController_1.InvoiceController.prototype.getUserInvoices)), async function InvoiceController_getUserInvoices(request, response, next) {
+    app.get('/orders/get-orders/:userId', ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController)), ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController.prototype.getOrders)), async function OrderController_getOrders(request, response, next) {
         const args = {
             userId: { "in": "path", "name": "userId", "required": true, "dataType": "string" },
         };
@@ -1441,9 +1473,9 @@ function RegisterRoutes(app, opts) {
         let validatedArgs = [];
         try {
             validatedArgs = templateService.getValidatedArgs({ args, request, response });
-            const controller = new InvoiceController_1.InvoiceController();
+            const controller = new OrderController_1.OrderController();
             await templateService.apiHandler({
-                methodName: 'getUserInvoices',
+                methodName: 'getOrders',
                 controller,
                 response,
                 next,
@@ -1456,22 +1488,115 @@ function RegisterRoutes(app, opts) {
         }
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    app.post('/invoices/create', ...((0, runtime_1.fetchMiddlewares)(InvoiceController_1.InvoiceController)), ...((0, runtime_1.fetchMiddlewares)(InvoiceController_1.InvoiceController.prototype.createInvoice)), async function InvoiceController_createInvoice(request, response, next) {
+    app.post('/orders/create', ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController)), ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController.prototype.createOrder)), async function OrderController_createOrder(request, response, next) {
         const args = {
-            requestBody: { "in": "body", "name": "requestBody", "required": true, "ref": "InvoiceCreationRequest" },
+            requestBody: { "in": "body", "name": "requestBody", "required": true, "ref": "OrderCreationRequest" },
         };
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         let validatedArgs = [];
         try {
             validatedArgs = templateService.getValidatedArgs({ args, request, response });
-            const controller = new InvoiceController_1.InvoiceController();
+            const controller = new OrderController_1.OrderController();
             await templateService.apiHandler({
-                methodName: 'createInvoice',
+                methodName: 'createOrder',
                 controller,
                 response,
                 next,
                 validatedArgs,
                 successStatus: 201,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/orders/order/:orderId', ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController)), ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController.prototype.getOrder)), async function OrderController_getOrder(request, response, next) {
+        const args = {
+            orderId: { "in": "path", "name": "orderId", "required": true, "dataType": "string" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new OrderController_1.OrderController();
+            await templateService.apiHandler({
+                methodName: 'getOrder',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/orders/update-status/:orderId', ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController)), ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController.prototype.updateOrderStatus)), async function OrderController_updateOrderStatus(request, response, next) {
+        const args = {
+            orderId: { "in": "path", "name": "orderId", "required": true, "dataType": "string" },
+            status: { "in": "body", "name": "status", "required": true, "dataType": "string" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new OrderController_1.OrderController();
+            await templateService.apiHandler({
+                methodName: 'updateOrderStatus',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/orders/get-mongo-orders/:userId', ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController)), ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController.prototype.getMongoOrders)), async function OrderController_getMongoOrders(request, response, next) {
+        const args = {
+            userId: { "in": "path", "name": "userId", "required": true, "dataType": "string" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new OrderController_1.OrderController();
+            await templateService.apiHandler({
+                methodName: 'getMongoOrders',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/orders/get-mongo-order/:orderId', ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController)), ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController.prototype.getMongoOrder)), async function OrderController_getMongoOrder(request, response, next) {
+        const args = {
+            orderId: { "in": "path", "name": "orderId", "required": true, "dataType": "string" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new OrderController_1.OrderController();
+            await templateService.apiHandler({
+                methodName: 'getMongoOrder',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
             });
         }
         catch (err) {

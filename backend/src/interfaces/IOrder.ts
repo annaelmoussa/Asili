@@ -1,4 +1,6 @@
-import { IOrderItem } from "../interfaces/IOrderItem";
+import { IOrderItem } from "./IOrderItem";
+import { IPayment } from "./IPayment";
+import { IShipping } from "./IShipping";
 
 export interface IOrder {
   id?: string;
@@ -8,4 +10,8 @@ export interface IOrder {
   status: string;
   shippingAddress: string;
   items?: IOrderItem[];
+  shipping?: IShipping;
+  payment?: IPayment;
 }
+
+export { IOrderItem };

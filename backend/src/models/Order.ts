@@ -1,59 +1,141 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import { IOrder } from "../interfaces/IOrder";
-import { sequelize } from "../config/dbConfigPostgres";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+  HasMany,
+  HasOne,
+  AfterCreate,
+} from "sequelize-typescript";
+import { IOrder, IOrderItem } from "../interfaces/IOrder";
+import { MongoOrder } from "./MongoOrder";
+import User from "./User";
+import Product from "./Product";
+import OrderItem from "./OrderItem";
+import Shipping from "./Shipping";
+import Payment from "./Payment";
 
-type OrderCreationAttributes = Optional<IOrder, "id">;
+@Table({
+  tableName: "Order",
+  timestamps: true,
+})
+export default class Order extends Model<IOrder> implements IOrder {
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
 
-class Order extends Model<IOrder, OrderCreationAttributes> implements IOrder {
-  public id!: string;
-  public userId!: string;
-  public stripeInvoiceId!: string;
-  public amount!: number;
-  public status!: string;
-  public shippingAddress!: string;
-  public trackingNumber?: string;
-}
-
-Order.init({
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-    primaryKey: true
-  },
-  userId: {
-    type: DataTypes.UUID,
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.UUID,
     allowNull: false,
-    references: {
-      model: 'User',
-      key: 'id'
+  })
+  userId!: string;
+
+  @BelongsTo(() => User)
+  user!: User;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  stripeInvoiceId!: string;
+
+  @Column({
+    type: DataType.DOUBLE,
+    allowNull: false,
+  })
+  amount!: number;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  status!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  shippingAddress!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  trackingNumber?: string;
+
+  @HasMany(() => OrderItem)
+  items?: IOrderItem[];
+
+  @HasOne(() => Shipping)
+  shipping?: Shipping;
+
+  @HasOne(() => Payment)
+  payment?: Payment;
+
+  @AfterCreate
+static async createMongoOrder(order: Order): Promise<void> {
+  try {
+    const orderWithDetails = await Order.findByPk(order.id, {
+      include: [
+        {
+          model: OrderItem,
+          as: 'items',
+          include: [{ model: Product, as: 'product' }]
+        },
+        {
+          model: Shipping,
+          as: 'shipping'
+        },
+        {
+          model: Payment,
+          as: 'payment'
+        }
+      ]
+    });
+
+    if (orderWithDetails) {
+      await MongoOrder.create({
+        id: orderWithDetails.id,
+        userId: orderWithDetails.userId,
+        stripeInvoiceId: orderWithDetails.stripeInvoiceId,
+        amount: orderWithDetails.amount,
+        status: orderWithDetails.status,
+        items: orderWithDetails.items?.map((item) => ({
+          id: item.id,
+          productId: item.productId,
+          productName: item.product?.name,
+          productDescription: item.product?.description,
+          priceAtPurchase: item.priceAtPurchase,
+          productImage: item.product?.image,
+          quantity: item.quantity,
+        })),
+        shipping: orderWithDetails.shipping ? {
+          id: orderWithDetails.shipping.id,
+          address: orderWithDetails.shipping.address,
+          status: orderWithDetails.shipping.status,
+          trackingNumber: orderWithDetails.shipping.trackingNumber
+        } : undefined,
+        payment: orderWithDetails.payment ? {
+          id: orderWithDetails.payment.id,
+          stripePaymentId: orderWithDetails.payment.stripePaymentId,
+          amount: orderWithDetails.payment.amount,
+          status: orderWithDetails.payment.status
+        } : undefined
+      });
     }
-  },
-  stripeInvoiceId: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  amount: {
-    type: DataTypes.DOUBLE,
-    allowNull: false
-  },
-  status: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  shippingAddress: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-}, {
-  sequelize,
-  modelName: 'Order',
-  tableName: 'Order',
-  timestamps: true
-});
+  } catch (error) {
+    console.error('Error creating MongoOrder:', error);
+  }
+}
+}
 
 export const associateOrder = (models: any) => {
   Order.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
   Order.hasMany(models.OrderItem, { foreignKey: 'orderId', as: 'items' });
 };
-
-export default Order;

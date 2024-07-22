@@ -606,6 +606,9 @@
 					"userId": {
 						"type": "string"
 					},
+					"orderId": {
+						"type": "string"
+					},
 					"stripePaymentId": {
 						"type": "string"
 					},
@@ -630,6 +633,7 @@
 				},
 				"required": [
 					"userId",
+					"orderId",
 					"stripePaymentId",
 					"amount",
 					"status",
@@ -638,7 +642,64 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"IInvoice": {
+			"IOrderItem": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"orderId": {
+						"type": "string"
+					},
+					"productId": {
+						"type": "string"
+					},
+					"quantity": {
+						"type": "number",
+						"format": "double"
+					},
+					"priceAtPurchase": {
+						"type": "number",
+						"format": "double"
+					},
+					"product": {
+						"$ref": "#/components/schemas/IProduct"
+					}
+				},
+				"required": [
+					"productId",
+					"quantity",
+					"priceAtPurchase"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IShipping": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"orderId": {
+						"type": "string"
+					},
+					"address": {
+						"type": "string"
+					},
+					"trackingNumber": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"orderId",
+					"address",
+					"status"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"IOrder": {
 				"properties": {
 					"id": {
 						"type": "string"
@@ -655,18 +716,34 @@
 					},
 					"status": {
 						"type": "string"
+					},
+					"shippingAddress": {
+						"type": "string"
+					},
+					"items": {
+						"items": {
+							"$ref": "#/components/schemas/IOrderItem"
+						},
+						"type": "array"
+					},
+					"shipping": {
+						"$ref": "#/components/schemas/IShipping"
+					},
+					"payment": {
+						"$ref": "#/components/schemas/IPayment"
 					}
 				},
 				"required": [
 					"userId",
 					"stripeInvoiceId",
 					"amount",
-					"status"
+					"status",
+					"shippingAddress"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"InvoiceCreationRequest": {
+			"OrderCreationRequest": {
 				"properties": {
 					"userId": {
 						"type": "string"
@@ -680,13 +757,42 @@
 					},
 					"status": {
 						"type": "string"
+					},
+					"shippingAddress": {
+						"type": "string"
+					},
+					"items": {
+						"items": {
+							"properties": {
+								"priceAtPurchase": {
+									"type": "number",
+									"format": "double"
+								},
+								"quantity": {
+									"type": "number",
+									"format": "double"
+								},
+								"productId": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"priceAtPurchase",
+								"quantity",
+								"productId"
+							],
+							"type": "object"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
 					"userId",
 					"stripeInvoiceId",
 					"amount",
-					"status"
+					"status",
+					"shippingAddress",
+					"items"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -2573,9 +2679,9 @@
 				"parameters": []
 			}
 		},
-		"/invoices/{userId}": {
+		"/orders/get-orders/{userId}": {
 			"get": {
-				"operationId": "GetUserInvoices",
+				"operationId": "GetOrders",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -2583,7 +2689,7 @@
 							"application/json": {
 								"schema": {
 									"items": {
-										"$ref": "#/components/schemas/IInvoice"
+										"$ref": "#/components/schemas/IOrder"
 									},
 									"type": "array"
 								}
@@ -2604,16 +2710,21 @@
 				]
 			}
 		},
-		"/invoices/create": {
+		"/orders/create": {
 			"post": {
-				"operationId": "CreateInvoice",
+				"operationId": "CreateOrder",
 				"responses": {
 					"201": {
-						"description": "Invoice Created",
+						"description": "Order Created",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/IInvoice"
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/IOrder"
+										}
+									],
+									"nullable": true
 								}
 							}
 						}
@@ -2626,11 +2737,139 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/InvoiceCreationRequest"
+								"$ref": "#/components/schemas/OrderCreationRequest"
 							}
 						}
 					}
 				}
+			}
+		},
+		"/orders/order/{orderId}": {
+			"get": {
+				"operationId": "GetOrder",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/IOrder"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orderId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/orders/update-status/{orderId}": {
+			"post": {
+				"operationId": "UpdateOrderStatus",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/IOrder"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orderId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/orders/get-mongo-orders/{userId}": {
+			"get": {
+				"operationId": "GetMongoOrders",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/orders/get-mongo-order/{orderId}": {
+			"get": {
+				"operationId": "GetMongoOrder",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "orderId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
 		"/carts/get-cart-items": {

@@ -1,6 +1,8 @@
 import Order, { associateOrder } from './Order';
 import OrderItem, { associateOrderItem } from './OrderItem';
 import User from './User';
+import Shipping, { associateShipping } from './Shipping';
+import Payment, { associatePayment } from './Payment';
 import Product from './Product';
 
 /**
@@ -11,9 +13,13 @@ export const setupAssociations = () => {
     Order,
     OrderItem,
     User,
-    Product
+    Product,
+    Shipping,
+    Payment
   };
 
   associateOrder(models);
   associateOrderItem(models);
+  associateShipping(models);
+  associatePayment(models);
 };

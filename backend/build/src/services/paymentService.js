@@ -15,9 +15,11 @@ const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, {
     apiVersion: "2024-06-20",
 });
 class PaymentService {
+    async createPayment(paymentInfo) {
+        return Payment_1.default.create(paymentInfo);
+    }
     async createPaymentSession(items, userId) {
-        console.log(items);
-        const lineItems = items.map((item) => ({
+        const lineItems = items.map(item => ({
             price_data: {
                 currency: "eur",
                 product_data: {
