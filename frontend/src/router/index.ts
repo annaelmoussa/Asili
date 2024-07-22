@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw, type RouteMeta } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginPage from '../views/LoginPage.vue'
 import ResetPasswordRequestView from '../views/ResetPasswordRequestView.vue'
@@ -27,9 +27,15 @@ import FavoritesView from '../views/FavoritesView.vue'
 import ReferralsView from '../views/ReferralsView.vue'
 import MemberBenefitsView from '../views/MemberBenefitsView.vue'
 import PanelViewStock from '../views/Panel/PanelStockView.vue'
-import OrderSingleView from "../views/OrderSingleView.vue";
+import OrderSingleView from '../views/OrderSingleView.vue'
 
-const routes: Array<RouteRecordRaw> = [
+interface CustomRouteMeta extends RouteMeta {
+  requiresAuth?: boolean
+  requiresAdmin?: boolean
+  hideNavbar?: boolean
+}
+
+const routes: Array<RouteRecordRaw & { meta?: CustomRouteMeta }> = [
   {
     path: '/',
     name: 'home',
@@ -204,8 +210,8 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
-  const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin)
+  const requiresAuth = to.matched.some((record) => record.meta?.requiresAuth)
+  const requiresAdmin = to.matched.some((record) => record.meta?.requiresAdmin)
 
   if (requiresAuth && !userStore.isAuthenticated) {
     next('/login')

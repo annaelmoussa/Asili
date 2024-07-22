@@ -49,7 +49,12 @@
       <div v-else-if="error">Une erreur est survenue: {{ error }}</div>
       <div v-else-if="products.length === 0">Aucun produit trouvé</div>
       <div v-else class="product-list">
-        <div v-for="product in products" :key="product.id" class="product-item">
+        <div
+          v-for="product in products"
+          :key="product.id"
+          class="product-item"
+          @click="goToProductPage(product.id)"
+        >
           <img :src="product.image" :alt="product.name" />
           <h3>{{ product.name }}</h3>
           <p>{{ product.price.toFixed(2) }} €</p>
@@ -173,6 +178,10 @@ function updateSearch() {
   router.push({ name: 'search', query })
 }
 
+function goToProductPage(productId: string) {
+  router.push({ name: 'ProductSingleView', params: { productId } })
+}
+
 watch(
   [searchQuery, selectedCategory, selectedBrand, minPrice, maxPrice, isPromotion, inStock],
   () => {
@@ -214,6 +223,12 @@ watch(
   border-radius: 5px;
   padding: 10px;
   text-align: center;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+}
+
+.product-item:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .product-item img {

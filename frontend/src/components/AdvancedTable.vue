@@ -1,35 +1,37 @@
 <template>
   <div class="advanced-table bg-white shadow-lg rounded-lg overflow-hidden">
-    <div
-      class="table-controls p-4 bg-gray-50 border-b border-gray-200 flex flex-wrap justify-between items-center"
-    >
-      <div class="search mb-2 sm:mb-0">
-        <input
-          v-model="searchQuery"
-          @input="handleSearch"
-          placeholder="Rechercher..."
-          class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      <div class="actions space-x-2">
-        <button
-          @click="exportCSV"
-          :disabled="!hasSelectedItems"
-          class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Exporter CSV
-        </button>
-        <DeleteButton
-          :confirmationMessage="`Êtes-vous sûr de vouloir supprimer ${selectedItems.size} éléments ?`"
-          :onDelete="deleteSelected"
-          @success="handleDeleteSuccess"
-          :disabled="!hasSelectedItems"
-          :button-text="`Supprimer (${selectedItems.size})`"
-        />
+    <div class="table-controls p-4 bg-gray-50 border-b border-gray-200">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex-grow flex items-center max-w-md">
+          <Search class="text-gray-400 mr-2" />
+          <input
+            v-model="globalSearch"
+            @input="handleSearch"
+            type="text"
+            placeholder="Recherche globale..."
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+          />
+        </div>
+        <div class="flex-shrink-0 flex items-center space-x-2">
+          <button
+            @click="exportCSV"
+            :disabled="!hasSelectedItems"
+            class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
+          >
+            Exporter CSV
+          </button>
+          <DeleteButton
+            :confirmationMessage="`Êtes-vous sûr de vouloir supprimer ${selectedItems.size} éléments ?`"
+            :onDelete="deleteSelected"
+            :disabled="!hasSelectedItems"
+            :button-text="`Supprimer (${selectedItems.size})`"
+            class="transition duration-150 ease-in-out"
+          />
+        </div>
       </div>
     </div>
 
-    <div class="overflow-x-auto" v-if="paginatedData.length > 0">
+    <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
@@ -38,22 +40,32 @@
                 type="checkbox"
                 :checked="isAllSelected"
                 @change="toggleSelectAll"
-                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition duration-150 ease-in-out"
               />
             </th>
             <th
               v-for="column in columns"
               :key="column.key"
-              @click="sortBy(column.key)"
-              :class="[
-                'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer',
-                { 'text-blue-500': sortKey === column.key }
-              ]"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
             >
-              {{ column.label }}
-              <span v-if="sortKey === column.key" class="ml-1">
-                {{ sortOrder === 'asc' ? '▲' : '▼' }}
-              </span>
+              <div
+                @click="sortBy(column.key)"
+                class="cursor-pointer hover:text-gray-700 transition duration-150 ease-in-out"
+              >
+                {{ column.label }}
+                <span v-if="sortKey === column.key" class="ml-1">
+                  {{ sortOrder === 'asc' ? '▲' : '▼' }}
+                </span>
+              </div>
+              <div v-if="column.filterable !== false && column.type !== 'image'" class="mt-2">
+                <input
+                  v-model="columnFilters[column.key]"
+                  @input="handleSearch"
+                  :type="column.type === 'date' ? 'date' : 'text'"
+                  :placeholder="`Filtrer ${column.label}`"
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 transition duration-150 ease-in-out"
+                />
+              </div>
             </th>
             <th
               scope="col"
@@ -64,51 +76,59 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="item in paginatedData" :key="item.id" class="hover:bg-gray-50">
+          <tr
+            v-for="item in paginatedData"
+            :key="item.id"
+            class="hover:bg-gray-50 transition duration-150 ease-in-out"
+          >
             <td class="p-4 w-4">
               <input
                 type="checkbox"
                 :checked="isSelected(item.id)"
                 @change="toggleSelect(item.id)"
-                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition duration-150 ease-in-out"
               />
             </td>
             <td v-for="column in columns" :key="column.key" class="px-6 py-4 whitespace-nowrap">
               <div v-if="column.type === 'image'" class="flex items-center">
                 <img
-                  :src="extractImageUrl(item[column.key as keyof typeof item])"
+                  :src="extractImageUrl((item as any)[column.key])"
                   :alt="column.label"
                   class="h-10 w-10 rounded-full object-cover"
                   loading="lazy"
-                  @error="handleImageError"
                 />
               </div>
               <div v-else-if="column.type === 'boolean'" class="text-sm text-gray-900">
-                {{ item[column.key as keyof typeof item] ? 'Oui' : 'Non' }}
+                {{ (item as any)[column.key] ? 'Oui' : 'Non' }}
               </div>
               <div v-else class="text-sm text-gray-900">
-                {{ item[column.key as keyof typeof item] }}
+                {{ (item as any)[column.key] }}
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2 flex">
-              <button @click="viewItem(item)" class="text-blue-600 hover:text-blue-900">
+              <button
+                @click="viewItem(item)"
+                class="text-blue-600 hover:text-blue-900 transition duration-150 ease-in-out"
+              >
                 <Eye />
               </button>
-              <button @click="editItem(item)" class="text-indigo-600 hover:text-indigo-900">
+              <button
+                @click="editItem(item)"
+                class="text-indigo-600 hover:text-indigo-900 transition duration-150 ease-in-out"
+              >
                 <Pencil />
               </button>
               <DeleteButton
                 :use-icon="true"
-                :confirmationMessage="`Êtes-vous sûr de vouloir supprimer ${(item as any).name} ?`"
+                :confirmationMessage="`Êtes-vous sûr de vouloir supprimer cet élément ?`"
                 :onDelete="() => deleteItem(item)"
-                @success="handleDeleteSuccess"
+                class="transition duration-150 ease-in-out"
               />
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div v-else class="p-4 text-center text-gray-500">Aucune donnée disponible</div>
 
     <div
       class="pagination bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6"
@@ -117,30 +137,27 @@
         <button
           @click="changePage(-1)"
           :disabled="isFirstPage"
-          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition duration-150 ease-in-out"
         >
           Précédent
         </button>
         <button
           @click="changePage(1)"
           :disabled="isLastPage"
-          class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition duration-150 ease-in-out"
         >
           Suivant
         </button>
       </div>
       <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
         <div>
-          <p class="text-sm text-gray-700" v-if="filteredData && filteredData.length > 0">
+          <p class="text-sm text-gray-700">
             Affichage de
             <span class="font-medium">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> à
             <span class="font-medium">{{
               Math.min(currentPage * itemsPerPage, filteredData.length)
             }}</span>
             sur <span class="font-medium">{{ filteredData.length }}</span> résultats
-          </p>
-          <p class="text-sm text-gray-700" v-else-if="filteredData && filteredData.length === 0">
-            Aucun résultat trouvé
           </p>
         </div>
         <div>
@@ -151,7 +168,7 @@
             <button
               @click="changePage(-1)"
               :disabled="isFirstPage"
-              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition duration-150 ease-in-out"
             >
               <span class="sr-only">Précédent</span>
               <svg
@@ -176,7 +193,7 @@
             <button
               @click="changePage(1)"
               :disabled="isLastPage"
-              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition duration-150 ease-in-out"
             >
               <span class="sr-only">Suivant</span>
               <svg
@@ -201,17 +218,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType, computed, ref, watch } from 'vue'
+import { defineComponent, computed, ref, watch, type PropType } from 'vue'
 import debounce from 'lodash/debounce'
+import { Eye, Pencil, Search } from 'lucide-vue-next'
 import DeleteButton from './DeleteButton.vue'
 import { extractImageUrl, formatPrice } from '@/utils/productUtils'
-import { Eye, Pencil } from 'lucide-vue-next'
 
 interface TableColumn {
   key: string
   label: string
   sortable: boolean
-  type?: 'text' | 'image' | 'date' | 'boolean'
+  type?: 'text' | 'number' | 'image' | 'date' | 'boolean'
+  filterable?: boolean
 }
 
 interface TableItem {
@@ -224,18 +242,17 @@ export default defineComponent({
   components: {
     DeleteButton,
     Eye,
-    Pencil
+    Pencil,
+    Search
   },
   props: {
     data: {
       type: Array as PropType<TableItem[]>,
-      required: true,
-      default: () => []
+      required: true
     },
     columns: {
       type: Array as PropType<TableColumn[]>,
-      required: true,
-      default: () => []
+      required: true
     },
     itemsPerPage: {
       type: Number,
@@ -246,27 +263,57 @@ export default defineComponent({
   setup(props, { emit }) {
     const sortKey = ref('')
     const sortOrder = ref<'asc' | 'desc'>('asc')
-    const searchQuery = ref('')
+    const columnFilters = ref<Record<string, string>>({})
+    const globalSearch = ref('')
     const currentPage = ref(1)
     const selectedItems = ref<Set<string | number>>(new Set())
 
+    const initializeColumnFilters = () => {
+      props.columns.forEach((column) => {
+        if (column.filterable !== false) {
+          columnFilters.value[column.key] = ''
+        }
+      })
+    }
+
+    initializeColumnFilters()
+
+    watch(() => props.columns, initializeColumnFilters)
+
     const filteredData = computed(() => {
-      if (!props.data) return []
       let result = props.data
-      if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase()
+
+      // Apply global search
+      if (globalSearch.value) {
+        const searchTerm = globalSearch.value.toLowerCase()
         result = result.filter((item) =>
-          Object.values(item).some((value) => String(value).toLowerCase().includes(query))
+          Object.values(item).some(
+            (value) => value && value.toString().toLowerCase().includes(searchTerm)
+          )
         )
       }
+
+      // Apply column filters
+      Object.entries(columnFilters.value).forEach(([key, value]) => {
+        if (value) {
+          const column = props.columns.find((col) => col.key === key)
+          result = result.filter((item) => {
+            const itemValue = item[key]
+            if (column?.type === 'boolean') {
+              return itemValue.toString() === value
+            } else if (column?.type === 'date') {
+              return itemValue.includes(value)
+            } else if (column?.type === 'number') {
+              return itemValue.toString().includes(value)
+            } else {
+              return String(itemValue).toLowerCase().includes(value.toLowerCase())
+            }
+          })
+        }
+      })
+
       return result
     })
-
-    const handleImageError = (event: Event) => {
-      const target = event.target as HTMLImageElement
-      target.src =
-        'https://media.istockphoto.com/id/1409329028/vector/no-picture-available-placeholder-thumbnail-icon-illustration-design.jpg?s=612x612&w=0&k=20&c=_zOuJu755g2eEUioiOUdz_mHKJQJn-tDgIAhQzyeKUQ='
-    }
 
     const sortedData = computed(() => {
       if (!sortKey.value) return filteredData.value
@@ -284,7 +331,6 @@ export default defineComponent({
     })
 
     const paginatedData = computed(() => {
-      if (!sortedData.value || sortedData.value.length === 0) return []
       const start = (currentPage.value - 1) * props.itemsPerPage
       const end = start + props.itemsPerPage
       return sortedData.value.slice(start, end).map((item) => ({
@@ -294,19 +340,12 @@ export default defineComponent({
       }))
     })
 
-    const totalPages = computed(() => {
-      return filteredData.value && filteredData.value.length > 0
-        ? Math.ceil(filteredData.value.length / props.itemsPerPage)
-        : 1
-    })
-
+    const totalPages = computed(() => Math.ceil(filteredData.value.length / props.itemsPerPage))
     const isFirstPage = computed(() => currentPage.value === 1)
     const isLastPage = computed(() => currentPage.value === totalPages.value)
-
     const isAllSelected = computed(() =>
       paginatedData.value.every((item) => selectedItems.value.has(item.id))
     )
-
     const hasSelectedItems = computed(() => selectedItems.value.size > 0)
 
     const handleSearch = debounce(() => {
@@ -356,10 +395,15 @@ export default defineComponent({
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
       const link = document.createElement('a')
-      link.href = URL.createObjectURL(blob)
-      link.download = 'export.csv'
-      link.click()
-      URL.revokeObjectURL(link.href)
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob)
+        link.setAttribute('href', url)
+        link.setAttribute('download', 'export.csv')
+        link.style.visibility = 'hidden'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
     }
 
     const viewItem = (item: TableItem) => emit('view', item)
@@ -369,12 +413,6 @@ export default defineComponent({
     }
     const deleteSelected = async (): Promise<void> => {
       await emit('delete-selected', Array.from(selectedItems.value))
-    }
-
-    const handleDeleteSuccess = () => {
-      // Logique à exécuter après une suppression réussie
-      // Par exemple, rafraîchir les données
-      // Vous pouvez émettre un événement ou appeler une fonction pour mettre à jour les données
     }
 
     watch(
@@ -388,7 +426,8 @@ export default defineComponent({
     return {
       sortKey,
       sortOrder,
-      searchQuery,
+      columnFilters,
+      globalSearch,
       currentPage,
       selectedItems,
       paginatedData,
@@ -409,10 +448,24 @@ export default defineComponent({
       deleteItem,
       deleteSelected,
       extractImageUrl,
-      handleImageError,
-      filteredData,
-      handleDeleteSuccess
+      filteredData
     }
   }
 })
 </script>
+<style scoped>
+.advanced-table {
+  @apply max-w-full overflow-hidden;
+}
+
+@media (max-width: 640px) {
+  .advanced-table {
+    @apply text-sm;
+  }
+
+  .advanced-table th,
+  .advanced-table td {
+    @apply px-2 py-1;
+  }
+}
+</style>
