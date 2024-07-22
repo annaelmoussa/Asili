@@ -63,6 +63,12 @@ export default class Widget extends Model<IWidget> implements IWidget {
   })
   h!: number;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  modelType!: string;
+
   @ForeignKey(() => User)
   @Column({
     type: DataType.UUID,

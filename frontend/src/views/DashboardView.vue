@@ -4,6 +4,7 @@
       <select v-model="selectedDataType" class="mr-4 px-4 py-2 border rounded">
         <option value="Products">Products</option>
         <option value="Users">Users</option>
+        <option value="Orders">Orders</option>
       </select>
       <select v-model="selectedChartType" class="mr-4 px-4 py-2 border rounded">
         <option value="Area">Area Chart</option>
@@ -38,7 +39,7 @@ import DeleteButton from '@/components/DeleteButton.vue'
 
 const grid = ref<GridStack | undefined>(undefined)
 const selectedChartType = ref<'Area' | 'Line' | 'Bar' | 'Donut'>('Area')
-const selectedDataType = ref<'Products' | 'Users'>('Products')
+const selectedDataType = ref<'Products' | 'Users' | 'Orders'>('Products')
 const editMode = ref(false)
 
 const chartComponents: Record<'Area' | 'Line' | 'Bar' | 'Donut' | 'DeleteButton', any> = {
@@ -125,16 +126,17 @@ const makeWidget = async (item: Widget) => {
   if (chartContainer) {
     const ChartComponent = chartComponents[item.type]
     if (ChartComponent) {
+      const transformedData = widgetsStore.transformWidgetData(item.data, item.modelType)
       let props: Record<string, any> = {
-        data: item.data.data,
-        index: item.data.index,
-        categories: item.data.categories,
-        colors: ['#10b981', '#3b82f6'],
+        data: transformedData.data,
+        index: transformedData.index,
+        categories: transformedData.categories,
+        colors: ['#10b981', '#3b82f6', '#ef4444', '#f59e0b'],
         keyElement: generateKey()
       }
 
       if (item.type === 'Donut') {
-        props.category = item.data.categories[0]
+        props.category = transformedData.categories[0]
         delete props.categories
       }
 
@@ -147,20 +149,15 @@ const makeWidget = async (item: Widget) => {
 }
 
 const addWidget = async () => {
-  let data
-  if (selectedDataType.value === 'Products') {
-    const rawData = await widgetsStore.fetchProductData()
-    data = widgetsStore.transformProductDataForChart(rawData, selectedChartType.value)
-  } else {
-    const rawData = await widgetsStore.fetchUserData()
-    data = widgetsStore.transformUserDataForChart(rawData, selectedChartType.value)
-  }
+  const modelType = selectedDataType.value
+  const rawData = await widgetsStore.fetchWidgetData(modelType)
 
-  const widget = {
-    title: `Widget ${widgetsStore.widgets.length + 1}`,
+  const widget: Omit<Widget, 'id'> = {
+    title: `${modelType} Widget ${widgetsStore.widgets.length + 1}`,
     type: selectedChartType.value,
-    data: data,
-    grid: { x: 0, y: 0, w: 2, h: 2 }
+    data: rawData,
+    grid: { x: 0, y: 0, w: 6, h: 5 },
+    modelType: modelType
   }
 
   try {
@@ -247,6 +244,7 @@ interface Widget {
   type: 'Area' | 'Line' | 'Bar' | 'Donut'
   data: any
   grid: Partial<GridStackWidget>
+  modelType: 'Products' | 'Users' | 'Orders'
 }
 </script>
 

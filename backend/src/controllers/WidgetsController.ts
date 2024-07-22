@@ -12,7 +12,7 @@ import {
   Request,
 } from "tsoa";
 import { WidgetsService } from "../services/WidgetsService";
-import { IWidget, WidgetCreationParams } from "../interfaces/IWidget";
+import { IWidget, IWidgetWithData, WidgetCreationParams } from "../interfaces/IWidget";
 import express from "express";
 import { IJwtPayload } from "../interfaces/IJwtPayload";
 import { AuthenticatedRequest } from "../types/AuthenticatedRequest";
@@ -21,12 +21,26 @@ import { AuthenticatedRequest } from "../types/AuthenticatedRequest";
 @Tags("Widgets")
 @Security("jwt", ["ROLE_ADMIN"])
 export class WidgetsController extends Controller {
+  private widgetsService: WidgetsService;
+
+  constructor() {
+    super();
+    this.widgetsService = new WidgetsService();
+  }
+
   @Get()
   public async getWidgets(
     @Request() request: AuthenticatedRequest
   ): Promise<IWidget[]> {
     const user = request.user as IJwtPayload;
-    return new WidgetsService().getAllByUser(user.id);
+    return this.widgetsService.getAllByUser(user.id);
+  }
+
+  @Get("{widgetId}")
+  public async getWidget(
+    @Path() widgetId: string
+  ): Promise<IWidgetWithData | null> {
+    return this.widgetsService.getWidgetWithData(widgetId);
   }
 
   @Post()
@@ -35,7 +49,7 @@ export class WidgetsController extends Controller {
     @Request() request: AuthenticatedRequest
   ): Promise<IWidget> {
     const user = request.user as IJwtPayload;
-    return new WidgetsService().create(user.id, requestBody);
+    return this.widgetsService.create(user.id, requestBody);
   }
 
   @Put("{widgetId}")
@@ -43,11 +57,16 @@ export class WidgetsController extends Controller {
     @Path() widgetId: string,
     @Body() requestBody: WidgetCreationParams
   ): Promise<IWidget | null> {
-    return new WidgetsService().update(widgetId, requestBody);
+    return this.widgetsService.update(widgetId, requestBody);
   }
 
   @Delete("{widgetId}")
   public async deleteWidget(@Path() widgetId: string): Promise<void> {
-    return new WidgetsService().delete(widgetId);
+    return this.widgetsService.delete(widgetId);
+  }
+
+  @Get("data/{modelType}")
+  public async getWidgetData(@Path() modelType: string): Promise<any> {
+    return this.widgetsService.getWidgetData(modelType);
   }
 }

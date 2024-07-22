@@ -28,6 +28,7 @@ import ReferralsView from '../views/ReferralsView.vue'
 import MemberBenefitsView from '../views/MemberBenefitsView.vue'
 import PanelViewStock from '../views/Panel/PanelStockView.vue'
 import OrderSingleView from '../views/OrderSingleView.vue'
+import RGPDManager from '../views/RGPDManagerView.vue'
 
 interface CustomRouteMeta extends RouteMeta {
   requiresAuth?: boolean
@@ -164,6 +165,12 @@ const routes: Array<RouteRecordRaw & { meta?: CustomRouteMeta }> = [
         name: 'PanelStock',
         component: PanelViewStock,
         meta: { requiresAdmin: true }
+      },
+      {
+        path: '/rgpd-manager',
+        name: 'RGPDManager',
+        component: RGPDManager,
+        meta: { requiresAuth: true, requiresAdmin: true }
       },
       {
         path: 'payments',

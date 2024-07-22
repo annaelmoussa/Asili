@@ -100,6 +100,8 @@ export default class User extends Model<IUser> implements IUser {
   static beforeSaveHook(instance: User) {
     if (instance.role === "ROLE_ADMIN") {
       instance.scopes = ALL_SCOPES;
+    } else if (instance.role === "ROLE_STORE_KEEPER") {
+      instance.scopes.push("ROLE_STORE_KEEPER");
     }
     if (instance.changed("password")) {
       instance.lastPasswordChange = new Date();

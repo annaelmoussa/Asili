@@ -16,19 +16,29 @@ exports.WidgetsController = void 0;
 const tsoa_1 = require("tsoa");
 const WidgetsService_1 = require("../services/WidgetsService");
 let WidgetsController = class WidgetsController extends tsoa_1.Controller {
+    constructor() {
+        super();
+        this.widgetsService = new WidgetsService_1.WidgetsService();
+    }
     async getWidgets(request) {
         const user = request.user;
-        return new WidgetsService_1.WidgetsService().getAllByUser(user.id);
+        return this.widgetsService.getAllByUser(user.id);
+    }
+    async getWidget(widgetId) {
+        return this.widgetsService.getWidgetWithData(widgetId);
     }
     async createWidget(requestBody, request) {
         const user = request.user;
-        return new WidgetsService_1.WidgetsService().create(user.id, requestBody);
+        return this.widgetsService.create(user.id, requestBody);
     }
     async updateWidget(widgetId, requestBody) {
-        return new WidgetsService_1.WidgetsService().update(widgetId, requestBody);
+        return this.widgetsService.update(widgetId, requestBody);
     }
     async deleteWidget(widgetId) {
-        return new WidgetsService_1.WidgetsService().delete(widgetId);
+        return this.widgetsService.delete(widgetId);
+    }
+    async getWidgetData(modelType) {
+        return this.widgetsService.getWidgetData(modelType);
     }
 };
 exports.WidgetsController = WidgetsController;
@@ -39,6 +49,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], WidgetsController.prototype, "getWidgets", null);
+__decorate([
+    (0, tsoa_1.Get)("{widgetId}"),
+    __param(0, (0, tsoa_1.Path)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], WidgetsController.prototype, "getWidget", null);
 __decorate([
     (0, tsoa_1.Post)(),
     __param(0, (0, tsoa_1.Body)()),
@@ -62,8 +79,16 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], WidgetsController.prototype, "deleteWidget", null);
+__decorate([
+    (0, tsoa_1.Get)("data/{modelType}"),
+    __param(0, (0, tsoa_1.Path)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], WidgetsController.prototype, "getWidgetData", null);
 exports.WidgetsController = WidgetsController = __decorate([
     (0, tsoa_1.Route)("widgets"),
     (0, tsoa_1.Tags)("Widgets"),
-    (0, tsoa_1.Security)("jwt", ["ROLE_ADMIN"])
+    (0, tsoa_1.Security)("jwt", ["ROLE_ADMIN"]),
+    __metadata("design:paramtypes", [])
 ], WidgetsController);

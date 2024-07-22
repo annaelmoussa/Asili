@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { defaultApi, userApi, widgetsApi } from '@/api/config'
 import { useUserStore } from '@/stores/user'
 import type { GridStackWidget } from 'gridstack'
+import type { WidgetCreationParams } from '@/api'
 
 interface Widget {
   id: string
@@ -10,12 +11,73 @@ interface Widget {
   type: 'Area' | 'Line' | 'Bar' | 'Donut'
   data: any
   grid: Partial<GridStackWidget>
+  modelType: 'Products' | 'Users' | 'Orders'
 }
 
 export const useWidgetsStore = defineStore('widgets', () => {
   const widgets = ref<Widget[]>([])
   const isLoading = ref(false)
   const userStore = useUserStore()
+
+  const transformWidgetData = (widgetData: any, modelType: string) => {
+    if (!widgetData) {
+      console.error('Invalid widget data format:', widgetData)
+      return { index: 'category', categories: ['value'], data: [] }
+    }
+
+    switch (modelType) {
+      case 'Products': {
+        const priceData = widgetData.priceDistribution.map((item: any) => ({
+          category: `Price $${item._id}`,
+          value: item.count
+        }))
+        const stockData = widgetData.stockLevels.map((item: any) => ({
+          category: `Stock ${item._id}`,
+          value: item.count
+        }))
+        return {
+          index: 'category',
+          categories: ['value'],
+          data: [...priceData, ...stockData]
+        }
+      }
+      case 'Users': {
+        const roleData = widgetData.roleDistribution.map((item: any) => ({
+          category: item.role,
+          value: parseInt(item.count)
+        }))
+        const confirmationData = widgetData.confirmationStatus.map((item: any) => ({
+          category: item.isConfirmed ? 'Confirmed' : 'Not Confirmed',
+          value: parseInt(item.count)
+        }))
+        return {
+          index: 'category',
+          categories: ['value'],
+          data: [...roleData, ...confirmationData]
+        }
+      }
+      case 'Orders': {
+        if (widgetData.revenueOverTime && widgetData.revenueOverTime.length > 0) {
+          return {
+            index: 'date',
+            categories: ['revenue'],
+            data: widgetData.revenueOverTime.map((item: any) => ({
+              date: new Date(item.date).toLocaleDateString(),
+              revenue: item.revenue
+            }))
+          }
+        } else {
+          return {
+            index: 'category',
+            categories: ['value'],
+            data: [{ category: 'No Data', value: 0 }]
+          }
+        }
+      }
+      default:
+        return { index: 'category', categories: ['value'], data: [] }
+    }
+  }
 
   const fetchWidgets = async () => {
     if (!userStore.hasScope('ROLE_ADMIN')) {
@@ -25,12 +87,13 @@ export const useWidgetsStore = defineStore('widgets', () => {
     isLoading.value = true
     try {
       const response = await widgetsApi.getWidgets()
-      widgets.value = response.data.map((widget) => ({
+      widgets.value = response.data.map((widget: any) => ({
         id: widget.id ?? '',
         title: widget.name,
         type: widget.type as 'Area' | 'Line' | 'Bar' | 'Donut',
-        data: widget.settings,
-        grid: { x: widget.x, y: widget.y, w: widget.w, h: widget.h }
+        data: widget.settings, // Store raw data
+        grid: { x: widget.x, y: widget.y, w: widget.w, h: widget.h },
+        modelType: widget.modelType as 'Products' | 'Users' | 'Orders'
       }))
     } catch (error) {
       console.error('Failed to fetch widgets:', error)
@@ -53,19 +116,21 @@ export const useWidgetsStore = defineStore('widgets', () => {
     }
 
     try {
-      const response = await widgetsApi.createWidget(
-        {
-          name: widget.title,
-          type: widget.type,
-          settings: widget.data,
-          x: widget.grid.x ?? 0,
-          y: widget.grid.y ?? 0,
-          w: widget.grid.w ?? 2,
-          h: widget.grid.h ?? 2,
-          userId: userStore.user.id
-        },
-        { headers: { Authorization: `Bearer ${userStore.token}` } }
-      )
+      const widgetCreationParams: WidgetCreationParams = {
+        name: widget.title,
+        type: widget.type,
+        settings: widget.data,
+        x: widget.grid.x ?? 0,
+        y: widget.grid.y ?? 0,
+        w: widget.grid.w ?? 2,
+        h: widget.grid.h ?? 2,
+        userId: userStore.user.id,
+        modelType: widget.modelType
+      }
+
+      const response = await widgetsApi.createWidget(widgetCreationParams, {
+        headers: { Authorization: `Bearer ${userStore.token}` }
+      })
 
       const newWidget: Widget = {
         ...widget,
@@ -113,20 +178,22 @@ export const useWidgetsStore = defineStore('widgets', () => {
     }
 
     try {
-      await widgetsApi.updateWidget(
-        id,
-        {
-          name: widget.title,
-          type: widget.type,
-          settings: widget.data,
-          x: widget.grid.x ?? 0,
-          y: widget.grid.y ?? 0,
-          w: widget.grid.w ?? 2,
-          h: widget.grid.h ?? 2,
-          userId: userStore.user.id
-        },
-        { headers: { Authorization: `Bearer ${userStore.token}` } }
-      )
+      const widgetCreationParams: WidgetCreationParams = {
+        name: widget.title,
+        type: widget.type,
+        settings: widget.data,
+        x: widget.grid.x ?? 0,
+        y: widget.grid.y ?? 0,
+        w: widget.grid.w ?? 2,
+        h: widget.grid.h ?? 2,
+        userId: userStore.user.id,
+        modelType: widget.modelType
+      }
+
+      await widgetsApi.updateWidget(id, widgetCreationParams, {
+        headers: { Authorization: `Bearer ${userStore.token}` }
+      })
+
       const index = widgets.value.findIndex((w) => w.id === id)
       if (index !== -1) {
         widgets.value[index] = { ...widget }
@@ -137,80 +204,13 @@ export const useWidgetsStore = defineStore('widgets', () => {
     }
   }
 
-  const fetchProductData = async () => {
+  const fetchWidgetData = async (modelType: string) => {
     try {
-      const response = await defaultApi.getProducts()
+      const response = await widgetsApi.getWidgetData(modelType)
       return response.data
     } catch (error) {
-      console.error('Failed to fetch products:', error)
-      return []
-    }
-  }
-
-  const fetchUserData = async () => {
-    try {
-      const response = await userApi.getAllUsers()
-      return response.data
-    } catch (error) {
-      console.error('Failed to fetch users:', error)
-      return []
-    }
-  }
-
-  const transformProductDataForChart = (data: any[], chartType: string) => {
-    switch (chartType) {
-      case 'Area':
-      case 'Bar':
-      case 'Line':
-        return {
-          index: 'name',
-          categories: ['price', 'stock'],
-          data: data.map((item) => ({ name: item.name, price: item.price, stock: item.stock }))
-        }
-      case 'Donut':
-        return {
-          index: 'name',
-          categories: ['price'],
-          data: data.map((item) => ({ name: item.name, price: item.price }))
-        }
-      default:
-        return { index: 'name', categories: [], data: [] }
-    }
-  }
-
-  const transformUserDataForChart = (data: any[], chartType: string) => {
-    switch (chartType) {
-      case 'Area':
-      case 'Bar':
-        return {
-          index: 'email',
-          categories: ['role', 'isConfirmed'],
-          data: data.map((item) => ({
-            email: item.email,
-            role: item.role === 'admin' ? 1 : 0,
-            isConfirmed: item.isConfirmed ? 1 : 0
-          }))
-        }
-      case 'Line':
-        return {
-          index: 'email',
-          categories: ['isConfirmed'],
-          data: data.map((item) => ({
-            email: item.email,
-            isConfirmed: item.isConfirmed ? 1 : 0
-          }))
-        }
-      case 'Donut':
-        return {
-          index: 'email',
-          categories: ['isConfirmed'],
-          data: data.map((item) => ({
-            email: item.email,
-            isConfirmed: item.isConfirmed ? 1 : 0
-          }))
-        }
-      default:
-        return { index: 'email', categories: [], data: [] }
+      console.error(`Failed to fetch ${modelType} data:`, error)
+      return {}
     }
   }
 
@@ -221,9 +221,7 @@ export const useWidgetsStore = defineStore('widgets', () => {
     addWidget,
     removeWidget,
     updateWidget,
-    fetchProductData,
-    fetchUserData,
-    transformProductDataForChart,
-    transformUserDataForChart
+    fetchWidgetData,
+    transformWidgetData
   }
 })
