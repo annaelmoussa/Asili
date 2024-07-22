@@ -7,11 +7,10 @@ import TokenBlacklist from "./TokenBlacklist";
 import Widget from "./Widget";
 import Brand from "./Brand";
 import Category from "./Category";
-import EmailNotification from "./EmailNotification";
-import UserPreferences from "./UserPreferences";
 import Invoice from "./Invoice";
 import Payment from "./Payment";
 import SentEmail from "./SentEmail";
+import AlertPreference from "./AlertPreference";
 
 const env = process.env.NODE_ENV || "development";
 const config = require("../config/config.js")[env];
@@ -27,11 +26,10 @@ const sequelize = new Sequelize({
     Widget,
     Brand,
     Category,
-    EmailNotification,
-    UserPreferences,
     Invoice,
     Payment,
     SentEmail,
+    AlertPreference,
   ],
 });
 
@@ -46,11 +44,10 @@ const db = {
   Widget,
   Brand,
   Category,
-  EmailNotification,
-  UserPreferences,
   Invoice,
   Payment,
   SentEmail,
+  AlertPreference,
 };
 
 export = db;

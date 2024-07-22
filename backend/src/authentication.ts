@@ -3,6 +3,7 @@ import { verify, Secret, JwtPayload } from "jsonwebtoken";
 import { AuthService } from "./services/authService";
 import { IJwtPayload } from "./interfaces/IJwtPayload";
 import { UserService } from "./services/userService";
+import { IUser } from "./interfaces/IUser";
 
 const authService = new AuthService();
 const userService = new UserService();
@@ -45,10 +46,17 @@ export function expressAuthentication(
 
           if (typeof decoded !== "string") {
             const jwtPayload = decoded as IJwtPayload;
-            (request as Request & { user: IJwtPayload }).user = jwtPayload;
+
+            // Create a user object that satisfies both IUser and IJwtPayload
+            const user: IUser & IJwtPayload = {
+              ...jwtPayload,
+              password: "", // Set a default value or fetch from database if needed
+            };
+
+            (request as Request & { user: IUser & IJwtPayload }).user = user;
 
             if (scopes && scopes.length > 0) {
-              const tokenScopes = jwtPayload.scopes as string[];
+              const tokenScopes = jwtPayload.scopes || [];
 
               const hasRequiredScope = scopes.some((requiredScope) => {
                 const [scope1, scope2] = requiredScope.split("|");
@@ -66,7 +74,7 @@ export function expressAuthentication(
 
             try {
               const needsChange = await userService.shouldChangePassword(
-                jwtPayload.userId
+                jwtPayload.id
               );
               if (needsChange) {
                 reject(new Error("Password change required"));

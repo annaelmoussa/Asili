@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useUserStore } from '@/stores/user'
 import { authApi } from '@/api/config'
+import type { UpdatePasswordRequest } from '@/api'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -35,7 +36,7 @@ function validatePassword() {
     passwordSchema.parse(password.value)
   } catch (error) {
     if (error instanceof z.ZodError) {
-      errors.value = error.errors.map(err => err.message)
+      errors.value = error.errors.map((err) => err.message)
     }
   }
 }
@@ -53,10 +54,14 @@ async function changePassword() {
   }
 
   try {
-    const changePasswordRequest: UpdatePasswordRequest = {token : userStore.token,password: password.value, confirm_password: confirmPassword.value };
-    await authApi.resetPassword(changePasswordRequest);
-    userStore.mustChangePassword = false;
-    router.push('/');
+    const changePasswordRequest: UpdatePasswordRequest = {
+      token: userStore.token ?? '',
+      password: password.value,
+      confirm_password: confirmPassword.value
+    }
+    await authApi.resetPassword(changePasswordRequest)
+    userStore.mustChangePassword = false
+    router.push('/')
   } catch (error) {
     console.error('Échec de la modification du mot de passe', error)
   }
@@ -77,15 +82,15 @@ async function changePassword() {
           <div class="grid gap-2">
             <Label for="password">Mot de passe</Label>
             <div class="relative">
-              <Input 
-                id="password" 
-                v-model="password" 
-                :type="showPassword ? 'text' : 'password'" 
-                required 
-                @input="validatePassword" 
+              <Input
+                id="password"
+                v-model="password"
+                :type="showPassword ? 'text' : 'password'"
+                required
+                @input="validatePassword"
               />
-              <button 
-                type="button" 
+              <button
+                type="button"
                 class="absolute right-2 top-1/2 -translate-y-1/2"
                 @click="togglePasswordVisibility('password')"
               >
@@ -96,14 +101,14 @@ async function changePassword() {
           <div class="grid gap-2">
             <Label for="confirm-password">Confirmer le mot de passe</Label>
             <div class="relative">
-              <Input 
-                id="confirm-password" 
-                v-model="confirmPassword" 
-                :type="showConfirmPassword ? 'text' : 'password'" 
-                required 
+              <Input
+                id="confirm-password"
+                v-model="confirmPassword"
+                :type="showConfirmPassword ? 'text' : 'password'"
+                required
               />
-              <button 
-                type="button" 
+              <button
+                type="button"
                 class="absolute right-2 top-1/2 -translate-y-1/2"
                 @click="togglePasswordVisibility('confirmPassword')"
               >
@@ -117,7 +122,13 @@ async function changePassword() {
               <li v-if="passwordMismatch">Les mots de passe ne correspondent pas</li>
             </ul>
           </div>
-          <div v-if="userStore.message" :class="{'text-green-500': !userStore.message.includes('erreur'), 'text-red-500': userStore.message.includes('erreur')}">
+          <div
+            v-if="userStore.message"
+            :class="{
+              'text-green-500': !userStore.message.includes('erreur'),
+              'text-red-500': userStore.message.includes('erreur')
+            }"
+          >
             {{ userStore.message }}
           </div>
           <Button type="submit" class="w-full" :disabled="errors.length > 0 || passwordMismatch">
@@ -133,7 +144,7 @@ async function changePassword() {
         width="1920"
         height="1080"
         class="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-      >
+      />
     </div>
   </div>
 </template>

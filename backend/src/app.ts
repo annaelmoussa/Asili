@@ -14,7 +14,7 @@ const corsOptions = {
   origin: isProd ? "https://littleyarns.org" : "http://localhost:8080",
   credentials: true,
 };
-app.use("/stripe-webhook", bodyParser.raw({type: 'application/json'}));
+app.use("/stripe-webhook", bodyParser.raw({ type: "application/json" }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -37,7 +37,7 @@ app.use(
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use("/auth/login", loginRateLimiter);
+// app.use("/auth/login", loginRateLimiter);
 
 app.use(
   "/uploads",

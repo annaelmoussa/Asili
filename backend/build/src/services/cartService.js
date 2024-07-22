@@ -51,6 +51,7 @@ class CartService {
         return models_1.default.sequelize.transaction(async (t) => {
             const user = await User_1.default.findByPk(userId, { transaction: t });
             if (!user) {
+                console.log("User not found for token 278:");
                 throw new Error("User not found");
             }
             const product = await Product_1.default.findByPk(productId, {

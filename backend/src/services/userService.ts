@@ -157,6 +157,7 @@ export class UserService {
   public async shouldChangePassword(userId: string): Promise<boolean> {
     const user = await User.findByPk(userId);
     if (!user) {
+      console.log("User not found for userId:", userId);
       throw new Error("User not found");
     }
     const daysSinceLastChange = differenceInDays(

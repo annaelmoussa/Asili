@@ -51,6 +51,7 @@ export class CartService {
     return db.sequelize.transaction(async (t: Transaction) => {
       const user = await User.findByPk(userId, { transaction: t });
       if (!user) {
+        console.log("User not found for token 278:");
         throw new Error("User not found");
       }
 

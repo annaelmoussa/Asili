@@ -9,11 +9,11 @@ const route = useRoute()
 const { t } = useI18n()
 
 const navItems = computed(() => {
-  const profileRoute = router.options.routes.find(route => route.path === '/profile')
+  const profileRoute = router.options.routes.find((route) => route.path === '/profile')
   if (!profileRoute || !profileRoute.children) return []
 
-  return profileRoute.children.map(child => {
-    const translationKey = `app.profile.${child.name}`
+  return profileRoute.children.map((child) => {
+    const translationKey = `app.profile.${String(child.name)}`
     return {
       title: t(translationKey),
       to: child.path === '' ? '/profile' : `/profile/${child.path}`
@@ -40,8 +40,8 @@ const isActive = (itemPath: string) => {
         { 'bg-accent text-accent-foreground': isActive(item.to) }
       ]"
     >
-      <RouterLink 
-        :to="item.to" 
+      <RouterLink
+        :to="item.to"
         class="w-full h-full flex items-center"
         :class="{ 'font-bold': isActive(item.to) }"
       >

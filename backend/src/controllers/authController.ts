@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Post, Route, Tags, Request, Query, SuccessResponse, OperationId } from "tsoa";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Route,
+  Tags,
+  Request,
+  Query,
+  SuccessResponse,
+  OperationId,
+} from "tsoa";
 import { AuthService } from "../services/authService";
 import { IUser } from "../interfaces/IUser";
 import { AuthenticatedRequest } from "../types/AuthenticatedRequest";
@@ -10,6 +21,7 @@ interface ResendConfirmationRequest {
 interface ResetPasswordRequest {
   email: string;
 }
+
 interface UpdatePasswordRequest {
   token: string;
   password: string;
@@ -28,6 +40,7 @@ interface LoginRequest {
   email: string;
   password: string;
 }
+
 interface SignupRequest {
   email: string;
   password: string;
@@ -38,6 +51,15 @@ interface ChangePasswordRequest {
   confirm_password: string;
 }
 
+interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
+interface RefreshTokenResponse {
+  token: string;
+  refreshToken: string;
+}
+
 @Route("auth")
 @Tags("Auth")
 export class AuthController extends Controller {
@@ -45,7 +67,12 @@ export class AuthController extends Controller {
   @OperationId("loginUser")
   public async login(
     @Body() body: LoginRequest
-  ): Promise<{ user: IUser; token: string,mustChangePassword : boolean }> {
+  ): Promise<{
+    user: IUser;
+    token: string;
+    refreshToken: string;
+    mustChangePassword: boolean;
+  }> {
     const authService = new AuthService();
     try {
       return await authService.login(body.email, body.password);
@@ -62,7 +89,10 @@ export class AuthController extends Controller {
     const authService = new AuthService();
     await authService.signup(body.email, body.password);
     this.setStatus(201);
-    return { message: "User registered. Please check your email to confirm your account." };
+    return {
+      message:
+        "User registered. Please check your email to confirm your account.",
+    };
   }
 
   @Post("logout")
@@ -87,7 +117,9 @@ export class AuthController extends Controller {
 
   @Get("confirm")
   @SuccessResponse("200", "Email confirmed successfully")
-  public async confirmEmail(@Query() token: string): Promise<{ message: string }> {
+  public async confirmEmail(
+    @Query() token: string
+  ): Promise<{ message: string }> {
     const authService = new AuthService();
     const user = await authService.confirmEmail(token);
     if (user) {
@@ -99,23 +131,72 @@ export class AuthController extends Controller {
   }
 
   @Post("resend-confirmation-email")
-  public async resendConfirmationEmail(@Body() body: ResendConfirmationRequest): Promise<{ message: string }> {
+  public async resendConfirmationEmail(
+    @Body() body: ResendConfirmationRequest
+  ): Promise<{ message: string }> {
     const authService = new AuthService();
     await authService.resendConfirmationEmail(body.email);
-    return { message: "A new confirmation email has been sent. Please check your email." };
+    return {
+      message:
+        "A new confirmation email has been sent. Please check your email.",
+    };
   }
 
   @Post("reset-password-request")
-  public async resetPasswordRequest(@Body() body: ResetPasswordRequest): Promise<{ message: string }> {
+  public async resetPasswordRequest(
+    @Body() body: ResetPasswordRequest
+  ): Promise<{ message: string }> {
     const authService = new AuthService();
     await authService.sendPasswordResetEmail(body.email);
-    return { message: "If an account with that email exists, a password reset link has been sent." };
+    return {
+      message:
+        "If an account with that email exists, a password reset link has been sent.",
+    };
   }
 
   @Post("reset-password")
-  public async resetPassword(@Body() body: UpdatePasswordRequest): Promise<{ message: string }> {
+  public async resetPassword(
+    @Body() body: UpdatePasswordRequest
+  ): Promise<{ message: string }> {
     const authService = new AuthService();
-    await authService.resetPassword(body.token, body.password, body.confirm_password);
+    await authService.resetPassword(
+      body.token,
+      body.password,
+      body.confirm_password
+    );
     return { message: "Password has been reset successfully." };
+  }
+
+  @Post("refresh-token")
+  @OperationId("refreshToken")
+  public async refreshToken(
+    @Body() body: RefreshTokenRequest
+  ): Promise<RefreshTokenResponse> {
+    const authService = new AuthService();
+    try {
+      const { token, refreshToken } = await authService.refreshToken(
+        body.refreshToken
+      );
+      return { token, refreshToken };
+    } catch (error) {
+      this.setStatus(401);
+      throw new Error((error as Error).message);
+    }
+  }
+
+  @Post("change-password")
+  @OperationId("changePassword")
+  public async changePassword(
+    @Body() body: ChangePasswordRequest,
+    @Request() request: AuthenticatedRequest
+  ): Promise<{ message: string }> {
+    const authService = new AuthService();
+    const userId = request.user.id;
+    await authService.changePassword(
+      userId,
+      body.password,
+      body.confirm_password
+    );
+    return { message: "Password has been changed successfully." };
   }
 }

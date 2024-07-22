@@ -1,61 +1,64 @@
-import { DataTypes, Model, Optional } from "sequelize";
-import { sequelize } from "../config/dbConfigPostgres";
-import User from "./User";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+} from "sequelize-typescript";
 import { IAlertPreference } from "../interfaces/IAlertPreference";
+import User from "./User";
 
-type AlertPreferenceCreationAttributes = Optional<IAlertPreference, "id" | "newProductInCategory" | "productRestock" | "priceChange" | "newsletter">;
+@Table({
+  tableName: "AlertPreference",
+  timestamps: true,
+})
+export default class AlertPreference
+  extends Model<IAlertPreference>
+  implements IAlertPreference
+{
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+  })
+  id!: string;
 
-class AlertPreference extends Model<IAlertPreference, AlertPreferenceCreationAttributes> implements IAlertPreference {
-  public id!: string;
-  public userId!: string;
-  public newProductInCategory!: boolean;
-  public productRestock!: boolean;
-  public priceChange!: boolean;
-  public newsletter!: boolean;
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  userId!: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  newProductInCategory!: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  productRestock!: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  priceChange!: boolean;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  newsletter!: boolean;
+
+  @BelongsTo(() => User)
+  user!: User;
 }
-
-AlertPreference.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    userId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: User,
-        key: 'id',
-      },
-    },
-    newProductInCategory: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-    productRestock: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-    priceChange: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-    newsletter: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-  },
-  {
-    sequelize,
-    modelName: "AlertPreference",
-    tableName: "AlertPreference",
-    timestamps: true,
-  }
-);
-
-export default AlertPreference;

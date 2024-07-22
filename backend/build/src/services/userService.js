@@ -9,6 +9,7 @@ const scopes_1 = require("../config/scopes");
 const uuid_1 = require("uuid");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const Widget_1 = __importDefault(require("../models/Widget"));
+const date_fns_1 = require("date-fns");
 class UserService {
     async get(userId, options) {
         try {
@@ -39,17 +40,14 @@ class UserService {
     async create(user, options) {
         const t = options?.transaction || (await User_1.default.sequelize.transaction());
         try {
-            // Vérifier si un utilisateur supprimé existe avec le même email
             const existingDeletedUser = await User_1.default.findOne({
                 where: { email: user.email, isDeleted: true },
                 transaction: t,
             });
             if (existingDeletedUser) {
-                // Si un utilisateur supprimé existe, créer un nouveau compte
-                // sans lien avec l'ancien compte supprimé
                 const newUser = await User_1.default.create({
                     ...user,
-                    id: (0, uuid_1.v4)(), // Générer un nouvel ID
+                    id: (0, uuid_1.v4)(),
                 }, { transaction: t });
                 if (!options?.transaction) {
                     await t.commit();
@@ -57,7 +55,6 @@ class UserService {
                 return newUser.toJSON();
             }
             else {
-                // Sinon, créer un nouveau compte normalement
                 if (user.role === "ROLE_ADMIN") {
                     user.scopes = scopes_1.ALL_SCOPES;
                 }
@@ -101,17 +98,13 @@ class UserService {
                 transaction: t,
             });
             if (user) {
-                // Générer des données aléatoires pour l'anonymisation
                 const anonymousEmail = `deleted-${(0, uuid_1.v4)()}@example.com`;
                 const anonymousPassword = await bcrypt_1.default.hash((0, uuid_1.v4)(), 10);
-                // Mettre à jour l'utilisateur avec des données anonymes
                 await user.update({
                     email: anonymousEmail,
                     password: anonymousPassword,
                     isDeleted: true,
                 }, { transaction: t });
-                // Anonymiser ou supprimer les données associées
-                // Par exemple, supprimer les widgets de l'utilisateur
                 await Widget_1.default.destroy({ where: { userId: user.id }, transaction: t });
             }
             if (!options?.transaction) {
@@ -126,9 +119,17 @@ class UserService {
             throw error;
         }
     }
-    // Remplacer la méthode de suppression dure par la suppression douce
     async delete(userId, options) {
         return this.softDelete(userId, options);
+    }
+    async shouldChangePassword(userId) {
+        const user = await User_1.default.findByPk(userId);
+        if (!user) {
+            console.log("User not found for userId:", userId);
+            throw new Error("User not found");
+        }
+        const daysSinceLastChange = (0, date_fns_1.differenceInDays)(new Date(), user.lastPasswordChange);
+        return daysSinceLastChange >= 60;
     }
 }
 exports.UserService = UserService;

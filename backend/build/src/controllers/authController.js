@@ -23,14 +23,16 @@ let AuthController = class AuthController extends tsoa_1.Controller {
         }
         catch (error) {
             this.setStatus(401);
-            throw new Error("Invalid email or password");
+            throw new Error(error.message);
         }
     }
     async signup(body) {
         const authService = new authService_1.AuthService();
         await authService.signup(body.email, body.password);
         this.setStatus(201);
-        return { message: "User registered. Please check your email to confirm your account." };
+        return {
+            message: "User registered. Please check your email to confirm your account.",
+        };
     }
     async logout(body) {
         const authService = new authService_1.AuthService();
@@ -58,18 +60,38 @@ let AuthController = class AuthController extends tsoa_1.Controller {
     async resendConfirmationEmail(body) {
         const authService = new authService_1.AuthService();
         await authService.resendConfirmationEmail(body.email);
-        return { message: "A new confirmation email has been sent. Please check your email." };
+        return {
+            message: "A new confirmation email has been sent. Please check your email.",
+        };
     }
     async resetPasswordRequest(body) {
         const authService = new authService_1.AuthService();
         await authService.sendPasswordResetEmail(body.email);
-        return { message: "If an account with that email exists, a password reset link has been sent." };
+        return {
+            message: "If an account with that email exists, a password reset link has been sent.",
+        };
     }
     async resetPassword(body) {
-        console.log(body);
         const authService = new authService_1.AuthService();
         await authService.resetPassword(body.token, body.password, body.confirm_password);
         return { message: "Password has been reset successfully." };
+    }
+    async refreshToken(body) {
+        const authService = new authService_1.AuthService();
+        try {
+            const { token, refreshToken } = await authService.refreshToken(body.refreshToken);
+            return { token, refreshToken };
+        }
+        catch (error) {
+            this.setStatus(401);
+            throw new Error(error.message);
+        }
+    }
+    async changePassword(body, request) {
+        const authService = new authService_1.AuthService();
+        const userId = request.user.id;
+        await authService.changePassword(userId, body.password, body.confirm_password);
+        return { message: "Password has been changed successfully." };
     }
 };
 exports.AuthController = AuthController;
@@ -135,6 +157,23 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "resetPassword", null);
+__decorate([
+    (0, tsoa_1.Post)("refresh-token"),
+    (0, tsoa_1.OperationId)("refreshToken"),
+    __param(0, (0, tsoa_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "refreshToken", null);
+__decorate([
+    (0, tsoa_1.Post)("change-password"),
+    (0, tsoa_1.OperationId)("changePassword"),
+    __param(0, (0, tsoa_1.Body)()),
+    __param(1, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "changePassword", null);
 exports.AuthController = AuthController = __decorate([
     (0, tsoa_1.Route)("auth"),
     (0, tsoa_1.Tags)("Auth")

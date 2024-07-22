@@ -10,9 +10,8 @@ import {
 } from "sequelize-typescript";
 import { IUser } from "../interfaces/IUser";
 import { ALL_SCOPES } from "../config/scopes";
-import EmailNotification from "./EmailNotification";
-import UserPreferences from "./UserPreferences";
 import Widget from "./Widget";
+import AlertPreference from "./AlertPreference";
 
 @Table({
   tableName: "User",
@@ -83,14 +82,11 @@ export default class User extends Model<IUser> implements IUser {
   })
   lastPasswordChange!: Date;
 
-  @HasMany(() => EmailNotification)
-  notifications!: EmailNotification[];
-
-  @HasOne(() => UserPreferences)
-  preferences!: UserPreferences;
-
   @HasMany(() => Widget)
   widgets!: Widget[];
+
+  @HasOne(() => AlertPreference)
+  alertPreferences!: AlertPreference;
 
   @Column({
     type: DataType.BOOLEAN,

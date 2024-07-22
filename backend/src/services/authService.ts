@@ -10,6 +10,8 @@ import { AlertService } from "./AlertService";
 
 export class AuthService {
   private secret = process.env.JWT_SECRET || "your_jwt_secret";
+  private refreshSecret =
+    process.env.REFRESH_TOKEN_SECRET || "your_refresh_token_secret";
   private alertService: AlertService;
   private userService: UserService;
 
@@ -21,7 +23,12 @@ export class AuthService {
   async login(
     email: string,
     password: string
-  ): Promise<{ user: IUser; token: string; mustChangePassword: boolean }> {
+  ): Promise<{
+    user: IUser;
+    token: string;
+    refreshToken: string;
+    mustChangePassword: boolean;
+  }> {
     const user = await User.findOne({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new Error("Invalid credentials");
@@ -32,6 +39,7 @@ export class AuthService {
     }
 
     const needsChange = await this.userService.shouldChangePassword(user.id);
+    // const needsChange = false;
 
     const payload: IJwtPayload = {
       id: user.id,
@@ -44,9 +52,17 @@ export class AuthService {
       expiresIn: "1h",
     });
 
+    const refreshToken = jwt.sign({ id: user.id }, this.refreshSecret, {
+      expiresIn: "7d",
+    });
+
+    console.log("Payload:", payload);
+    console.log("Token:", token);
+
     return {
       user: user.toJSON() as IUser,
       token,
+      refreshToken,
       mustChangePassword: needsChange,
     };
   }
@@ -84,6 +100,7 @@ export class AuthService {
         where: { confirmationToken: token, email: decoded.email },
       });
       if (!user) {
+        console.log("User not found for token 1:", token);
         throw new Error("User not found");
       }
       user.isConfirmed = true;
@@ -98,6 +115,7 @@ export class AuthService {
   public async resendConfirmationEmail(email: string): Promise<void> {
     const user = await User.findOne({ where: { email } });
     if (!user) {
+      console.log("User not found for token 287556:");
       throw new Error("User not found");
     }
     if (user.isConfirmed) {
@@ -158,6 +176,7 @@ export class AuthService {
 
       const hashedPassword = await bcrypt.hash(password, 10);
       user.password = hashedPassword;
+      user.lastPasswordChange = new Date();
       await user.save();
     } catch (err) {
       throw new Error("Invalid or expired token.");
@@ -181,5 +200,64 @@ export class AuthService {
   async isTokenBlacklisted(token: string): Promise<boolean> {
     const blacklistedToken = await TokenBlacklist.findOne({ where: { token } });
     return !!blacklistedToken;
+  }
+
+  async refreshToken(
+    refreshToken: string
+  ): Promise<{ token: string; refreshToken: string }> {
+    try {
+      const decoded = jwt.verify(refreshToken, this.refreshSecret) as {
+        id: string;
+      };
+      const user = await User.findByPk(decoded.id);
+
+      if (!user) {
+        console.log("User not found for token 2568:");
+        throw new Error("User not found");
+      }
+
+      const payload: IJwtPayload = {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        scopes: user.scopes,
+      };
+
+      const newToken = jwt.sign(payload, this.secret, {
+        expiresIn: "1h",
+      });
+
+      const newRefreshToken = jwt.sign({ id: user.id }, this.refreshSecret, {
+        expiresIn: "7d",
+      });
+
+      return { token: newToken, refreshToken: newRefreshToken };
+    } catch (error) {
+      throw new Error("Invalid refresh token");
+    }
+  }
+
+  async changePassword(
+    userId: string,
+    newPassword: string,
+    confirmPassword: string
+  ): Promise<void> {
+    if (newPassword !== confirmPassword) {
+      throw new Error("Passwords do not match.");
+    }
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      console.log("User not found for token 267:");
+      throw new Error("User not found");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.lastPasswordChange = new Date();
+    await user.save();
+
+    // Optionally, you might want to invalidate all existing tokens for this user
+    // This would require additional implementation in your token management system
   }
 }

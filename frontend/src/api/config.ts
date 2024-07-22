@@ -1,7 +1,6 @@
 // api/config.ts
 import { Configuration, DefaultApi, AuthApi, WidgetsApi, UserApi } from './index'
 import api from './axiosConfig'
-import { useUserStore } from '@/stores/user'
 
 const configuration = new Configuration({
   basePath: import.meta.env.VITE_API_BASE_URL as string,

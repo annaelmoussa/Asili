@@ -9,7 +9,7 @@ import {
   type LogoutRequest,
   type ResetPasswordRequest,
   type UpdatePasswordRequest,
-  type User
+  type PartialIUser
 } from '@/api'
 import { useCartStore } from '@/stores/cart'
 
@@ -26,6 +26,7 @@ const userApi = new UserApi(configuration)
 export const useUserStore = defineStore('user', () => {
   const user = ref<IUser | null>(null)
   const token = ref<string | null>(null)
+  const refreshToken = ref<string | null>(null)
   const loading = ref(true)
   const scopes = ref<string[]>([])
   const message = ref<string | null>(null)
@@ -35,6 +36,7 @@ export const useUserStore = defineStore('user', () => {
     if (user.value && token.value) {
       localStorage.setItem('user', JSON.stringify(user.value))
       localStorage.setItem('token', token.value)
+      localStorage.setItem('refreshToken', refreshToken.value || '')
       localStorage.setItem('scopes', JSON.stringify(scopes.value))
       localStorage.setItem('mustChangePassword', JSON.stringify(mustChangePassword.value))
     }
@@ -43,11 +45,13 @@ export const useUserStore = defineStore('user', () => {
   function loadUserData() {
     const savedUser = localStorage.getItem('user')
     const savedToken = localStorage.getItem('token')
+    const savedRefreshToken = localStorage.getItem('refreshToken')
     const savedScopes = localStorage.getItem('scopes')
     const savedMustChangePassword = localStorage.getItem('mustChangePassword')
     if (savedUser && savedToken && savedScopes && savedMustChangePassword !== null) {
       user.value = JSON.parse(savedUser)
       token.value = savedToken
+      refreshToken.value = savedRefreshToken
       scopes.value = JSON.parse(savedScopes)
       mustChangePassword.value = JSON.parse(savedMustChangePassword)
     }
@@ -59,6 +63,7 @@ export const useUserStore = defineStore('user', () => {
       const response = await authApi.loginUser(loginRequest)
       user.value = response.data.user
       token.value = response.data.token
+      refreshToken.value = response.data.refreshToken
       scopes.value = response.data.user.scopes || []
       mustChangePassword.value = response.data.mustChangePassword
       saveUserData()
@@ -71,6 +76,7 @@ export const useUserStore = defineStore('user', () => {
       console.error('Login failed:', error)
       user.value = null
       token.value = null
+      refreshToken.value = null
       scopes.value = []
       mustChangePassword.value = false
       loading.value = false
@@ -81,10 +87,12 @@ export const useUserStore = defineStore('user', () => {
   function clearUserData() {
     user.value = null
     token.value = null
+    refreshToken.value = null
     scopes.value = []
     mustChangePassword.value = false
     localStorage.removeItem('user')
     localStorage.removeItem('token')
+    localStorage.removeItem('refreshToken')
     localStorage.removeItem('scopes')
     localStorage.removeItem('mustChangePassword')
   }
@@ -98,6 +106,24 @@ export const useUserStore = defineStore('user', () => {
       clearUserData()
       const cartStore = useCartStore()
       cartStore.clearCart()
+    }
+  }
+
+  async function refreshAuthToken() {
+    if (refreshToken.value) {
+      try {
+        const response = await authApi.refreshToken({ refreshToken: refreshToken.value })
+        token.value = response.data.token
+        refreshToken.value = response.data.refreshToken
+        saveUserData()
+        return token.value
+      } catch (error) {
+        console.error('Failed to refresh token:', error)
+        clearUserData()
+        throw error
+      }
+    } else {
+      throw new Error('No refresh token available')
     }
   }
 
@@ -133,14 +159,19 @@ export const useUserStore = defineStore('user', () => {
   async function updateEmail(newEmail: string) {
     try {
       if (!user.value || !token.value) {
+        console.log("User not found for token 56:");
         throw new Error('User not authenticated')
       }
 
-      const updatedUserData: Partial<IUser> = {
-        ...user.value,
+      const updatedUserData: PartialIUser = {
         email: newEmail
       }
       console.log(updatedUserData)
+
+      // Ensure that user.value.id is not undefined
+      if (!user.value.id) {
+        throw new Error('User ID is undefined')
+      }
 
       const response = await userApi.updateUser(user.value.id, updatedUserData)
 
@@ -167,6 +198,7 @@ export const useUserStore = defineStore('user', () => {
   return {
     user,
     token,
+    refreshToken,
     scopes,
     login,
     logout,
@@ -177,6 +209,7 @@ export const useUserStore = defineStore('user', () => {
     message,
     clearUserData,
     updateEmail,
+    refreshAuthToken,
     isAuthenticated: computed(() => !!user.value),
     hasScope: (requiredScope: string) => scopes.value.includes(requiredScope),
     mustChangePassword
