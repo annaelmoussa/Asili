@@ -1,6 +1,11 @@
 <template>
   <div v-if="product" class="product-card" @click="goToProductSingleView(product.id)">
-    <img v-if="product.image" :src="product.image" alt="Product image" class="product-image" />
+    <img
+      v-if="product.image"
+      :src="extractImageUrl(product.image)"
+      alt="Product image"
+      class="product-image"
+    />
     <div v-else class="no-image">{{ $t('app.products.noImage') }}</div>
     <div class="product-info">
       <h2 class="product-name">{{ product.name }}</h2>
@@ -19,7 +24,8 @@ import { computed } from 'vue'
 import { useCurrencyStore } from '@/stores/currency'
 import { useRouter } from 'vue-router'
 import type { IProduct } from '@/api'
-import ProductSingleView from "@/views/ProductSingleView.vue";
+import ProductSingleView from '@/views/ProductSingleView.vue'
+import { extractImageUrl } from '@/utils/productUtils'
 
 const router = useRouter()
 
@@ -35,8 +41,7 @@ const addToCart = () => {
 }
 
 function goToProductSingleView(productId: string | undefined) {
-  if (productId === undefined)
-    return;
+  if (productId === undefined) return
 
   return router.push({ name: 'ProductSingleView', params: { productId } })
 }
@@ -92,7 +97,7 @@ function goToProductSingleView(productId: string | undefined) {
 
 .product-price {
   font-size: 1.4em;
-  color: #3949AB;
+  color: #3949ab;
   font-weight: bold;
   margin: 15px 0;
 }
@@ -103,8 +108,8 @@ function goToProductSingleView(productId: string | undefined) {
   justify-content: center;
   width: 100%;
   background-color: #ffffff;
-  color: #3949AB;
-  border: 2px solid #3949AB;
+  color: #3949ab;
+  border: 2px solid #3949ab;
   padding: 10px 0;
   border-radius: 5px;
   cursor: pointer;
@@ -119,7 +124,7 @@ function goToProductSingleView(productId: string | undefined) {
 }
 
 .add-to-cart:hover {
-  background-color: #3949AB;
+  background-color: #3949ab;
   color: #ffffff;
 }
 

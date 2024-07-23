@@ -60,6 +60,5 @@ yarn-error.log*
 Thumbs.db
 
 
-/backend/uploads/
 # fichiers auto-générés
 /frontend/src/api/api.ts

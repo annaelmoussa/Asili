@@ -15,11 +15,14 @@ const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, {
     apiVersion: "2024-06-20",
 });
 class PaymentService {
+    constructor() {
+        this.baseUrl = process.env.BASE_URL || "http://localhost:8080";
+    }
     async createPayment(paymentInfo) {
         return Payment_1.default.create(paymentInfo);
     }
     async createPaymentSession(items, userId) {
-        const lineItems = items.map(item => ({
+        const lineItems = items.map((item) => ({
             price_data: {
                 currency: "eur",
                 product_data: {
@@ -35,8 +38,8 @@ class PaymentService {
             payment_method_types: ["card"],
             line_items: lineItems,
             mode: "payment",
-            success_url: "http://localhost:8080/payment-success",
-            cancel_url: "http://localhost:8080/payment-cancel",
+            success_url: `${this.baseUrl}/payment-success`,
+            cancel_url: `${this.baseUrl}/payment-cancel`,
             metadata: {
                 userId: userId,
             },

@@ -12,7 +12,11 @@
 
     <template v-else>
       <div v-for="item in sortedCartItems" :key="item.id" class="cart-item">
-        <img :src="item.product.image" :alt="item.product.name" class="cart-item-image" />
+        <img
+          :src="extractImageUrl(item.product.image)"
+          :alt="item.product.name"
+          class="cart-item-image"
+        />
         <div class="cart-item-details">
           <h2 class="cart-item-title">{{ item.product.name }}</h2>
           <p class="cart-item-category">{{ item.product.category?.name }}</p>
@@ -73,6 +77,7 @@ import { useUserStore } from '@/stores/user'
 import { useI18n } from 'vue-i18n'
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { extractImageUrl } from '@/utils/productUtils'
 
 const { t } = useI18n()
 const cart = useCartStore()
@@ -220,7 +225,7 @@ onUnmounted(() => {
 
 .cart-item-price {
   font-size: 1.5rem;
-  color: #3949AB;
+  color: #3949ab;
   font-weight: bold;
 }
 
@@ -303,7 +308,7 @@ onUnmounted(() => {
   display: block;
   width: 100%;
   padding: 1rem;
-  background-color: #3949AB;
+  background-color: #3949ab;
   color: white;
   border: none;
   border-radius: 8px;

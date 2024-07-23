@@ -55,7 +55,7 @@
           class="product-item"
           @click="goToProductPage(product.id)"
         >
-          <img :src="product.image" :alt="product.name" />
+          <img :src="extractImageUrl(product.image)" :alt="product.name" />
           <h3>{{ product.name }}</h3>
           <p>{{ product.price.toFixed(2) }} €</p>
           <p>{{ product.description }}</p>
@@ -70,6 +70,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { defaultApi } from '@/api/config'
 import type { IBrand, ICategory, IProduct } from '@/api'
+import { extractImageUrl } from '@/utils/productUtils'
 
 const route = useRoute()
 const router = useRouter()
