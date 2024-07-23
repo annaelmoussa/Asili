@@ -10,10 +10,7 @@
         <ul class="menu-list">
           <li v-if="isAdmin" @click="goToDashboard">{{ $t('app.auth.dashboard') }}</li>
           <li v-if="!isAdmin" @click="goToProfile">{{ $t('app.profile.profile') }}</li>
-          <li v-if="!isAdmin" @click="goToFavorites">{{ $t('app.auth.favorites') }}</li>
           <li v-if="!isAdmin" @click="goToOrders">{{ $t('app.auth.orders') }}</li>
-          <li v-if="!isAdmin" @click="goToReferrals">{{ $t('app.auth.referrals') }}</li>
-          <li v-if="!isAdmin" @click="goToMemberBenefits">{{ $t('app.auth.memberBenefits') }}</li>
           <li @click="logout">{{ $t('app.auth.logout') }}</li>
         </ul>
       </div>
@@ -57,33 +54,9 @@ function goToProfile() {
   router.push('/profile')
 }
 
-function goToFavorites() {
-  if (userStore.isAuthenticated) {
-    router.push('/favorites')
-  } else {
-    router.push('/login')
-  }
-}
-
 function goToOrders() {
   if (userStore.isAuthenticated) {
     router.push('/panel/orders')
-  } else {
-    router.push('/login')
-  }
-}
-
-function goToReferrals() {
-  if (userStore.isAuthenticated) {
-    router.push('/referrals')
-  } else {
-    router.push('/login')
-  }
-}
-
-function goToMemberBenefits() {
-  if (userStore.isAuthenticated) {
-    router.push('/member-benefits')
   } else {
     router.push('/login')
   }

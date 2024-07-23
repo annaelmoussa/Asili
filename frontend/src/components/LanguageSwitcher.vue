@@ -8,16 +8,9 @@
           <option value="fr">{{ t('app.language.fr') }}</option>
         </select>
       </div>
-      <div class="selector">
-        <select v-model="currentCurrency" @change="changeCurrency">
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
-        </select>
-      </div>
     </div>
     <div class="links">
-      <a href="#contact">{{ t('app.contact') }}</a>
-      <a href="#help">{{ t('app.help') }}</a>
+      <a href="#" @click="goToContact">{{ t('app.contact.cta') }}</a>
     </div>
   </div>
 </template>
@@ -27,8 +20,10 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCurrencyStore } from '@/stores/currency'
 import { useLanguageStore } from '@/stores/language'
+import { useRouter } from "vue-router";
 
 const { locale, t } = useI18n()
+const router = useRouter()
 const currencyStore = useCurrencyStore()
 const languageStore = useLanguageStore()
 
@@ -38,6 +33,10 @@ const currentCurrency = ref(currencyStore.currency)
 const flags: Record<string, string> = {
   en: 'https://flagcdn.com/us.svg',
   fr: 'https://flagcdn.com/fr.svg'
+}
+
+function goToContact() {
+  router.push('contact')
 }
 
 const currentFlag = computed(() => flags[currentLocale.value])

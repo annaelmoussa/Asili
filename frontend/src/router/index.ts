@@ -23,18 +23,21 @@ import UserNotification from '../views/UserNotificationView.vue'
 import SearchView from '../views/SearchView.vue'
 import PanelCategories from '../views/Panel/PanelCategoriesView.vue'
 import PanelBrands from '../views/Panel/PanelBrandsView.vue'
-import FavoritesView from '../views/FavoritesView.vue'
-import ReferralsView from '../views/ReferralsView.vue'
-import MemberBenefitsView from '../views/MemberBenefitsView.vue'
 import PanelViewStock from '../views/Panel/PanelStockView.vue'
 import OrderSingleView from '../views/OrderSingleView.vue'
 import RGPDManager from '../views/RGPDManagerView.vue'
+import ContactView from "../views/ContactView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
     component: HomeView
+  },
+  {
+    path: '/contact',
+    name: 'contact',
+    component: ContactView
   },
   {
     path: '/login',
@@ -59,24 +62,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'reset-password',
     component: ResetPasswordView,
     meta: { hideNavbar: true }
-  },
-  {
-    path: '/favorites',
-    name: 'favorites',
-    component: FavoritesView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/referrals',
-    name: 'referrals',
-    component: ReferralsView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/member-benefits',
-    name: 'member-benefits',
-    component: MemberBenefitsView,
-    meta: { requiresAuth: true }
   },
   {
     path: '/product/:productId',

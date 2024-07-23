@@ -2,12 +2,12 @@
   "app": {
     "title": "ASILI",
     "navbar": {
-      "proteins": "Protéines",
-      "snacks": "Barres/Snacks & Boissons",
-      "clothing": "Vêtements",
-      "creatines": "Créatines",
-      "vitamins": "Vitamines",
-      "vegan": "Végan"
+      "protein": "Protéines",
+      "vitamin": "Vitamines",
+      "collagen": "Collagène",
+      "mineral": "Minéraux",
+      "creatine": "Créatines",
+      "aminoAcid": "Acides Aminés"
     },
     "account": "Compte",
     "search": "Rechercher",
@@ -25,7 +25,15 @@
       "inStock": "En stock",
       "addToCart": "Ajouter au panier"
     },
-    "contact": "Contactez-nous",
+    "contact": {
+      "cta": "Contactez-nous",
+      "heading": "Contact",
+      "title": "Faites-nous savoir comment nous pouvons aider",
+      "description": "Nous sommes là pour vous aider et répondre à toutes vos questions, Nous avons hâte de vous entendre.",
+      "office": "Notre bureau",
+      "phone": "Téléphone",
+      "email": "Email"
+    },
     "help": "Aide",
     "language": {
       "fr": "Français",

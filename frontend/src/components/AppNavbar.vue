@@ -1,12 +1,12 @@
 <template>
   <nav class="navbar">
     <a
-      v-for="category in categories"
-      :key="category"
-      href="#"
-      @click.prevent="goToCategory(category)"
+        v-for="(label, key) in categories"
+        :key="key"
+        href="#"
+        @click.prevent="goToCategory(label)"
     >
-      {{ $t(`app.navbar.${decapitalize(category)}`) }}
+      {{ $t(`app.navbar.${decapitalize(key)}`) }}
     </a>
   </nav>
 </template>
@@ -16,7 +16,16 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const categories = ref(['Proteins', 'Snacks', 'Clothing', 'Creatines', 'Vitamins', 'Vegan'])
+
+const cats = {
+  "protein": "Protéines",
+  "vitamin": "Vitamines",
+  "collagen": "Collagène",
+  "mineral": "Minéraux",
+  "creatine": "Créatines",
+  "aminoAcid": "Acides Aminés"
+}
+const categories = ref(cats)
 
 function decapitalize(str: string) {
   return str.charAt(0).toLowerCase() + str.slice(1)

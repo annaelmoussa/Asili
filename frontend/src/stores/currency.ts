@@ -6,7 +6,6 @@ export const useCurrencyStore = defineStore('currency', () => {
   const currency = ref(savedCurrency)
 
   const exchangeRates: { [key: string]: number } = {
-    USD: 1,
     EUR: 1
   }
 
