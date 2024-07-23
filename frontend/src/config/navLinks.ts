@@ -31,6 +31,7 @@ const navLinks: NavLink[] = [
   { name: 'Catégories', path: '/panel/categories', icon: Menu, requiresAuth: true, requiresAdmin: true },
   { name: 'Marques', path: '/panel/brands', icon: Package, requiresAuth: true, requiresAdmin: true },
   { name: 'Paramètres', path: '/panel/settings', icon: Bell, requiresAuth: true, requiresAdmin: true },
+  { name: 'RGPD Manager', path: '/rgpd-manager', icon: CircleUser, requiresAuth: true, requiresAdmin: true },
 ]
 
 export default navLinks
