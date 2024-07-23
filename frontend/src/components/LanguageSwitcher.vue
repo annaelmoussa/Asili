@@ -92,7 +92,6 @@ const changeCurrency = () => {
 
 .links a {
   margin-left: 20px;
-  color: #10b981;
   text-decoration: none;
   font-size: 14px;
 }

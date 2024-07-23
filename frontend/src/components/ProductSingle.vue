@@ -87,12 +87,6 @@ const addToCart = () => {
 </script>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-}
 .message {
   position: fixed;
   bottom: 20px;
@@ -131,6 +125,7 @@ const addToCart = () => {
 }
 
 .product-title {
+  margin-bottom: 0.5rem;
   font-size: 2em;
   color: #2c3e50;
   font-weight: bold;
@@ -138,8 +133,9 @@ const addToCart = () => {
 
 .product-category {
   font-size: 1.2em;
-  color: #16a085;
-  margin-bottom: 5px;
+  color: #3949AB;
+  margin-top: 0.8rem;
+  margin-bottom: 0.8rem;
 }
 
 .product-description-detail {
@@ -157,7 +153,7 @@ const addToCart = () => {
 
 .product-price-detail {
   font-size: 1.5em;
-  color: #10b981;
+  color: #3949AB;
   font-weight: bold;
 }
 
@@ -180,9 +176,9 @@ const addToCart = () => {
 .add-to-cart-detail {
   padding: 10px 20px;
   background-color: #ffffff;
-  border: 2px solid #10b981;
+  border: 2px solid #3949AB;
   border-radius: 5px;
-  color: #10b981;
+  color: #3949AB;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
   font-size: 1em;
@@ -191,7 +187,7 @@ const addToCart = () => {
 }
 
 .add-to-cart-detail:hover {
-  background-color: #10b981;
+  background-color: #3949AB;
   color: #ffffff;
 }
 

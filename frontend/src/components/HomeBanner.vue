@@ -1,41 +1,19 @@
 <template>
-  <section class="banner">
-    <h1>{{ $t('app.banner.title') }}</h1>
-    <p>{{ $t('app.banner.description') }}</p>
-    <button>{{ $t('app.banner.button') }}</button>
+  <section class="py-14" style="background: linear-gradient(152.92deg, rgba(192, 132, 252, 0.2) 4.54%, rgba(232, 121, 249, 0.17) 34.2%, rgba(192, 132, 252, 0.1) 77.55%);">
+    <div class="max-w-screen-xl mx-auto px-4 md:text-center md:px-8">
+      <div class="max-w-xl space-y-3 md:mx-auto">
+        <p class="text-gray-800 text-3xl font-semibold sm:text-4xl">
+          {{ $t('app.banner.title') }}
+        </p>
+        <p class="text-gray-600">
+          {{ $t('app.banner.description') }}
+        </p>
+      </div>
+      <div class="mt-4">
+        <a href="javascript:void(0)" class="inline-block py-2 px-4 text-white font-medium bg-gray-800 duration-150 hover:bg-gray-700 active:bg-gray-900 rounded-lg shadow-md hover:shadow-none">
+          {{ $t('app.banner.button') }}
+        </a>
+      </div>
+    </div>
   </section>
 </template>
-
-<style scoped>
-.banner {
-  background: url('https://cdn.midjourney.com/e061fa1a-9ae4-4ed8-8301-4323fd33a75f/0_1.png') no-repeat center center;
-  background-size: cover;
-  padding: 100px 20px;
-  color: white;
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.banner h1 {
-  font-size: 2.5em;
-  margin-bottom: 20px;
-}
-
-.banner p {
-  font-size: 1.2em;
-}
-
-.banner button {
-  background-color: #10b981;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.banner button:hover {
-  background-color: #10b981;
-}
-</style>

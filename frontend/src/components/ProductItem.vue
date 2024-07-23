@@ -92,7 +92,7 @@ function goToProductSingleView(productId: string | undefined) {
 
 .product-price {
   font-size: 1.4em;
-  color: #10b981;
+  color: #3949AB;
   font-weight: bold;
   margin: 15px 0;
 }
@@ -103,8 +103,8 @@ function goToProductSingleView(productId: string | undefined) {
   justify-content: center;
   width: 100%;
   background-color: #ffffff;
-  color: #10b981;
-  border: 2px solid #10b981;
+  color: #3949AB;
+  border: 2px solid #3949AB;
   padding: 10px 0;
   border-radius: 5px;
   cursor: pointer;
@@ -119,7 +119,7 @@ function goToProductSingleView(productId: string | undefined) {
 }
 
 .add-to-cart:hover {
-  background-color: #10b981;
+  background-color: #3949AB;
   color: #ffffff;
 }
 

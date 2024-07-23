@@ -1,13 +1,10 @@
 <template>
   <div class="account-dropdown" @mouseover="showDropdown = true" @mouseleave="showDropdown = false">
-    <div class="account-icon">
-      <i class="pi pi-user"></i>
-      <span>{{ user ? `Bonjour, ${user.email}` : $t('app.account') }}</span>
-    </div>
+    <CircleUser class="h-5 w-5" />
     <div v-if="showDropdown" class="dropdown-menu">
       <div v-if="!user">
-        <button class="login-button" @click="goToLogin">{{ $t('app.auth.login') }}</button>
-        <button class="signup-button" @click="goToSignup">{{ $t('app.auth.signup') }}</button>
+        <Button variant="default" class="w-full mb-2" @click="goToLogin">{{ $t('app.auth.login') }}</Button>
+        <Button variant="outline" class="w-full" @click="goToSignup">{{ $t('app.auth.signup') }}</Button>
       </div>
       <div v-else>
         <ul class="menu-list">
@@ -25,10 +22,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
+import {CircleUser, User} from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
 
 const showDropdown = ref(false)
 const router = useRouter()
@@ -38,24 +37,15 @@ const { user } = storeToRefs(userStore)
 
 const isAdmin = computed(() => user.value?.role === 'ROLE_ADMIN')
 
-watch(
-  () => userStore.user,
-  (newUser) => {
-    if (!newUser) {
-      router.push('/login')
-    }
-  }
-)
-
-const goToLogin = () => {
+function goToLogin() {
   router.push('/login')
 }
 
-const goToSignup = () => {
+function goToSignup() {
   router.push('/signup')
 }
 
-const goToDashboard = () => {
+function goToDashboard() {
   if (userStore.isAuthenticated) {
     router.push('/panel')
   } else {
@@ -63,7 +53,11 @@ const goToDashboard = () => {
   }
 }
 
-const goToFavorites = () => {
+function goToProfile() {
+  router.push('/profile')
+}
+
+function goToFavorites() {
   if (userStore.isAuthenticated) {
     router.push('/favorites')
   } else {
@@ -71,7 +65,7 @@ const goToFavorites = () => {
   }
 }
 
-const goToOrders = () => {
+function goToOrders() {
   if (userStore.isAuthenticated) {
     router.push('/panel/orders')
   } else {
@@ -79,7 +73,7 @@ const goToOrders = () => {
   }
 }
 
-const goToReferrals = () => {
+function goToReferrals() {
   if (userStore.isAuthenticated) {
     router.push('/referrals')
   } else {
@@ -87,7 +81,7 @@ const goToReferrals = () => {
   }
 }
 
-const goToMemberBenefits = () => {
+function goToMemberBenefits() {
   if (userStore.isAuthenticated) {
     router.push('/member-benefits')
   } else {
@@ -95,14 +89,10 @@ const goToMemberBenefits = () => {
   }
 }
 
-const logout = async () => {
+async function logout() {
   await userStore.logout()
+  router.push('/login')
 }
-
-const goToProfile = () => {
-  router.push('/profile')
-}
-
 </script>
 
 <style scoped>
@@ -111,22 +101,10 @@ const goToProfile = () => {
   display: inline-block;
 }
 
-.account-icon {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  color: #ffffff;
-}
-
-.account-icon i {
-  margin-right: 5px;
-  font-size: 1.2em;
-}
-
 .dropdown-menu {
   position: absolute;
   top: 100%;
-  left: 0;
+  right: 0;
   background-color: #ffffff;
   border: 1px solid #eaeaea;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -135,26 +113,6 @@ const goToProfile = () => {
   z-index: 1000;
   min-width: 200px;
   padding: 10px;
-}
-
-.login-button,
-.signup-button {
-  display: block;
-  width: 100%;
-  background-color: #10b981;
-  color: #ffffff;
-  border: none;
-  padding: 10px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  text-align: center;
-  border-radius: 5px;
-}
-
-.signup-button {
-  background-color: #ffffff;
-  color: #10b981;
-  border: 2px solid #10b981;
 }
 
 .menu-list {

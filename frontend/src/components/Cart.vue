@@ -220,7 +220,7 @@ onUnmounted(() => {
 
 .cart-item-price {
   font-size: 1.5rem;
-  color: #10b981;
+  color: #3949AB;
   font-weight: bold;
 }
 
@@ -303,7 +303,7 @@ onUnmounted(() => {
   display: block;
   width: 100%;
   padding: 1rem;
-  background-color: #10b981;
+  background-color: #3949AB;
   color: white;
   border: none;
   border-radius: 8px;

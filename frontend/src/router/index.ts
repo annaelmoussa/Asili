@@ -83,11 +83,6 @@ const routes: Array<RouteRecordRaw> = [
     component: ProductSingleView
   },
   {
-    path: '/order/:orderId',
-    name: 'OrderSingleView',
-    component: OrderSingleView
-  },
-  {
     path: '/cart',
     name: 'cart',
     component: CartView
@@ -110,7 +105,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/panel',
     component: PanelLayout,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, hideNavbar: true  },
     children: [
       {
         path: 'dashboard',
@@ -152,6 +147,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'orders',
         name: 'PanelOrders',
         component: PanelOrder
+      },
+      {
+        path: '/order/:orderId',
+        name: 'OrderSingleView',
+        component: OrderSingleView
       },
       {
         path: 'stock',

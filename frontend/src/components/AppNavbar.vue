@@ -50,7 +50,6 @@ function goToCategory(category: string) {
 }
 
 .navbar a:hover {
-  background-color: #10b981;
-  color: white;
+  font-weight: bold;
 }
 </style>
