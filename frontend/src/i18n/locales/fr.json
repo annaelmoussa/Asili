@@ -95,7 +95,8 @@
     "orders": {
       "title": "Mes commandes",
       "loading": "Chargement...",
-      "noOrder": "Aucune commande"
+      "noOrder": "Aucune commande",
+      "detail": "Details de la commande"
     }
   }
 }

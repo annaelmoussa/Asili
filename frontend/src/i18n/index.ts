@@ -1,16 +1,17 @@
 import { createI18n } from 'vue-i18n'
-
 import en from './locales/en.json'
 import fr from './locales/fr.json'
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'fr',
-  fallbackLocale: 'en',
-  messages: {
-    en,
-    fr
-  }
-})
+export function setupI18n() {
+  const storedLanguage = localStorage.getItem('language') || 'fr'
 
-export default i18n
+  return createI18n({
+    legacy: false,
+    locale: storedLanguage,
+    fallbackLocale: 'en',
+    messages: {
+      en,
+      fr
+    }
+  })
+}

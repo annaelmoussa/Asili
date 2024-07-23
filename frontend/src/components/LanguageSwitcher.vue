@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCurrencyStore } from '@/stores/currency'
 import { useLanguageStore } from '@/stores/language'
@@ -41,6 +41,12 @@ const flags: Record<string, string> = {
 }
 
 const currentFlag = computed(() => flags[currentLocale.value])
+
+onMounted(() => {
+  if (currentLocale.value !== locale.value) {
+    languageStore.setLanguage(currentLocale.value)
+  }
+})
 
 const changeLanguage = () => {
   locale.value = currentLocale.value

@@ -11,12 +11,39 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var OrderItem_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.associateOrderItem = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
+const MongoOrder_1 = require("./MongoOrder");
 const Order_1 = __importDefault(require("./Order"));
 const Product_1 = __importDefault(require("./Product"));
-let OrderItem = class OrderItem extends sequelize_typescript_1.Model {
+let OrderItem = OrderItem_1 = class OrderItem extends sequelize_typescript_1.Model {
+    static async updateMongoOrder(orderItem) {
+        try {
+            const itemWithProduct = await OrderItem_1.findByPk(orderItem.id, {
+                include: [{ model: Product_1.default, as: 'product' }]
+            });
+            if (itemWithProduct && itemWithProduct.product) {
+                await MongoOrder_1.MongoOrder.findOneAndUpdate({ id: orderItem.orderId }, {
+                    $push: {
+                        items: {
+                            id: itemWithProduct.id,
+                            productId: itemWithProduct.productId,
+                            productName: itemWithProduct.product.name,
+                            productDescription: itemWithProduct.product.description,
+                            priceAtPurchase: itemWithProduct.priceAtPurchase,
+                            productImage: itemWithProduct.product.image,
+                            quantity: itemWithProduct.quantity,
+                        }
+                    }
+                }, { new: true });
+            }
+        }
+        catch (error) {
+            console.error('Error updating MongoOrder with new order item:', error);
+        }
+    }
 };
 __decorate([
     (0, sequelize_typescript_1.Column)({
@@ -64,7 +91,13 @@ __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => Product_1.default),
     __metadata("design:type", Product_1.default)
 ], OrderItem.prototype, "product", void 0);
-OrderItem = __decorate([
+__decorate([
+    sequelize_typescript_1.AfterCreate,
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [OrderItem]),
+    __metadata("design:returntype", Promise)
+], OrderItem, "updateMongoOrder", null);
+OrderItem = OrderItem_1 = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: "OrderItem",
         timestamps: true,

@@ -43,10 +43,17 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+interface Order {
+  id: string;
+  _id: string;
+  amount: number;
+  status: string;
+}
+
 const { t } = useI18n();
 const userStore = useUserStore();
 const router = useRouter();
-const orders = ref([]);
+const orders = ref<Order[]>([]);
 const isLoading = ref(true);
 const currencyStore = useCurrencyStore();
 
@@ -68,9 +75,13 @@ const viewOrderDetails = (orderId: string | undefined) => {
 
 onMounted(async () => {
   try {
-    const userId = userStore.user.id;
-    const response = await defaultApi.getMongoOrders(userId);
-    orders.value = response.data;
+    const userId = userStore.user?.id;
+    if (userId) {
+      const response = await defaultApi.getMongoOrders(userId);
+      orders.value = response.data;
+    } else {
+      console.error('User ID is undefined');
+    }
   } catch (error) {
     console.error('Failed to fetch orders:', error);
   } finally {

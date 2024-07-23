@@ -95,7 +95,8 @@
     "orders": {
       "title": "My orders",
       "loading": "Loading...",
-      "noOrder": "No orders"
+      "noOrder": "No orders",
+      "detail": "Order details"
     }
   }
 }

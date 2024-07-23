@@ -111,37 +111,37 @@ const routes: Array<RouteRecordRaw> = [
         path: 'dashboard',
         name: 'Dashboard',
         component: DashboardView,
-        requiresAdmin: true
+        meta: { requiresAdmin: true }
       },
       {
         path: 'users',
         name: 'PanelUsers',
         component: PanelUsers,
-        requiresAdmin: true
+        meta: { requiresAdmin: true }
       },
       {
         path: 'settings',
         name: 'PanelSettings',
         component: PanelSettings,
-        requiresAdmin: true
+        meta: { requiresAdmin: true }
       },
       {
         path: 'products',
         name: 'PanelProducts',
         component: PanelProduct,
-        requiresAdmin: true
+        meta: { requiresAdmin: true }
       },
       {
         path: 'categories',
         name: 'PanelCategories',
         component: PanelCategories,
-        requiresAdmin: true
+        meta: { requiresAdmin: true }
       },
       {
         path: 'brands',
         name: 'PanelBrands',
         component: PanelBrands,
-        requiresAdmin: true
+        meta: { requiresAdmin: true }
       },
       {
         path: 'orders',
@@ -157,13 +157,13 @@ const routes: Array<RouteRecordRaw> = [
         path: 'stock',
         name: 'PanelStock',
         component: PanelViewStock,
-        requiresAdmin: true
+        meta: { requiresAdmin: true }
       },
       {
         path: 'payments',
         name: 'PanelPayments',
         component: PanelPayment,
-        requiresAdmin: true
+        meta: { requiresAdmin: true }
       }
     ]
   },
