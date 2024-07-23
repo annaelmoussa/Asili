@@ -2,10 +2,17 @@
   <div v-if="isLoading" class="loading">{{ $t('app.ProductSingleView.loading') }}</div>
   <div v-else-if="product">
     <div class="product-details-container">
-      <img :src="product.image" alt="Image du produit" class="product-image-detail"/>
+      <img
+        :src="extractImageUrl(product.image)"
+        alt="Image du produit"
+        class="product-image-detail"
+      />
       <div class="product-details">
         <h1 class="product-title">{{ product.name }}</h1>
-        <span class="product-stock" :class="{'in-stock': product.stock > 0, 'out-of-stock': product.stock <= 0}">
+        <span
+          class="product-stock"
+          :class="{ 'in-stock': product.stock > 0, 'out-of-stock': product.stock <= 0 }"
+        >
           {{ product.stock > 0 ? $t('app.products.inStock') : $t('app.products.outOfStock') }}
         </span>
         <h2 class="product-category">{{ product.category?.name }}</h2>
@@ -29,61 +36,60 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useCurrencyStore } from '@/stores/currency';
-import { useCartStore } from '@/stores/cart';
-import { defaultApi  } from '@/api/config';
-import type { IProduct } from '@/api';
-import {useI18n} from "vue-i18n";
-import { Button } from '@/components/ui/button'
+import { ref, onMounted, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useCurrencyStore } from '@/stores/currency'
+import { useCartStore } from '@/stores/cart'
+import { defaultApi } from '@/api/config'
+import type { IProduct } from '@/api'
+import { useI18n } from 'vue-i18n'
+import { extractImageUrl } from '@/utils/productUtils'
 
-
-const { t } = useI18n();
-const route = useRoute();
-const router = useRouter();
-const product = ref<IProduct | null>(null);
-const isLoading = ref(true);
-const currencyStore = useCurrencyStore();
-const messageVisible = ref(false);
-const messageText = ref("");
-const cart = useCartStore();
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const product = ref<IProduct | null>(null)
+const isLoading = ref(true)
+const currencyStore = useCurrencyStore()
+const messageVisible = ref(false)
+const messageText = ref('')
+const cart = useCartStore()
 
 const formattedPrice = computed(() => {
   if (product.value?.price !== undefined) {
-    return currencyStore.formattedPrice(product.value.price);
+    return currencyStore.formattedPrice(product.value.price)
   } else {
-    return "Prix non disponible";
+    return 'Prix non disponible'
   }
-});
+})
 
 onMounted(async () => {
   try {
-    const productId = route.params.productId as string;
-    const response = await defaultApi.getProduct(productId);
-    product.value = response.data;
+    const productId = route.params.productId as string
+    const response = await defaultApi.getProduct(productId)
+    product.value = response.data
   } catch (error) {
-    console.error('Failed to fetch product details:', error);
+    console.error('Failed to fetch product details:', error)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-  cart.init();
-});
+  cart.init()
+})
 
 const showMessage = (key: string) => {
-  messageText.value = t(`app.cart.${key}`);
-  messageVisible.value = true;
+  messageText.value = t(`app.cart.${key}`)
+  messageVisible.value = true
   setTimeout(() => {
-    messageVisible.value = false;
-  }, 3000);
-};
+    messageVisible.value = false
+  }, 3000)
+}
 
 const addToCart = () => {
   if (product.value) {
-    cart.addToCart(product.value);
-    showMessage("productAdded");
+    cart.addToCart(product.value)
+    showMessage('productAdded')
   }
-};
+}
 </script>
 
 <style scoped>
@@ -133,7 +139,7 @@ const addToCart = () => {
 
 .product-category {
   font-size: 1.2em;
-  color: #3949AB;
+  color: #3949ab;
   margin-top: 0.8rem;
   margin-bottom: 0.8rem;
 }
@@ -153,7 +159,7 @@ const addToCart = () => {
 
 .product-price-detail {
   font-size: 1.5em;
-  color: #3949AB;
+  color: #3949ab;
   font-weight: bold;
 }
 
@@ -176,18 +182,20 @@ const addToCart = () => {
 .add-to-cart-detail {
   padding: 10px 20px;
   background-color: #ffffff;
-  border: 2px solid #3949AB;
+  border: 2px solid #3949ab;
   border-radius: 5px;
-  color: #3949AB;
+  color: #3949ab;
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
   font-size: 1em;
   display: inline-flex;
   align-items: center;
 }
 
 .add-to-cart-detail:hover {
-  background-color: #3949AB;
+  background-color: #3949ab;
   color: #ffffff;
 }
 
@@ -196,7 +204,8 @@ const addToCart = () => {
   cursor: not-allowed;
 }
 
-.loading, .no-product {
+.loading,
+.no-product {
   text-align: center;
   font-size: 1.2em;
   color: #7f8c8d;

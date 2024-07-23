@@ -23,6 +23,9 @@ let RGPDController = class RGPDController extends tsoa_1.Controller {
     async createModule(moduleData) {
         return this.rgpdService.createModule(moduleData);
     }
+    async exportModules() {
+        return this.rgpdService.exportModules();
+    }
     async getModule(id) {
         return this.rgpdService.getModule(id);
     }
@@ -35,9 +38,6 @@ let RGPDController = class RGPDController extends tsoa_1.Controller {
     async deleteModule(id) {
         return this.rgpdService.deleteModule(id);
     }
-    async exportModules() {
-        return this.rgpdService.exportModules();
-    }
 };
 exports.RGPDController = RGPDController;
 __decorate([
@@ -49,6 +49,14 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], RGPDController.prototype, "createModule", null);
+__decorate([
+    (0, tsoa_1.Security)("jwt", ["ROLE_ADMIN"]),
+    (0, tsoa_1.Get)("export"),
+    (0, tsoa_1.OperationId)("exportRGPDModules"),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], RGPDController.prototype, "exportModules", null);
 __decorate([
     (0, tsoa_1.Get)("{id}"),
     (0, tsoa_1.OperationId)("getRGPDModule"),
@@ -83,14 +91,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], RGPDController.prototype, "deleteModule", null);
-__decorate([
-    (0, tsoa_1.Security)("jwt", ["ROLE_ADMIN"]),
-    (0, tsoa_1.Get)("export"),
-    (0, tsoa_1.OperationId)("exportRGPDModules"),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], RGPDController.prototype, "exportModules", null);
 exports.RGPDController = RGPDController = __decorate([
     (0, tsoa_1.Route)("rgpd"),
     (0, tsoa_1.Tags)("RGPD")

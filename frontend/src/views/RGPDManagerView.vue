@@ -1,7 +1,7 @@
 <template>
   <div class="rgpd-manager bg-gray-100 min-h-screen p-8">
     <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-2xl font-bold mb-6 text-gray-800">RGPD Modules</h2>
+      <h2 class="text-2xl font-bold mb-6 text-gray-800">Modules RGPD</h2>
 
       <!-- Liste des modules -->
       <div v-if="modules.length" class="space-y-4 mb-8">
@@ -12,46 +12,48 @@
         >
           <div>
             <h3 class="font-semibold text-gray-700">{{ module.name }}</h3>
-            <p class="text-sm text-gray-500">Type: {{ module.type }}</p>
+            <p class="text-sm text-gray-500">Type : {{ module.type }}</p>
           </div>
           <div>
             <button
               @click="editModule(module)"
               class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md mr-2 transition duration-200"
             >
-              Edit
+              Modifier
             </button>
             <button
               @click="deleteModule(module.id)"
               class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition duration-200"
             >
-              Delete
+              Supprimer
             </button>
           </div>
         </div>
       </div>
-      <p v-else class="text-gray-500 italic">No RGPD modules found.</p>
+      <p v-else class="text-gray-500 italic">Aucun module RGPD trouvé.</p>
 
       <!-- Formulaire pour créer/éditer un module -->
       <form @submit.prevent="saveModule" class="space-y-4 bg-gray-50 p-6 rounded-lg mb-6">
         <div>
-          <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Module Name</label>
+          <label for="name" class="block text-sm font-medium text-gray-700 mb-1"
+            >Nom du Module</label
+          >
           <input
             id="name"
             v-model="currentModule.name"
-            placeholder="Module Name"
+            placeholder="Nom du Module"
             required
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <div>
           <label for="content" class="block text-sm font-medium text-gray-700 mb-1"
-            >Module Content</label
+            >Contenu du Module</label
           >
           <textarea
             id="content"
             v-model="currentModule.content"
-            placeholder="Module Content"
+            placeholder="Contenu du Module"
             required
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
           ></textarea>
@@ -65,7 +67,7 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="popup">Popup</option>
-            <option value="text_block">Text Block</option>
+            <option value="text_block">Bloc de Texte</option>
           </select>
         </div>
         <div class="flex items-center">
@@ -76,14 +78,14 @@
             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
           />
           <label for="requires-acceptance" class="ml-2 block text-sm text-gray-700"
-            >Requires Acceptance</label
+            >Nécessite Acceptation</label
           >
         </div>
         <button
           type="submit"
           class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-200"
         >
-          {{ isEditing ? 'Update' : 'Create' }} Module
+          {{ isEditing ? 'Mettre à jour' : 'Créer' }} Module
         </button>
       </form>
 
@@ -92,7 +94,7 @@
         @click="exportModules"
         class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md transition duration-200"
       >
-        Export Modules
+        Exporter Modules
       </button>
     </div>
   </div>
@@ -104,7 +106,7 @@ import type {
   IRGPDModule,
   PickIRGPDModuleExcludeKeyofIRGPDModuleIdOrCreatedAtOrUpdatedAt
 } from '@/api'
-import { rgpdApi } from '@/api/config';
+import { rgpdApi } from '@/api/config'
 
 export default defineComponent({
   name: 'RGPDManager',
@@ -118,8 +120,6 @@ export default defineComponent({
     })
     const isEditing = ref(false)
     const editingId = ref<string | null>(null)
-
-    
 
     const fetchModules = async () => {
       try {
@@ -169,8 +169,28 @@ export default defineComponent({
     const exportModules = async () => {
       try {
         const response = await rgpdApi.exportRGPDModules()
-        console.log('Exported modules:', response.data)
-        // Implement download logic here
+        const modules = response.data
+
+        // Create a Blob with the JSON data
+        const blob = new Blob([JSON.stringify(modules, null, 2)], { type: 'application/json' })
+
+        // Create a URL for the Blob
+        const url = window.URL.createObjectURL(blob)
+
+        // Create a temporary anchor element to trigger the download
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'rgpd_modules_export.json'
+
+        // Append the anchor to the body, click it, and remove it
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+
+        // Revoke the URL to free up memory
+        window.URL.revokeObjectURL(url)
+
+        console.log('Modules exported successfully')
       } catch (error) {
         console.error('Error exporting modules:', error)
       }

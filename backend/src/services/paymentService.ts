@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { IProduct } from "../interfaces/IProduct";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 import Payment from "../models/Payment";
 import { IPayment } from "../interfaces/IPayment";
 
@@ -22,12 +22,16 @@ export interface PaymentSessionRequest {
 }
 
 export class PaymentService {
+  private baseUrl = process.env.BASE_URL || "http://localhost:8080";
   async createPayment(paymentInfo: IPayment): Promise<IPayment> {
     return Payment.create(paymentInfo);
   }
 
-  async createPaymentSession(items: PaymentSessionRequest[], userId: string): Promise<string> {
-    const lineItems = items.map(item => ({
+  async createPaymentSession(
+    items: PaymentSessionRequest[],
+    userId: string
+  ): Promise<string> {
+    const lineItems = items.map((item) => ({
       price_data: {
         currency: "eur",
         product_data: {
@@ -45,8 +49,8 @@ export class PaymentService {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: "http://localhost:8080/payment-success",
-      cancel_url: "http://localhost:8080/payment-cancel",
+      success_url: `${this.baseUrl}/payment-success`,
+      cancel_url: `${this.baseUrl}/payment-cancel`,
       metadata: {
         userId: userId,
       },

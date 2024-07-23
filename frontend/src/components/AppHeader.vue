@@ -9,31 +9,40 @@
         <div class="relative">
           <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-              v-model="searchQuery"
-              type="search"
-              :placeholder="$t('app.search')"
-              class="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
-              @input="handleSearchInput"
-              @focus="showResults = true"
+            v-model="searchQuery"
+            type="search"
+            :placeholder="$t('app.search')"
+            class="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
+            @input="handleSearchInput"
+            @focus="showResults = true"
           />
         </div>
       </form>
-      <div v-if="showResults" class="search-results absolute top-full left-0 w-full md:w-2/3 lg:w-1/3 bg-white border border-gray-200 rounded-b-md shadow-lg z-50">
+      <div
+        v-if="showResults"
+        class="search-results absolute top-full left-0 w-full md:w-2/3 lg:w-1/3 bg-white border border-gray-200 rounded-b-md shadow-lg z-50"
+      >
         <div v-if="searchResults.length > 0">
           <div class="search-results-header p-2 bg-gray-100 border-b border-gray-200">
             <h3 class="text-sm font-semibold">Produits</h3>
           </div>
           <div
-              v-for="product in searchResults"
-              :key="product.id"
-              class="search-result-item p-2 hover:bg-gray-100 cursor-pointer"
-              @click="goToProductPage(product.id)"
+            v-for="product in searchResults"
+            :key="product.id"
+            class="search-result-item p-2 hover:bg-gray-100 cursor-pointer"
+            @click="goToProductPage(product.id)"
           >
             <div class="flex items-center">
-              <img :src="product.image" :alt="product.name" class="w-12 h-12 object-contain mr-3" />
+              <img
+                :src="extractImageUrl(product.image)"
+                :alt="product.name"
+                class="w-12 h-12 object-contain mr-3"
+              />
               <div>
                 <div class="text-sm font-medium">{{ product.name }}</div>
-                <div class="text-xs text-gray-600">à partir de {{ product.price.toFixed(2) }} €</div>
+                <div class="text-xs text-gray-600">
+                  à partir de {{ product.price.toFixed(2) }} €
+                </div>
               </div>
             </div>
           </div>
@@ -48,7 +57,9 @@
       <Button variant="ghost" size="icon" class="relative" @click="goToCartView">
         <ShoppingCart class="h-5 w-5" />
         <span class="sr-only">{{ $t('app.cart.title') }}</span>
-        <span class="absolute -top-1 -right-1 h-4 w-4 font-bold rounded-full text-[10px] font-medium dark font-600 flex items-center justify-center">
+        <span
+          class="absolute -top-1 -right-1 h-4 w-4 font-bold rounded-full text-[10px] font-medium dark font-600 flex items-center justify-center"
+        >
           {{ cartStore.totalItems }}
         </span>
       </Button>
@@ -67,6 +78,7 @@ import { Input } from '@/components/ui/input'
 import { onMounted, onUnmounted } from 'vue'
 import { defaultApi } from '@/api/config'
 import type { IProduct } from '@/api'
+import { extractImageUrl } from '@/utils/productUtils'
 
 const router = useRouter()
 const route = useRoute()

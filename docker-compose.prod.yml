@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   traefik:
     image: traefik:v2.5
@@ -51,6 +53,19 @@ services:
     networks:
       - backend
     restart: unless-stopped
+  adminer:
+    image: adminer:latest
+    networks:
+      - backend
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.adminer.rule=Host(`adminer.littleyarns.org`)"
+      - "traefik.http.routers.adminer.entrypoints=websecure"
+      - "traefik.http.routers.adminer.tls.certresolver=myresolver"
+      - "traefik.http.services.adminer.loadbalancer.server.port=8080"
+      - "traefik.docker.network=web"
+    restart: unless-stopped
 
   redis:
     image: redis:alpine
@@ -97,6 +112,24 @@ services:
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
+    restart: unless-stopped
+
+  fakeapilaposte:
+    build:
+      context: ./fakeApiLaPoste
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+    networks:
+      - backend
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fakeapilaposte.rule=Host(`fakeapi.littleyarns.org`)"
+      - "traefik.http.routers.fakeapilaposte.entrypoints=websecure"
+      - "traefik.http.routers.fakeapilaposte.tls.certresolver=myresolver"
+      - "traefik.http.services.fakeapilaposte.loadbalancer.server.port=3000"
+      - "traefik.docker.network=web"
     restart: unless-stopped
 
 volumes:

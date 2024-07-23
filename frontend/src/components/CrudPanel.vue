@@ -10,8 +10,8 @@
     </button>
 
     <AdvancedTable
-      :data="items"
-      :columns="columns"
+      :data="items ?? []"
+      :columns="columns ?? []"
       :itemsPerPage="10"
       @view="viewItem"
       @edit="editItem"
@@ -93,8 +93,14 @@ export default defineComponent({
     title: String,
     itemName: String,
     addButtonText: String,
-    items: Array as PropType<TableItem[]>,
-    columns: Array as PropType<TableColumn[]>,
+    items: {
+      type: Array as PropType<TableItem[]>,
+      default: () => []
+    },
+    columns: {
+      type: Array as PropType<TableColumn[]>,
+      default: () => []
+    },
     formSchema: Object as PropType<z.ZodObject<any>>,
     initialFormData: Object,
     formTransformations: Object,

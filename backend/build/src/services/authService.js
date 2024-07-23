@@ -15,6 +15,8 @@ class AuthService {
     constructor() {
         this.secret = process.env.JWT_SECRET || "your_jwt_secret";
         this.refreshSecret = process.env.REFRESH_TOKEN_SECRET || "your_refresh_token_secret";
+        this.baseUrl = process.env.VITE_API_BASE_URL || "http://localhost:3000";
+        this.resetPasswordUrl = process.env.RESET_PASSWORD_URL || "http://localhost:8080";
         this.alertService = new AlertService_1.AlertService();
         this.userService = new userService_1.UserService();
     }
@@ -27,7 +29,6 @@ class AuthService {
             throw new Error("Please confirm your email address");
         }
         const needsChange = await this.userService.shouldChangePassword(user.id);
-        // const needsChange = false;
         const payload = {
             id: user.id,
             email: user.email,
@@ -62,7 +63,7 @@ class AuthService {
             confirmationToken: confirmationToken,
         });
         await this.alertService.createAlertPreference(user.id);
-        const confirmationLink = `http://localhost:3000/auth/confirm?token=${confirmationToken}`;
+        const confirmationLink = `${this.baseUrl}/auth/confirm?token=${confirmationToken}`;
         await (0, emailService_1.default)(email, "Please confirm your account", `Click the following link to confirm your account: ${confirmationLink}`);
         return user.toJSON();
     }
@@ -99,7 +100,7 @@ class AuthService {
         });
         user.confirmationToken = confirmationToken;
         await user.save();
-        const confirmationLink = `http://localhost:3000/auth/confirm?token=${confirmationToken}`;
+        const confirmationLink = `${this.baseUrl}/auth/confirm?token=${confirmationToken}`;
         await (0, emailService_1.default)(email, "Please confirm your account", `Click the following link to confirm your account: ${confirmationLink}`);
     }
     async sendPasswordResetEmail(email) {
@@ -111,7 +112,7 @@ class AuthService {
         const token = jsonwebtoken_1.default.sign({ email: user.email, id: user.id }, this.secret, {
             expiresIn: "1h",
         });
-        const resetLink = `http://localhost:8080/reset-password?token=${token}`;
+        const resetLink = `${this.resetPasswordUrl}/reset-password?token=${token}`;
         const emailText = `Click here to reset your password: ${resetLink}`;
         const emailHtml = `<a href="${resetLink}">Click here to reset your password</a>`;
         await (0, emailService_1.default)(user.email, "Password Reset", emailText, emailHtml);

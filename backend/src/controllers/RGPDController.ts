@@ -32,6 +32,13 @@ export class RGPDController extends Controller {
     return this.rgpdService.createModule(moduleData);
   }
 
+  @Security("jwt", ["ROLE_ADMIN"])
+  @Get("export")
+  @OperationId("exportRGPDModules")
+  public async exportModules(): Promise<IRGPDModule[]> {
+    return this.rgpdService.exportModules();
+  }
+
   @Get("{id}")
   @OperationId("getRGPDModule")
   public async getModule(@Path() id: string): Promise<IRGPDModule | null> {
@@ -59,12 +66,5 @@ export class RGPDController extends Controller {
   @OperationId("deleteRGPDModule")
   public async deleteModule(@Path() id: string): Promise<boolean> {
     return this.rgpdService.deleteModule(id);
-  }
-
-  @Security("jwt", ["ROLE_ADMIN"])
-  @Get("export")
-  @OperationId("exportRGPDModules")
-  public async exportModules(): Promise<IRGPDModule[]> {
-    return this.rgpdService.exportModules();
   }
 }

@@ -155,7 +155,7 @@ MongoClient.connect("mongodb://mongo:27017")
   .then((client) => {
     db = client.db("laposte");
 
-    setInterval(updateTrackingInfo, 120000); // Mise à jour toutes les 2 minutes
+    setInterval(updateTrackingInfo, 120000);
 
     app.listen(port, () => {
       console.log(`Fake La Poste API running on http://localhost:${port}`);

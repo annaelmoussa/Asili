@@ -2904,6 +2904,37 @@
 				"parameters": []
 			}
 		},
+		"/rgpd/export": {
+			"get": {
+				"operationId": "exportRGPDModules",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/IRGPDModule"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"RGPD"
+				],
+				"security": [
+					{
+						"jwt": [
+							"ROLE_ADMIN"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
 		"/rgpd/{id}": {
 			"get": {
 				"operationId": "getRGPDModule",
@@ -3023,37 +3054,6 @@
 						}
 					}
 				]
-			}
-		},
-		"/rgpd/export": {
-			"get": {
-				"operationId": "exportRGPDModules",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/IRGPDModule"
-									},
-									"type": "array"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"RGPD"
-				],
-				"security": [
-					{
-						"jwt": [
-							"ROLE_ADMIN"
-						]
-					}
-				],
-				"parameters": []
 			}
 		},
 		"/payments/create-session/{userId}": {

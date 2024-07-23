@@ -1550,6 +1550,27 @@ function RegisterRoutes(app, opts) {
         }
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/rgpd/export', authenticateMiddleware([{ "jwt": ["ROLE_ADMIN"] }]), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController)), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController.prototype.exportModules)), async function RGPDController_exportModules(request, response, next) {
+        const args = {};
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new RGPDController_1.RGPDController();
+            await templateService.apiHandler({
+                methodName: 'exportModules',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     app.get('/rgpd/:id', ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController)), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController.prototype.getModule)), async function RGPDController_getModule(request, response, next) {
         const args = {
             id: { "in": "path", "name": "id", "required": true, "dataType": "string" },
@@ -1629,27 +1650,6 @@ function RegisterRoutes(app, opts) {
             const controller = new RGPDController_1.RGPDController();
             await templateService.apiHandler({
                 methodName: 'deleteModule',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-            });
-        }
-        catch (err) {
-            return next(err);
-        }
-    });
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    app.get('/rgpd/export', authenticateMiddleware([{ "jwt": ["ROLE_ADMIN"] }]), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController)), ...((0, runtime_1.fetchMiddlewares)(RGPDController_1.RGPDController.prototype.exportModules)), async function RGPDController_exportModules(request, response, next) {
-        const args = {};
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        let validatedArgs = [];
-        try {
-            validatedArgs = templateService.getValidatedArgs({ args, request, response });
-            const controller = new RGPDController_1.RGPDController();
-            await templateService.apiHandler({
-                methodName: 'exportModules',
                 controller,
                 response,
                 next,
