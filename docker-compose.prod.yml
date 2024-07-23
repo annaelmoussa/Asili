@@ -64,6 +64,7 @@ services:
       - "traefik.http.routers.adminer.entrypoints=websecure"
       - "traefik.http.routers.adminer.tls.certresolver=myresolver"
       - "traefik.http.services.adminer.loadbalancer.server.port=8080"
+      - "traefik.docker.network=web"
     restart: unless-stopped
 
   redis:
@@ -101,8 +102,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile.prod
+      context: .
+      dockerfile: frontend/Dockerfile.prod
     networks:
       - web
     labels:
@@ -128,6 +129,7 @@ services:
       - "traefik.http.routers.fakeapilaposte.entrypoints=websecure"
       - "traefik.http.routers.fakeapilaposte.tls.certresolver=myresolver"
       - "traefik.http.services.fakeapilaposte.loadbalancer.server.port=3000"
+      - "traefik.docker.network=web"
     restart: unless-stopped
 
 volumes:
