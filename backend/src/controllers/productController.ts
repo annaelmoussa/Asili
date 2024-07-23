@@ -14,19 +14,26 @@ import {
   Security,
   UploadedFile,
   FormField,
+  Request,
 } from "tsoa";
 import { IProduct, ProductCreationParams } from "../interfaces/IProduct";
 import { ProductService } from "../services/productService";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
+import { AuthenticatedRequest } from "@/types/AuthenticatedRequest";
+import {AlertService}  from "../services/AlertService";
+import Product  from "../models/Product";
+import { ICategory } from "../interfaces/ICategory";
 
 @Route("products")
 export class ProductController extends Controller {
   private productService: ProductService;
+  private alertService: AlertService;
 
   constructor() {
     super();
     this.productService = new ProductService();
+    this.alertService = new AlertService();
   }
 
   upload = multer({
@@ -79,6 +86,11 @@ export class ProductController extends Controller {
   @Get("categories")
   public async getCategories(): Promise<string[]> {
     return this.productService.getCategories();
+  }
+
+  @Get("categories-with-id")
+  public async getCategoriesWithId(): Promise<ICategory[]> {
+    return this.productService.getCategoriesWithId();
   }
 
   @Get("brands")
@@ -158,6 +170,7 @@ export class ProductController extends Controller {
         ...productData,
         image: imagePath,
       });
+      await this.alertService.sendNewProductInCategoryAlert(product);
       this.setStatus(201);
       return product;
     } catch (error) {
@@ -224,13 +237,26 @@ export class ProductController extends Controller {
         productId,
         updates
       );
-
+  
       if (!updatedProduct) {
         if (newImagePath) {
           await this.deleteFile(newImagePath);
         }
         this.setStatus(404);
         return null;
+      }
+      if (updatedProduct) {
+        console.log("ouioui")
+        const refreshedProduct = await Product.findByPk(updatedProduct.id);
+        if (refreshedProduct) {
+          if (stock !== undefined && oldProduct && oldProduct.stock === 0 && refreshedProduct.stock > 0) {
+            await this.alertService.sendRestockAlert(refreshedProduct);
+          }
+  
+          if (price !== undefined && oldProduct && oldProduct.price !== refreshedProduct.price) {
+            await this.alertService.sendPriceChangeAlert(refreshedProduct, oldProduct.price);
+          }
+        }
       }
 
       if (
@@ -296,5 +322,80 @@ export class ProductController extends Controller {
     @Path() productId: string
   ): Promise<{ date: Date; quantity: number }[]> {
     return this.productService.getStockHistory(productId);
+  }
+
+  @Security("jwt")
+  @Post("{productId}/subscribe-restock")
+  public async subscribeToProductRestock(@Path() productId: string, @Request() request: AuthenticatedRequest): Promise<void> {
+    const userId = request.user.id;
+    await this.productService.subscribeToProductRestock(userId, productId);
+  }
+
+  @Security("jwt")
+  @Post("{productId}/subscribe-price-change")
+  public async subscribeToProductPriceChange(@Path() productId: string, @Request() request: AuthenticatedRequest): Promise<void> {
+    const userId = request.user.id;
+    await this.productService.subscribeToProductPriceChange(userId, productId);
+  }
+
+  @Security("jwt")
+  @Post("categories/{categoryId}/subscribe-new-products")
+  public async subscribeToCategoryNewProducts(@Path() categoryId: string, @Request() request: AuthenticatedRequest): Promise<void> {
+    const userId = request.user.id;
+    await this.productService.subscribeToCategoryNewProducts(userId, categoryId);
+  }
+
+  @Security("jwt")
+  @Delete("{productId}/unsubscribe-restock")
+  public async unsubscribeFromProductRestock(@Path() productId: string, @Request() request: AuthenticatedRequest): Promise<void> {
+    const userId = request.user.id;
+    await this.productService.unsubscribeFromProductRestock(userId, productId);
+  }
+
+  @Security("jwt")
+  @Delete("{productId}/unsubscribe-price-change")
+  public async unsubscribeFromProductPriceChange(@Path() productId: string, @Request() request: AuthenticatedRequest): Promise<void> {
+    const userId = request.user.id;
+    await this.productService.unsubscribeFromProductPriceChange(userId, productId);
+  }
+
+  @Security("jwt")
+  @Delete("categories/{categoryId}/unsubscribe-new-products")
+  public async unsubscribeFromCategoryNewProducts(@Path() categoryId: string, @Request() request: AuthenticatedRequest): Promise<void> {
+    const userId = request.user.id;
+    await this.productService.unsubscribeFromCategoryNewProducts(userId, categoryId);
+  }
+
+  @Security("jwt")
+  @Get("{productId}/check-restock-subscription")
+  public async checkProductRestockSubscription(
+    @Path() productId: string, 
+    @Request() request: AuthenticatedRequest
+  ): Promise<{ isSubscribed: boolean }> {
+    const userId = request.user.id;
+    const isSubscribed = await this.productService.checkProductRestockSubscription(userId, productId);
+    return { isSubscribed };
+  }
+
+  @Security("jwt")
+  @Get("{productId}/check-price-change-subscription")
+  public async checkProductPriceChangeSubscription(
+    @Path() productId: string, 
+    @Request() request: AuthenticatedRequest
+  ): Promise<{ isSubscribed: boolean }> {
+    const userId = request.user.id;
+    const isSubscribed = await this.productService.checkProductPriceChangeSubscription(userId, productId);
+    return { isSubscribed };
+  }
+
+  @Security("jwt")
+  @Get("categories/{categoryId}/check-new-products-subscription")
+  public async checkCategoryNewProductsSubscription(
+    @Path() categoryId: string, 
+    @Request() request: AuthenticatedRequest
+  ): Promise<{ isSubscribed: boolean }> {
+    const userId = request.user.id;
+    const isSubscribed = await this.productService.checkCategoryNewProductsSubscription(userId, categoryId);
+    return { isSubscribed };
   }
 }

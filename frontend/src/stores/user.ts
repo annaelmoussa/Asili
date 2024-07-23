@@ -1,8 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import {
-  AuthApi,
-  UserApi,
   Configuration,
   type IUser,
   type LoginRequest,
@@ -12,16 +10,8 @@ import {
   type PartialIUser
 } from '@/api'
 import { useCartStore } from '@/stores/cart'
+import { authApi, userApi } from '@/api/config'
 
-const configuration = new Configuration({
-  basePath: import.meta.env.VITE_API_BASE_URL as string,
-  baseOptions: {
-    withCredentials: true
-  }
-})
-
-const authApi = new AuthApi(configuration)
-const userApi = new UserApi(configuration)
 
 export const useUserStore = defineStore('user', () => {
   const user = ref<IUser | null>(null)
@@ -166,13 +156,12 @@ export const useUserStore = defineStore('user', () => {
       const updatedUserData: PartialIUser = {
         email: newEmail
       }
-      console.log(updatedUserData)
 
       // Ensure that user.value.id is not undefined
       if (!user.value.id) {
         throw new Error('User ID is undefined')
       }
-
+      console.log(user.value.id +"ici")
       const response = await userApi.updateUser(user.value.id, updatedUserData)
 
       if (response.data) {

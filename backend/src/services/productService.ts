@@ -9,6 +9,8 @@ import CartItem from "../models/CartItem";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import path from "path";
+import ProductSubscription from "../models/ProductSubscription";
+import { ICategory } from "../interfaces/ICategory";
 
 const productMongoService = new ProductMongoService();
 
@@ -44,7 +46,6 @@ export class ProductService {
     productCreationParams: ProductCreationParams,
     options?: { transaction?: Transaction }
   ): Promise<IProduct> {
-    console.time("create-product");
     try {
       const fullProductParams = {
         ...productCreationParams,
@@ -157,6 +158,17 @@ export class ProductService {
     return categories.map((category: { name: string }) => category.name);
   }
 
+  public async getCategoriesWithId(): Promise<ICategory[]> {
+  const categories = await Category.findAll({
+    attributes: ["id", "name"],
+    raw: true,
+  });
+  return categories.map((category: { id: string; name: string }) => ({
+    id: category.id,
+    name: category.name
+  }));
+}
+
   public async getBrands(): Promise<string[]> {
     const brands = await Brand.findAll({
       attributes: ["name"],
@@ -200,6 +212,93 @@ export class ProductService {
   ): Promise<{ date: Date; quantity: number }[]> {
     const product = await Product.findByPk(productId, options);
     return product ? product.stockHistory : [];
+  }
+
+  public async subscribeToProductRestock(userId: string, productId: string): Promise<void> {
+    await ProductSubscription.create({
+      userId,
+      productId,
+      notifyRestock: true,
+    });
+  }
+
+  public async subscribeToProductPriceChange(userId: string, productId: string): Promise<void> {
+    await ProductSubscription.create({
+      userId,
+      productId,
+      notifyPriceChange: true,
+    });
+  }
+
+  public async subscribeToCategoryNewProducts(userId: string, categoryId: string): Promise<void> {
+    await ProductSubscription.create({
+      userId,
+      categoryId,
+      notifyNewProductInCategory: true,
+    });
+  }
+
+  public async unsubscribeFromProductRestock(userId: string, productId: string): Promise<void> {
+    await ProductSubscription.destroy({
+      where: {
+        userId,
+        productId,
+        notifyRestock: true,
+      },
+    });
+  }
+  
+  public async unsubscribeFromProductPriceChange(userId: string, productId: string): Promise<void> {
+    await ProductSubscription.destroy({
+      where: {
+        userId,
+        productId,
+        notifyPriceChange: true,
+      },
+    });
+  }
+  
+  public async unsubscribeFromCategoryNewProducts(userId: string, categoryId: string): Promise<void> {
+    await ProductSubscription.destroy({
+      where: {
+        userId,
+        categoryId,
+        notifyNewProductInCategory: true,
+      },
+    });
+  }
+
+  public async checkProductRestockSubscription(userId: string, productId: string): Promise<boolean> {
+    const subscription = await ProductSubscription.findOne({
+      where: {
+        userId,
+        productId,
+        notifyRestock: true,
+      },
+    });
+    return !!subscription;
+  }
+
+  public async checkProductPriceChangeSubscription(userId: string, productId: string): Promise<boolean> {
+    const subscription = await ProductSubscription.findOne({
+      where: {
+        userId,
+        productId,
+        notifyPriceChange: true,
+      },
+    });
+    return !!subscription;
+  }
+
+  public async checkCategoryNewProductsSubscription(userId: string, categoryId: string): Promise<boolean> {
+    const subscription = await ProductSubscription.findOne({
+      where: {
+        userId,
+        categoryId,
+        notifyNewProductInCategory: true,
+      },
+    });
+    return !!subscription;
   }
 }
 

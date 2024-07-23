@@ -14,7 +14,11 @@
     "banner": {
       "title": "Always Room for Snacks",
       "description": "With 40% off bars and snacks",
-      "button": "Shop Now"
+      "button": "Shop Now",
+      "NewsletterTitle": "Sign up for our newsletter",
+      "descriptionNewsletter": "Get exclusive offers and nutrition tips straight to your inbox.",
+      "unsubscribe": "Unsubscribe",
+      "subscribe": "Subscribe"
     },
     "products": {
       "title": "Our Products",
@@ -23,7 +27,18 @@
       "price": "Price",
       "category": "Category",
       "inStock": "In stock",
-      "addToCart": "Add to cart"
+      "addToCart": "Add to cart",
+      "notifyWhenInStock": "Notify me when in stock",
+      "unsubscribeFromRestock": "Unsubscribe from restock notifications",
+      "subscribeSuccess": "Subscription successful",
+      "subscribeMessage": "You will be notified when this product is back in stock.",
+      "unsubscribeSuccess": "Unsubscription successful",
+      "unsubscribeMessage": "You will no longer receive notifications for this product.",
+      "subscribeError": "Subscription action failed",
+      "subscribeErrorMessage": "There was an error processing your subscription request. Please try again later.",
+      "unsubscribeFromPriceChange": "Unsubscribe from price change notifications",
+      "notifyWhenPriceChanges": "Notify me when price changes",
+      "outOfStock": "Out of stock"
     },
     "contact": {
       "cta": "Contact Us",

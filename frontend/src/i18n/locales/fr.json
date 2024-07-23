@@ -14,7 +14,11 @@
     "banner": {
       "title": "Toujours de la place pour des snacks",
       "description": "Avec 40% de réduction sur les barres et snacks",
-      "button": "Achetez maintenant"
+      "button": "Achetez maintenant",
+      "NewsletterTitle": "Inscrivez-vous à notre newsletter",
+      "descriptionNewsletter": "Recevez des offres exclusives et des conseils de nutrition directement dans votre boîte de réception.",
+      "unsubscribe": "Se désabonner",
+      "subscribe": "S'abonner"
     },
     "products": {
       "title": "Nos Produits",
@@ -23,7 +27,12 @@
       "price": "Prix",
       "category": "Catégorie",
       "inStock": "En stock",
-      "addToCart": "Ajouter au panier"
+      "addToCart": "Ajouter au panier",
+      "notifyWhenInStock": "Notifier quand disponible",
+      "unsubscribeFromRestock": "Se désabonner des notifications de réapprovisionnement",
+      "unsubscribeFromPriceChange": "Se désabonner des notifications de changement de prix",
+      "notifyWhenPriceChanges": "Notifier quand le prix change",
+      "outOfStock": "En rupture de stock"
     },
     "contact": {
       "cta": "Contactez-nous",

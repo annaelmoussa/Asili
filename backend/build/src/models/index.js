@@ -18,6 +18,8 @@ const Shipping_1 = __importDefault(require("./Shipping"));
 const Order_1 = __importDefault(require("./Order"));
 const OrderItem_1 = __importDefault(require("./OrderItem"));
 const RGPDModule_1 = __importDefault(require("./RGPDModule"));
+const ProductSubscription_1 = __importDefault(require("./ProductSubscription"));
+const NewsletterSubscription_1 = __importDefault(require("./NewsletterSubscription"));
 const env = process.env.NODE_ENV || "development";
 const config = require("../config/config.js")[env];
 const sequelize = new sequelize_typescript_1.Sequelize({
@@ -38,6 +40,8 @@ const sequelize = new sequelize_typescript_1.Sequelize({
         Order_1.default,
         OrderItem_1.default,
         RGPDModule_1.default,
+        ProductSubscription_1.default,
+        NewsletterSubscription_1.default
     ],
 });
 const db = {
@@ -58,5 +62,7 @@ const db = {
     Order: Order_1.default,
     OrderItem: OrderItem_1.default,
     RGPDModule: RGPDModule_1.default,
+    ProductSubscription: ProductSubscription_1.default,
+    NewsletterSubscription: NewsletterSubscription_1.default
 };
 module.exports = db;

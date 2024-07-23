@@ -7,6 +7,8 @@ exports.AlertService = void 0;
 const AlertPreference_1 = __importDefault(require("../models/AlertPreference"));
 const User_1 = __importDefault(require("../models/User"));
 const emailService_1 = __importDefault(require("./emailService"));
+const ProductSubscription_1 = __importDefault(require("../models/ProductSubscription"));
+const Category_1 = __importDefault(require("../models/Category"));
 class AlertService {
     async createAlertPreference(userId) {
         return AlertPreference_1.default.create({
@@ -44,45 +46,90 @@ class AlertService {
         }
     }
     async sendRestockAlert(product) {
-        const users = await User_1.default.findAll({
+        const subscriptions = await ProductSubscription_1.default.findAll({
+            where: {
+                productId: product.id,
+                notifyRestock: true,
+            },
             include: [
                 {
-                    model: AlertPreference_1.default,
-                    as: "alertPreferences",
-                    where: { productRestock: true },
+                    model: User_1.default,
+                    include: [
+                        {
+                            model: AlertPreference_1.default,
+                            where: { productRestock: true },
+                        },
+                    ],
                 },
             ],
         });
-        for (const user of users) {
-            await (0, emailService_1.default)(user.email, "Product Restock Alert", `The product "${product.name}" is back in stock!`);
+        for (const subscription of subscriptions) {
+            if (subscription.user && subscription.user.alertPreferences) {
+                await (0, emailService_1.default)(subscription.user.email, "Product Restock Alert", `The product "${product.name}" is back in stock!`);
+            }
         }
     }
     async sendPriceChangeAlert(product, oldPrice) {
-        const users = await User_1.default.findAll({
+        const subscriptions = await ProductSubscription_1.default.findAll({
+            where: {
+                productId: product.id,
+                notifyPriceChange: true,
+            },
             include: [
                 {
-                    model: AlertPreference_1.default,
-                    as: "alertPreferences",
-                    where: { priceChange: true },
+                    model: User_1.default,
+                    include: [
+                        {
+                            model: AlertPreference_1.default,
+                            where: { priceChange: true },
+                        },
+                    ],
                 },
             ],
         });
-        for (const user of users) {
-            await (0, emailService_1.default)(user.email, "Price Change Alert", `The price of "${product.name}" has changed from $${oldPrice} to $${product.price}.`);
+        for (const subscription of subscriptions) {
+            if (subscription.user && subscription.user.alertPreferences) {
+                await (0, emailService_1.default)(subscription.user.email, "Price Change Alert", `The price of "${product.name}" has changed from $${oldPrice} to $${product.price}.`);
+            }
         }
     }
-    async sendNewsletterAlert(newsletter) {
-        const users = await User_1.default.findAll({
+    async sendNewProductInCategoryAlert(product) {
+        const category = await Category_1.default.findByPk(product.categoryId);
+        if (!category)
+            return;
+        const subscriptions = await ProductSubscription_1.default.findAll({
+            where: {
+                categoryId: product.categoryId,
+                notifyNewProductInCategory: true,
+            },
             include: [
                 {
-                    model: AlertPreference_1.default,
-                    as: "alertPreferences",
-                    where: { newsletter: true },
+                    model: User_1.default,
+                    include: [
+                        {
+                            model: AlertPreference_1.default,
+                            where: { newProductInCategory: true },
+                        },
+                    ],
                 },
             ],
         });
-        for (const user of users) {
-            await (0, emailService_1.default)(user.email, "Newsletter", newsletter);
+        for (const subscription of subscriptions) {
+            if (subscription.user && subscription.user.alertPreferences) {
+                await (0, emailService_1.default)(subscription.user.email, "New Product in Category Alert", `A new product "${product.name}" has been added to the ${category.name} category.`);
+            }
+        }
+    }
+    async sendNewsletter(subject, content) {
+        const subscribedUsers = await User_1.default.findAll({
+            include: [{
+                    model: AlertPreference_1.default,
+                    where: { newsletter: true },
+                    required: true
+                }]
+        });
+        for (const user of subscribedUsers) {
+            await (0, emailService_1.default)(user.email, subject, content);
         }
     }
 }

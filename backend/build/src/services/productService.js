@@ -14,6 +14,7 @@ const CartItem_1 = __importDefault(require("../models/CartItem"));
 const uuid_1 = require("uuid");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const ProductSubscription_1 = __importDefault(require("../models/ProductSubscription"));
 const productMongoService = new productMongoService_1.ProductMongoService();
 class ProductService {
     constructor(sequelize) {
@@ -34,7 +35,6 @@ class ProductService {
         return products.map((product) => product.toJSON());
     }
     async create(productCreationParams, options) {
-        console.time("create-product");
         try {
             const fullProductParams = {
                 ...productCreationParams,
@@ -115,6 +115,16 @@ class ProductService {
         });
         return categories.map((category) => category.name);
     }
+    async getCategoriesWithId() {
+        const categories = await Category_1.default.findAll({
+            attributes: ["id", "name"],
+            raw: true,
+        });
+        return categories.map((category) => ({
+            id: category.id,
+            name: category.name
+        }));
+    }
     async getBrands() {
         const brands = await Brand_1.default.findAll({
             attributes: ["name"],
@@ -145,6 +155,84 @@ class ProductService {
     async getStockHistory(productId, options) {
         const product = await Product_1.default.findByPk(productId, options);
         return product ? product.stockHistory : [];
+    }
+    async subscribeToProductRestock(userId, productId) {
+        await ProductSubscription_1.default.create({
+            userId,
+            productId,
+            notifyRestock: true,
+        });
+    }
+    async subscribeToProductPriceChange(userId, productId) {
+        await ProductSubscription_1.default.create({
+            userId,
+            productId,
+            notifyPriceChange: true,
+        });
+    }
+    async subscribeToCategoryNewProducts(userId, categoryId) {
+        await ProductSubscription_1.default.create({
+            userId,
+            categoryId,
+            notifyNewProductInCategory: true,
+        });
+    }
+    async unsubscribeFromProductRestock(userId, productId) {
+        await ProductSubscription_1.default.destroy({
+            where: {
+                userId,
+                productId,
+                notifyRestock: true,
+            },
+        });
+    }
+    async unsubscribeFromProductPriceChange(userId, productId) {
+        await ProductSubscription_1.default.destroy({
+            where: {
+                userId,
+                productId,
+                notifyPriceChange: true,
+            },
+        });
+    }
+    async unsubscribeFromCategoryNewProducts(userId, categoryId) {
+        await ProductSubscription_1.default.destroy({
+            where: {
+                userId,
+                categoryId,
+                notifyNewProductInCategory: true,
+            },
+        });
+    }
+    async checkProductRestockSubscription(userId, productId) {
+        const subscription = await ProductSubscription_1.default.findOne({
+            where: {
+                userId,
+                productId,
+                notifyRestock: true,
+            },
+        });
+        return !!subscription;
+    }
+    async checkProductPriceChangeSubscription(userId, productId) {
+        const subscription = await ProductSubscription_1.default.findOne({
+            where: {
+                userId,
+                productId,
+                notifyPriceChange: true,
+            },
+        });
+        return !!subscription;
+    }
+    async checkCategoryNewProductsSubscription(userId, categoryId) {
+        const subscription = await ProductSubscription_1.default.findOne({
+            where: {
+                userId,
+                categoryId,
+                notifyNewProductInCategory: true,
+            },
+        });
+        return !!subscription;
     }
 }
 exports.ProductService = ProductService;

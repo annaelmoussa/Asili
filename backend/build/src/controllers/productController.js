@@ -22,6 +22,8 @@ const tsoa_1 = require("tsoa");
 const productService_1 = require("../services/productService");
 const uuid_1 = require("uuid");
 const fs_1 = __importDefault(require("fs"));
+const AlertService_1 = require("../services/AlertService");
+const Product_1 = __importDefault(require("../models/Product"));
 let ProductController = class ProductController extends tsoa_1.Controller {
     constructor() {
         super();
@@ -41,6 +43,7 @@ let ProductController = class ProductController extends tsoa_1.Controller {
             },
         });
         this.productService = new productService_1.ProductService();
+        this.alertService = new AlertService_1.AlertService();
     }
     async saveFile(file) {
         const fileName = `${(0, uuid_1.v4)()}${path_1.default.extname(file.originalname)}`;
@@ -72,6 +75,9 @@ let ProductController = class ProductController extends tsoa_1.Controller {
     }
     async getCategories() {
         return this.productService.getCategories();
+    }
+    async getCategoriesWithId() {
+        return this.productService.getCategoriesWithId();
     }
     async getBrands() {
         return this.productService.getBrands();
@@ -120,6 +126,7 @@ let ProductController = class ProductController extends tsoa_1.Controller {
                 ...productData,
                 image: imagePath,
             });
+            await this.alertService.sendNewProductInCategoryAlert(product);
             this.setStatus(201);
             return product;
         }
@@ -180,6 +187,17 @@ let ProductController = class ProductController extends tsoa_1.Controller {
                 this.setStatus(404);
                 return null;
             }
+            if (updatedProduct) {
+                const refreshedProduct = await Product_1.default.findByPk(updatedProduct.id);
+                if (refreshedProduct) {
+                    if (stock !== undefined && oldProduct && oldProduct.stock === 0 && refreshedProduct.stock > 0) {
+                        await this.alertService.sendRestockAlert(refreshedProduct);
+                    }
+                    if (price !== undefined && oldProduct && oldProduct.price !== refreshedProduct.price) {
+                        await this.alertService.sendPriceChangeAlert(refreshedProduct, oldProduct.price);
+                    }
+                }
+            }
             if (newImagePath &&
                 oldProduct &&
                 oldProduct.image &&
@@ -221,6 +239,45 @@ let ProductController = class ProductController extends tsoa_1.Controller {
     async getStockHistory(productId) {
         return this.productService.getStockHistory(productId);
     }
+    async subscribeToProductRestock(productId, request) {
+        const userId = request.user.id;
+        await this.productService.subscribeToProductRestock(userId, productId);
+    }
+    async subscribeToProductPriceChange(productId, request) {
+        const userId = request.user.id;
+        await this.productService.subscribeToProductPriceChange(userId, productId);
+    }
+    async subscribeToCategoryNewProducts(categoryId, request) {
+        const userId = request.user.id;
+        await this.productService.subscribeToCategoryNewProducts(userId, categoryId);
+    }
+    async unsubscribeFromProductRestock(productId, request) {
+        const userId = request.user.id;
+        await this.productService.unsubscribeFromProductRestock(userId, productId);
+    }
+    async unsubscribeFromProductPriceChange(productId, request) {
+        const userId = request.user.id;
+        await this.productService.unsubscribeFromProductPriceChange(userId, productId);
+    }
+    async unsubscribeFromCategoryNewProducts(categoryId, request) {
+        const userId = request.user.id;
+        await this.productService.unsubscribeFromCategoryNewProducts(userId, categoryId);
+    }
+    async checkProductRestockSubscription(productId, request) {
+        const userId = request.user.id;
+        const isSubscribed = await this.productService.checkProductRestockSubscription(userId, productId);
+        return { isSubscribed };
+    }
+    async checkProductPriceChangeSubscription(productId, request) {
+        const userId = request.user.id;
+        const isSubscribed = await this.productService.checkProductPriceChangeSubscription(userId, productId);
+        return { isSubscribed };
+    }
+    async checkCategoryNewProductsSubscription(categoryId, request) {
+        const userId = request.user.id;
+        const isSubscribed = await this.productService.checkCategoryNewProductsSubscription(userId, categoryId);
+        return { isSubscribed };
+    }
 };
 exports.ProductController = ProductController;
 __decorate([
@@ -235,6 +292,12 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "getCategories", null);
+__decorate([
+    (0, tsoa_1.Get)("categories-with-id"),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "getCategoriesWithId", null);
 __decorate([
     (0, tsoa_1.Get)("brands"),
     __metadata("design:type", Function),
@@ -336,6 +399,87 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "getStockHistory", null);
+__decorate([
+    (0, tsoa_1.Security)("jwt"),
+    (0, tsoa_1.Post)("{productId}/subscribe-restock"),
+    __param(0, (0, tsoa_1.Path)()),
+    __param(1, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "subscribeToProductRestock", null);
+__decorate([
+    (0, tsoa_1.Security)("jwt"),
+    (0, tsoa_1.Post)("{productId}/subscribe-price-change"),
+    __param(0, (0, tsoa_1.Path)()),
+    __param(1, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "subscribeToProductPriceChange", null);
+__decorate([
+    (0, tsoa_1.Security)("jwt"),
+    (0, tsoa_1.Post)("categories/{categoryId}/subscribe-new-products"),
+    __param(0, (0, tsoa_1.Path)()),
+    __param(1, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "subscribeToCategoryNewProducts", null);
+__decorate([
+    (0, tsoa_1.Security)("jwt"),
+    (0, tsoa_1.Delete)("{productId}/unsubscribe-restock"),
+    __param(0, (0, tsoa_1.Path)()),
+    __param(1, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "unsubscribeFromProductRestock", null);
+__decorate([
+    (0, tsoa_1.Security)("jwt"),
+    (0, tsoa_1.Delete)("{productId}/unsubscribe-price-change"),
+    __param(0, (0, tsoa_1.Path)()),
+    __param(1, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "unsubscribeFromProductPriceChange", null);
+__decorate([
+    (0, tsoa_1.Security)("jwt"),
+    (0, tsoa_1.Delete)("categories/{categoryId}/unsubscribe-new-products"),
+    __param(0, (0, tsoa_1.Path)()),
+    __param(1, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "unsubscribeFromCategoryNewProducts", null);
+__decorate([
+    (0, tsoa_1.Security)("jwt"),
+    (0, tsoa_1.Get)("{productId}/check-restock-subscription"),
+    __param(0, (0, tsoa_1.Path)()),
+    __param(1, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "checkProductRestockSubscription", null);
+__decorate([
+    (0, tsoa_1.Security)("jwt"),
+    (0, tsoa_1.Get)("{productId}/check-price-change-subscription"),
+    __param(0, (0, tsoa_1.Path)()),
+    __param(1, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "checkProductPriceChangeSubscription", null);
+__decorate([
+    (0, tsoa_1.Security)("jwt"),
+    (0, tsoa_1.Get)("categories/{categoryId}/check-new-products-subscription"),
+    __param(0, (0, tsoa_1.Path)()),
+    __param(1, (0, tsoa_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "checkCategoryNewProductsSubscription", null);
 exports.ProductController = ProductController = __decorate([
     (0, tsoa_1.Route)("products"),
     __metadata("design:paramtypes", [])

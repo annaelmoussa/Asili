@@ -1345,6 +1345,28 @@
 				"parameters": []
 			}
 		},
+		"/products/categories-with-id": {
+			"get": {
+				"operationId": "GetCategoriesWithId",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/ICategory"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
 		"/products/brands": {
 			"get": {
 				"operationId": "GetBrands",
@@ -1844,6 +1866,409 @@
 						}
 					}
 				]
+			}
+		},
+		"/products/{productId}/subscribe-restock": {
+			"post": {
+				"operationId": "SubscribeToProductRestock",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "productId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/products/{productId}/subscribe-price-change": {
+			"post": {
+				"operationId": "SubscribeToProductPriceChange",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "productId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/products/categories/{categoryId}/subscribe-new-products": {
+			"post": {
+				"operationId": "SubscribeToCategoryNewProducts",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "categoryId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/products/{productId}/unsubscribe-restock": {
+			"delete": {
+				"operationId": "UnsubscribeFromProductRestock",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "productId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/products/{productId}/unsubscribe-price-change": {
+			"delete": {
+				"operationId": "UnsubscribeFromProductPriceChange",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "productId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/products/categories/{categoryId}/unsubscribe-new-products": {
+			"delete": {
+				"operationId": "UnsubscribeFromCategoryNewProducts",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "categoryId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/products/{productId}/check-restock-subscription": {
+			"get": {
+				"operationId": "CheckProductRestockSubscription",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"isSubscribed": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"isSubscribed"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "productId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/products/{productId}/check-price-change-subscription": {
+			"get": {
+				"operationId": "CheckProductPriceChangeSubscription",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"isSubscribed": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"isSubscribed"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "productId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/products/categories/{categoryId}/check-new-products-subscription": {
+			"get": {
+				"operationId": "CheckCategoryNewProductsSubscription",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"isSubscribed": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"isSubscribed"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "categoryId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/newsletter/send": {
+			"post": {
+				"operationId": "SendNewsletter",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [
+					{
+						"jwt": [
+							"ROLE_ADMIN"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"content": {
+										"type": "string"
+									},
+									"subject": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"content",
+									"subject"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/newsletter/subscribe": {
+			"post": {
+				"operationId": "SubscribeToNewsletter",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/newsletter/subscribe-guest": {
+			"post": {
+				"operationId": "SubscribeGuestToNewsletter",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"email": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"email"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/newsletter/unsubscribe": {
+			"post": {
+				"operationId": "UnsubscribeFromNewsletter",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/newsletter/subscription-status": {
+			"get": {
+				"operationId": "GetNewsletterSubscriptionStatus",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"isSubscribed": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"isSubscribed"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": []
 			}
 		},
 		"/email/send": {

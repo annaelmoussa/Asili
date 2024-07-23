@@ -14,6 +14,8 @@ import Shipping from "./Shipping";
 import Order from "./Order";
 import OrderItem from "./OrderItem";
 import RGPDModule from "./RGPDModule";
+import ProductSubscription from "./ProductSubscription";
+import NewsletterSubscription from "./NewsletterSubscription";
 
 const env = process.env.NODE_ENV || "development";
 const config = require("../config/config.js")[env];
@@ -36,6 +38,8 @@ const sequelize = new Sequelize({
     Order,
     OrderItem,
     RGPDModule,
+    ProductSubscription,
+    NewsletterSubscription
   ],
 });
 
@@ -57,6 +61,8 @@ const db = {
   Order,
   OrderItem,
   RGPDModule,
+  ProductSubscription,
+  NewsletterSubscription
 };
 
 export = db;

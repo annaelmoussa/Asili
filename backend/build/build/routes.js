@@ -10,6 +10,8 @@ const userController_1 = require("./../src/controllers/userController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const productController_1 = require("./../src/controllers/productController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+const newsletterController_1 = require("./../src/controllers/newsletterController");
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const emailController_1 = require("./../src/controllers/emailController");
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 const categoryController_1 = require("./../src/controllers/categoryController");
@@ -629,6 +631,27 @@ function RegisterRoutes(app, opts) {
         }
     });
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/products/categories-with-id', ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController)), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController.prototype.getCategoriesWithId)), async function ProductController_getCategoriesWithId(request, response, next) {
+        const args = {};
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new productController_1.ProductController();
+            await templateService.apiHandler({
+                methodName: 'getCategoriesWithId',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     app.get('/products/brands', ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController)), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController.prototype.getBrands)), async function ProductController_getBrands(request, response, next) {
         const args = {};
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -869,6 +892,337 @@ function RegisterRoutes(app, opts) {
             const controller = new productController_1.ProductController();
             await templateService.apiHandler({
                 methodName: 'getStockHistory',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/products/:productId/subscribe-restock', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController)), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController.prototype.subscribeToProductRestock)), async function ProductController_subscribeToProductRestock(request, response, next) {
+        const args = {
+            productId: { "in": "path", "name": "productId", "required": true, "dataType": "string" },
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new productController_1.ProductController();
+            await templateService.apiHandler({
+                methodName: 'subscribeToProductRestock',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/products/:productId/subscribe-price-change', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController)), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController.prototype.subscribeToProductPriceChange)), async function ProductController_subscribeToProductPriceChange(request, response, next) {
+        const args = {
+            productId: { "in": "path", "name": "productId", "required": true, "dataType": "string" },
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new productController_1.ProductController();
+            await templateService.apiHandler({
+                methodName: 'subscribeToProductPriceChange',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/products/categories/:categoryId/subscribe-new-products', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController)), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController.prototype.subscribeToCategoryNewProducts)), async function ProductController_subscribeToCategoryNewProducts(request, response, next) {
+        const args = {
+            categoryId: { "in": "path", "name": "categoryId", "required": true, "dataType": "string" },
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new productController_1.ProductController();
+            await templateService.apiHandler({
+                methodName: 'subscribeToCategoryNewProducts',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.delete('/products/:productId/unsubscribe-restock', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController)), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController.prototype.unsubscribeFromProductRestock)), async function ProductController_unsubscribeFromProductRestock(request, response, next) {
+        const args = {
+            productId: { "in": "path", "name": "productId", "required": true, "dataType": "string" },
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new productController_1.ProductController();
+            await templateService.apiHandler({
+                methodName: 'unsubscribeFromProductRestock',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.delete('/products/:productId/unsubscribe-price-change', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController)), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController.prototype.unsubscribeFromProductPriceChange)), async function ProductController_unsubscribeFromProductPriceChange(request, response, next) {
+        const args = {
+            productId: { "in": "path", "name": "productId", "required": true, "dataType": "string" },
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new productController_1.ProductController();
+            await templateService.apiHandler({
+                methodName: 'unsubscribeFromProductPriceChange',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.delete('/products/categories/:categoryId/unsubscribe-new-products', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController)), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController.prototype.unsubscribeFromCategoryNewProducts)), async function ProductController_unsubscribeFromCategoryNewProducts(request, response, next) {
+        const args = {
+            categoryId: { "in": "path", "name": "categoryId", "required": true, "dataType": "string" },
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new productController_1.ProductController();
+            await templateService.apiHandler({
+                methodName: 'unsubscribeFromCategoryNewProducts',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/products/:productId/check-restock-subscription', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController)), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController.prototype.checkProductRestockSubscription)), async function ProductController_checkProductRestockSubscription(request, response, next) {
+        const args = {
+            productId: { "in": "path", "name": "productId", "required": true, "dataType": "string" },
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new productController_1.ProductController();
+            await templateService.apiHandler({
+                methodName: 'checkProductRestockSubscription',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/products/:productId/check-price-change-subscription', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController)), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController.prototype.checkProductPriceChangeSubscription)), async function ProductController_checkProductPriceChangeSubscription(request, response, next) {
+        const args = {
+            productId: { "in": "path", "name": "productId", "required": true, "dataType": "string" },
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new productController_1.ProductController();
+            await templateService.apiHandler({
+                methodName: 'checkProductPriceChangeSubscription',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/products/categories/:categoryId/check-new-products-subscription', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController)), ...((0, runtime_1.fetchMiddlewares)(productController_1.ProductController.prototype.checkCategoryNewProductsSubscription)), async function ProductController_checkCategoryNewProductsSubscription(request, response, next) {
+        const args = {
+            categoryId: { "in": "path", "name": "categoryId", "required": true, "dataType": "string" },
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new productController_1.ProductController();
+            await templateService.apiHandler({
+                methodName: 'checkCategoryNewProductsSubscription',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/newsletter/send', authenticateMiddleware([{ "jwt": ["ROLE_ADMIN"] }]), ...((0, runtime_1.fetchMiddlewares)(newsletterController_1.NewsletterController)), ...((0, runtime_1.fetchMiddlewares)(newsletterController_1.NewsletterController.prototype.sendNewsletter)), async function NewsletterController_sendNewsletter(request, response, next) {
+        const args = {
+            newsletterData: { "in": "body", "name": "newsletterData", "required": true, "dataType": "nestedObjectLiteral", "nestedProperties": { "content": { "dataType": "string", "required": true }, "subject": { "dataType": "string", "required": true } } },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new newsletterController_1.NewsletterController();
+            await templateService.apiHandler({
+                methodName: 'sendNewsletter',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/newsletter/subscribe', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(newsletterController_1.NewsletterController)), ...((0, runtime_1.fetchMiddlewares)(newsletterController_1.NewsletterController.prototype.subscribeToNewsletter)), async function NewsletterController_subscribeToNewsletter(request, response, next) {
+        const args = {
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new newsletterController_1.NewsletterController();
+            await templateService.apiHandler({
+                methodName: 'subscribeToNewsletter',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/newsletter/subscribe-guest', ...((0, runtime_1.fetchMiddlewares)(newsletterController_1.NewsletterController)), ...((0, runtime_1.fetchMiddlewares)(newsletterController_1.NewsletterController.prototype.subscribeGuestToNewsletter)), async function NewsletterController_subscribeGuestToNewsletter(request, response, next) {
+        const args = {
+            body: { "in": "body", "name": "body", "required": true, "dataType": "nestedObjectLiteral", "nestedProperties": { "email": { "dataType": "string", "required": true } } },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new newsletterController_1.NewsletterController();
+            await templateService.apiHandler({
+                methodName: 'subscribeGuestToNewsletter',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.post('/newsletter/unsubscribe', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(newsletterController_1.NewsletterController)), ...((0, runtime_1.fetchMiddlewares)(newsletterController_1.NewsletterController.prototype.unsubscribeFromNewsletter)), async function NewsletterController_unsubscribeFromNewsletter(request, response, next) {
+        const args = {
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new newsletterController_1.NewsletterController();
+            await templateService.apiHandler({
+                methodName: 'unsubscribeFromNewsletter',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/newsletter/subscription-status', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(newsletterController_1.NewsletterController)), ...((0, runtime_1.fetchMiddlewares)(newsletterController_1.NewsletterController.prototype.getNewsletterSubscriptionStatus)), async function NewsletterController_getNewsletterSubscriptionStatus(request, response, next) {
+        const args = {
+            request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new newsletterController_1.NewsletterController();
+            await templateService.apiHandler({
+                methodName: 'getNewsletterSubscriptionStatus',
                 controller,
                 response,
                 next,

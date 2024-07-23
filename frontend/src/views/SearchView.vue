@@ -7,11 +7,19 @@
       <div class="filter-section">
         <h3>Catégorie</h3>
         <select v-model="selectedCategory" @change="updateSearch">
-          <option value="">Toutes les catégories</option>
-          <option v-for="category in categories" :key="category" :value="category">
-            {{ category }}
+          <option :value="null">Toutes les catégories</option>
+          <option v-for="category in categories" :key="category.id" :value="category">
+            {{ category.name }}
           </option>
         </select>
+        <button 
+          v-if="selectedCategory"
+          @click="toggleCategorySubscription"
+          class="subscribe-button"
+          :class="{ 'subscribed': isCategorySubscribed }"
+        >
+          {{ isCategorySubscribed ? $t('app.categories.unsubscribe') : $t('app.categories.subscribe') }}
+        </button>
       </div>
 
       <div class="filter-section">
@@ -71,23 +79,29 @@ import { useRoute, useRouter } from 'vue-router'
 import { defaultApi } from '@/api/config'
 import type { IBrand, ICategory, IProduct } from '@/api'
 import { extractImageUrl } from '@/utils/productUtils'
+import { useToast } from '@/components/ui/toast/use-toast'
+import { Toaster } from '@/components/ui/toast'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+const { toast } = useToast()
 
 const route = useRoute()
 const router = useRouter()
 
 const searchQuery = ref('')
-const selectedCategory = ref('')
+const selectedCategory = ref<{ id: string; name: string } | null>(null)
 const selectedBrand = ref('')
 const minPrice = ref<number | null>(null)
 const maxPrice = ref<number | null>(null)
 const isPromotion = ref<boolean>(false)
 const inStock = ref<boolean>(false)
-
+const isCategorySubscribed = ref(false)
 const products = ref<IProduct[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
 
-const categories = ref<string[]>([])
+const categories = ref<ICategory[]>([])
 const brands = ref<string[]>([])
 
 function initializeFilters() {
@@ -102,7 +116,7 @@ function initializeFilters() {
   } = route.query
 
   searchQuery.value = (query as string) || ''
-  selectedCategory.value = (category as string) || ''
+  selectedCategory.value = category ? categories.value.find(c => c.name === category) as { id: string; name: string } || null : null
   selectedBrand.value = (brand as string) || ''
   minPrice.value = minPriceParam ? Number(minPriceParam) : null
   maxPrice.value = maxPriceParam ? Number(maxPriceParam) : null
@@ -128,8 +142,12 @@ watch(
 
 async function loadCategoriesAndBrands() {
   try {
-    const categoriesResponse = await defaultApi.getCategories()
-    categories.value = categoriesResponse.data
+    const categoriesResponse = await defaultApi.getCategoriesWithId()
+    categories.value = categoriesResponse.data.map(category => ({
+      id: category.id,
+      name: category.name
+    }))
+    console.log(JSON.stringify(categoriesResponse),"porto")
 
     const brandsResponse = await defaultApi.getBrands()
     brands.value = brandsResponse.data
@@ -146,7 +164,7 @@ async function performSearch() {
   try {
     const response = await defaultApi.searchProducts(
       searchQuery.value,
-      selectedCategory.value,
+      selectedCategory.value?.name,
       selectedBrand.value,
       minPrice.value?.toString() ?? undefined,
       maxPrice.value?.toString() ?? undefined,
@@ -162,17 +180,21 @@ async function performSearch() {
   }
 }
 
-function updateSearch() {
+async function updateSearch() {
   const query: Record<string, string | undefined> = {
     query: searchQuery.value || undefined,
-    category: selectedCategory.value || undefined,
+    category: selectedCategory.value?.name || undefined,
     brand: selectedBrand.value || undefined,
     minPrice: minPrice.value?.toString() || undefined,
     maxPrice: maxPrice.value?.toString() || undefined,
     isPromotion: isPromotion.value ? 'true' : undefined,
     inStock: inStock.value ? 'true' : undefined
   }
-
+  if (selectedCategory.value) {
+    await checkCategorySubscription()
+  } else {
+    isCategorySubscribed.value = false
+  }
   // Remove undefined values
   Object.keys(query).forEach((key) => query[key] === undefined && delete query[key])
 
@@ -181,6 +203,56 @@ function updateSearch() {
 
 function goToProductPage(productId: string) {
   router.push({ name: 'ProductSingleView', params: { productId } })
+}
+
+async function checkCategorySubscription() {
+  if (selectedCategory.value) {
+    try {
+      const response = await defaultApi.checkCategoryNewProductsSubscription(selectedCategory.value.id)
+      isCategorySubscribed.value = response.data.isSubscribed
+    } catch (error) {
+      console.error('Erreur lors de la vérification de l\'abonnement à la catégorie:', error)
+    }
+  } else {
+    isCategorySubscribed.value = false
+  }
+}
+
+async function toggleCategorySubscription() {
+  if (!selectedCategory.value) return
+
+  try {
+    if (isCategorySubscribed.value) {
+      await defaultApi.unsubscribeFromCategoryNewProducts(selectedCategory.value.id)
+      isCategorySubscribed.value = false
+      toast({
+        title: t('app.categories.unsubscribeSuccess'),
+        description: t('app.categories.unsubscribeMessage', { category: selectedCategory.value.name }),
+        duration: 3000,
+      })
+    } else {
+      await defaultApi.subscribeToCategoryNewProducts(selectedCategory.value.id)
+      isCategorySubscribed.value = true
+      toast({
+        title: t('app.categories.subscribeSuccess'),
+        description: t('app.categories.subscribeMessage', { category: selectedCategory.value.name }),
+        duration: 3000,
+      })
+    }
+  } catch (error) {
+    console.error('Erreur lors de la modification de l\'abonnement à la catégorie:', error)
+    toast({
+      title: t('app.categories.subscribeError'),
+      description: t('app.categories.subscribeErrorMessage'),
+      variant: "destructive",
+      duration: 3000,
+    })
+  }
+}
+
+function getCategoryName(categoryId: string): string {
+  const category = categories.value.find(c => c.id === categoryId)
+  return category ? category.name : ''
 }
 
 watch(
