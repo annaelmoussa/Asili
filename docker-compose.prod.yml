@@ -98,6 +98,8 @@ services:
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
       - "traefik.docker.network=web"
+    volumes:
+      - ./uploads:/app/uploads
     restart: unless-stopped
 
   frontend:

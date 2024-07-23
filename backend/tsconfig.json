@@ -134,7 +134,8 @@
     "build/routes.ts",
     "src/**/*.ts",
     "src/types.d.ts",
-    "src/types/express.d.ts"
+    "src/types/express.d.ts",
+    "src/seeders/**/*"
   ],
   "exclude": ["node_modules", "build"]
 }

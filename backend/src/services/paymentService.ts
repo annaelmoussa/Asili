@@ -1,19 +1,7 @@
 import Stripe from "stripe";
 import { IProduct } from "../interfaces/IProduct";
-import dotenv from "dotenv";
 import Payment from "../models/Payment";
 import { IPayment } from "../interfaces/IPayment";
-
-dotenv.config();
-
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error(
-    "STRIPE_SECRET_KEY is not defined in the environment variables"
-  );
-}
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-06-20",
-});
 
 export interface PaymentSessionRequest {
   id?: string;
@@ -22,7 +10,21 @@ export interface PaymentSessionRequest {
 }
 
 export class PaymentService {
+  private stripe: Stripe;
   private baseUrl = process.env.BASE_URL || "http://localhost:8080";
+
+  constructor() {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey) {
+      throw new Error(
+        "STRIPE_SECRET_KEY is not defined in the environment variables"
+      );
+    }
+    this.stripe = new Stripe(stripeSecretKey, {
+      apiVersion: "2024-06-20",
+    });
+  }
+
   async createPayment(paymentInfo: IPayment): Promise<IPayment> {
     return Payment.create(paymentInfo);
   }
@@ -45,7 +47,7 @@ export class PaymentService {
 
     console.log(lineItems);
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
@@ -58,6 +60,7 @@ export class PaymentService {
 
     return session.id;
   }
+
   async getAllPayments(): Promise<IPayment[]> {
     try {
       const payments = await Payment.findAll();

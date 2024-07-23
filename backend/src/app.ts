@@ -19,21 +19,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Middleware Configuration
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        "img-src": [
-          "'self'",
-          "data:",
-          "https://flagcdn.com",
-          "https://cdn.midjourney.com",
-        ],
-      },
-    },
-  })
-);
+// app.use(
+//   helmet({
+//     contentSecurityPolicy: {
+//       directives: {
+//         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+//         "img-src": [
+//           "'self'",
+//           "data:",
+//           "https://flagcdn.com",
+//           "https://api.littleyarns.org",
+//         ],
+//       },
+//     },
+//   })
+// );
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -50,7 +50,6 @@ app.use(
     },
   })
 );
-
 // Registering the routes
 RegisterRoutes(app);
 

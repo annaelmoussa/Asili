@@ -5,18 +5,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaymentService = void 0;
 const stripe_1 = __importDefault(require("stripe"));
-const dotenv_1 = __importDefault(require("dotenv"));
 const Payment_1 = __importDefault(require("../models/Payment"));
-dotenv_1.default.config();
-if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error("STRIPE_SECRET_KEY is not defined in the environment variables");
-}
-const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2024-06-20",
-});
 class PaymentService {
     constructor() {
         this.baseUrl = process.env.BASE_URL || "http://localhost:8080";
+        const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+        if (!stripeSecretKey) {
+            throw new Error("STRIPE_SECRET_KEY is not defined in the environment variables");
+        }
+        this.stripe = new stripe_1.default(stripeSecretKey, {
+            apiVersion: "2024-06-20",
+        });
     }
     async createPayment(paymentInfo) {
         return Payment_1.default.create(paymentInfo);
@@ -34,7 +33,7 @@ class PaymentService {
             quantity: item.quantity,
         }));
         console.log(lineItems);
-        const session = await stripe.checkout.sessions.create({
+        const session = await this.stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             line_items: lineItems,
             mode: "payment",
