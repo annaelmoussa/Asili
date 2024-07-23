@@ -112,7 +112,7 @@ const routes: Array<RouteRecordRaw & { meta?: CustomRouteMeta }> = [
   {
     path: '/panel',
     component: PanelLayout,
-    meta: { requiresAuth: true, hideNavbar: true  },
+    meta: { requiresAuth: true, hideNavbar: true },
     children: [
       {
         path: 'dashboard',
@@ -170,7 +170,7 @@ const routes: Array<RouteRecordRaw & { meta?: CustomRouteMeta }> = [
         path: '/rgpd-manager',
         name: 'RGPDManager',
         component: RGPDManager,
-        meta: { requiresAuth: true, requiresAdmin: true }
+        meta: { requiresAdmin: true }
       },
       {
         path: 'payments',
