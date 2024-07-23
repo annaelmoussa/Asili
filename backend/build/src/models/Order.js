@@ -22,8 +22,9 @@ const OrderItem_1 = __importDefault(require("./OrderItem"));
 const Shipping_1 = __importDefault(require("./Shipping"));
 const Payment_1 = __importDefault(require("./Payment"));
 let Order = Order_1 = class Order extends sequelize_typescript_1.Model {
-    static async createMongoOrder(order) {
+    static async createMongoOrder(order, options) {
         try {
+            console.log('Order created:', order.toJSON());
             const orderWithDetails = await Order_1.findByPk(order.id, {
                 include: [
                     {
@@ -39,8 +40,10 @@ let Order = Order_1 = class Order extends sequelize_typescript_1.Model {
                         model: Payment_1.default,
                         as: 'payment'
                     }
-                ]
+                ],
+                transaction: options.transaction
             });
+            console.log('Order with details:', orderWithDetails?.toJSON());
             if (orderWithDetails) {
                 await MongoOrder_1.MongoOrder.create({
                     id: orderWithDetails.id,
@@ -50,7 +53,7 @@ let Order = Order_1 = class Order extends sequelize_typescript_1.Model {
                     status: orderWithDetails.status,
                     items: orderWithDetails.items?.map((item) => ({
                         id: item.id,
-                        productId: item.productId,
+                        productId: item.product?.id,
                         productName: item.product?.name,
                         productDescription: item.product?.description,
                         priceAtPurchase: item.priceAtPurchase,
@@ -147,7 +150,7 @@ __decorate([
 __decorate([
     sequelize_typescript_1.AfterCreate,
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Order]),
+    __metadata("design:paramtypes", [Order, Object]),
     __metadata("design:returntype", Promise)
 ], Order, "createMongoOrder", null);
 Order = Order_1 = __decorate([

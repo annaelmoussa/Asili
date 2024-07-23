@@ -84,7 +84,6 @@ export const useCartStore = defineStore('cart', {
       if (userStore.isAuthenticated && userStore.user?.id) {
         const existingItem = this.items.find((item) => item.product.id === product.id)
         if (existingItem) {
-          existingItem.quantity++
           await this.increment(existingItem.id)
         } else {
           await defaultApi.addItem({ productId: product.id, quantity: 1 })
@@ -127,6 +126,7 @@ export const useCartStore = defineStore('cart', {
 
       const userStore = useUserStore()
       if (userStore.isAuthenticated) {
+        console.log(item, item.quantity);
         const newQuantity = item.quantity + 1
         try {
           await defaultApi.updateItemQuantity(itemId, newQuantity)

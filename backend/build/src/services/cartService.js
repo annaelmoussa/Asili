@@ -32,15 +32,12 @@ class CartService {
                         { reservationExpires: { [sequelize_1.Op.gt]: new Date() } },
                     ],
                 },
-                include: [{
+                include: [
+                    {
                         model: Product_1.default,
                         as: "product",
-                        attributes: ['id', 'name', 'description', 'price', 'category', 'stock', 'image']
-                    }],
-                attributes: ['id', 'quantity'],
-                order: [
-                    [{ model: Product_1.default, as: 'product' }, 'name', 'ASC']
-                ]
+                    },
+                ],
             });
             console.log("Items fetched:", JSON.stringify(items, null, 2));
             return items;
@@ -82,7 +79,7 @@ class CartService {
                 transaction: t,
             });
             const newQuantity = item.quantity + quantity;
-            const stockReduction = quantity;
+            const stockReduction = quantity; // Only reduce stock by the new quantity added
             product.stock -= stockReduction;
             await product.save({ transaction: t });
             item.quantity = newQuantity;
@@ -113,6 +110,7 @@ class CartService {
             if (!product) {
                 throw new Error("Product not found");
             }
+            // We don't modify the stock here, as it will be handled by the stockReleaseQueue
             await item.destroy({ transaction: t });
             try {
                 await queues_1.reservationExpirationQueue.removeJobs(itemId);

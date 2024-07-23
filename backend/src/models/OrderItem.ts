@@ -5,8 +5,10 @@ import {
   DataType,
   ForeignKey,
   BelongsTo,
+  AfterCreate,
 } from "sequelize-typescript";
 import { IOrderItem } from "../interfaces/IOrder";
+import { MongoOrder } from "./MongoOrder";
 import Order from "./Order";
 import Product from "./Product";
 
@@ -53,6 +55,37 @@ export default class OrderItem extends Model<IOrderItem> implements IOrderItem {
 
   @BelongsTo(() => Product)
   product!: Product;
+
+  @AfterCreate
+  static async updateMongoOrder(orderItem: OrderItem): Promise<void> {
+    try {
+      const itemWithProduct = await OrderItem.findByPk(orderItem.id, {
+        include: [{ model: Product, as: 'product' }]
+      });
+
+      if (itemWithProduct && itemWithProduct.product) {
+        await MongoOrder.findOneAndUpdate(
+          { id: orderItem.orderId },
+          {
+            $push: {
+              items: {
+                id: itemWithProduct.id,
+                productId: itemWithProduct.productId,
+                productName: itemWithProduct.product.name,
+                productDescription: itemWithProduct.product.description,
+                priceAtPurchase: itemWithProduct.priceAtPurchase,
+                productImage: itemWithProduct.product.image,
+                quantity: itemWithProduct.quantity,
+              }
+            }
+          },
+          { new: true }
+        );
+      }
+    } catch (error) {
+      console.error('Error updating MongoOrder with new order item:', error);
+    }
+  }
 }
 
 export const associateOrderItem = (models: any) => {

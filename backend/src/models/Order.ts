@@ -79,60 +79,64 @@ export default class Order extends Model<IOrder> implements IOrder {
   payment?: Payment;
 
   @AfterCreate
-static async createMongoOrder(order: Order): Promise<void> {
-  try {
-    const orderWithDetails = await Order.findByPk(order.id, {
-      include: [
-        {
-          model: OrderItem,
-          as: 'items',
-          include: [{ model: Product, as: 'product' }]
-        },
-        {
-          model: Shipping,
-          as: 'shipping'
-        },
-        {
-          model: Payment,
-          as: 'payment'
-        }
-      ]
-    });
-
-    if (orderWithDetails) {
-      await MongoOrder.create({
-        id: orderWithDetails.id,
-        userId: orderWithDetails.userId,
-        stripeInvoiceId: orderWithDetails.stripeInvoiceId,
-        amount: orderWithDetails.amount,
-        status: orderWithDetails.status,
-        items: orderWithDetails.items?.map((item) => ({
-          id: item.id,
-          productId: item.productId,
-          productName: item.product?.name,
-          productDescription: item.product?.description,
-          priceAtPurchase: item.priceAtPurchase,
-          productImage: item.product?.image,
-          quantity: item.quantity,
-        })),
-        shipping: orderWithDetails.shipping ? {
-          id: orderWithDetails.shipping.id,
-          address: orderWithDetails.shipping.address,
-          status: orderWithDetails.shipping.status,
-          trackingNumber: orderWithDetails.shipping.trackingNumber
-        } : undefined,
-        payment: orderWithDetails.payment ? {
-          id: orderWithDetails.payment.id,
-          stripePaymentId: orderWithDetails.payment.stripePaymentId,
-          amount: orderWithDetails.payment.amount,
-          status: orderWithDetails.payment.status
-        } : undefined
+  static async createMongoOrder(order: Order, options: any): Promise<void> {
+    try {
+      console.log('Order created:', order.toJSON());
+      const orderWithDetails = await Order.findByPk(order.id, {
+        include: [
+          {
+            model: OrderItem,
+            as: 'items',
+            include: [{ model: Product, as: 'product' }]
+          },
+          {
+            model: Shipping,
+            as: 'shipping'
+          },
+          {
+            model: Payment,
+            as: 'payment'
+          }
+        ],
+        transaction: options.transaction
       });
+
+      console.log('Order with details:', orderWithDetails?.toJSON());
+
+      if (orderWithDetails) {
+        await MongoOrder.create({
+          id: orderWithDetails.id,
+          userId: orderWithDetails.userId,
+          stripeInvoiceId: orderWithDetails.stripeInvoiceId,
+          amount: orderWithDetails.amount,
+          status: orderWithDetails.status,
+          items: orderWithDetails.items?.map((item: any) => ({
+            id: item.id,
+            productId: item.product?.id,
+            productName: item.product?.name,
+            productDescription: item.product?.description,
+            priceAtPurchase: item.priceAtPurchase,
+            productImage: item.product?.image,
+            quantity: item.quantity,
+          })),
+          shipping: orderWithDetails.shipping ? {
+            id: orderWithDetails.shipping.id,
+            address: orderWithDetails.shipping.address,
+            status: orderWithDetails.shipping.status,
+            trackingNumber: orderWithDetails.shipping.trackingNumber
+          } : undefined,
+          payment: orderWithDetails.payment ? {
+            id: orderWithDetails.payment.id,
+            stripePaymentId: orderWithDetails.payment.stripePaymentId,
+            amount: orderWithDetails.payment.amount,
+            status: orderWithDetails.payment.status
+          } : undefined
+        });
+      }
+    } catch (error) {
+      console.error('Error creating MongoOrder:', error);
     }
-  } catch (error) {
-    console.error('Error creating MongoOrder:', error);
   }
-}
 }
 
 export const associateOrder = (models: any) => {
