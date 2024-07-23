@@ -14,6 +14,9 @@ export class AuthService {
     process.env.REFRESH_TOKEN_SECRET || "your_refresh_token_secret";
   private alertService: AlertService;
   private userService: UserService;
+  private baseUrl = process.env.VITE_API_BASE_URL || "http://localhost:3000";
+  private resetPasswordUrl =
+    process.env.RESET_PASSWORD_URL || "http://localhost:8080";
 
   constructor() {
     this.alertService = new AlertService();
@@ -39,7 +42,6 @@ export class AuthService {
     }
 
     const needsChange = await this.userService.shouldChangePassword(user.id);
-    // const needsChange = false;
 
     const payload: IJwtPayload = {
       id: user.id,
@@ -83,7 +85,7 @@ export class AuthService {
 
     await this.alertService.createAlertPreference(user.id);
 
-    const confirmationLink = `http://localhost:3000/auth/confirm?token=${confirmationToken}`;
+    const confirmationLink = `${this.baseUrl}/auth/confirm?token=${confirmationToken}`;
     await sendEmail(
       email,
       "Please confirm your account",
@@ -128,7 +130,7 @@ export class AuthService {
     user.confirmationToken = confirmationToken;
     await user.save();
 
-    const confirmationLink = `http://localhost:3000/auth/confirm?token=${confirmationToken}`;
+    const confirmationLink = `${this.baseUrl}/auth/confirm?token=${confirmationToken}`;
     await sendEmail(
       email,
       "Please confirm your account",
@@ -147,7 +149,7 @@ export class AuthService {
       expiresIn: "1h",
     });
 
-    const resetLink = `http://localhost:8080/reset-password?token=${token}`;
+    const resetLink = `${this.resetPasswordUrl}/reset-password?token=${token}`;
     const emailText = `Click here to reset your password: ${resetLink}`;
     const emailHtml = `<a href="${resetLink}">Click here to reset your password</a>`;
 
