@@ -34,6 +34,10 @@
       "notifyWhenPriceChanges": "Notifier quand le prix change",
       "outOfStock": "En rupture de stock"
     },
+    "categories": {
+      "unsubscribe": "Me désinscrire",
+      "subscribe": "M'inscrire"
+    },
     "contact": {
       "cta": "Contactez-nous",
       "heading": "Contact",

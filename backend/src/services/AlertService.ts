@@ -114,7 +114,7 @@ export class AlertService {
         await sendEmail(
           subscription.user.email,
           "Price Change Alert",
-          `The price of "${product.name}" has changed from $${oldPrice} to $${product.price}.`
+          `The price of "${product.name}" has changed from ${oldPrice}€ to ${product.price}€.`
         );
       }
     }

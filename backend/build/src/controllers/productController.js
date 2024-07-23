@@ -188,6 +188,7 @@ let ProductController = class ProductController extends tsoa_1.Controller {
                 return null;
             }
             if (updatedProduct) {
+                console.log("ouioui");
                 const refreshedProduct = await Product_1.default.findByPk(updatedProduct.id);
                 if (refreshedProduct) {
                     if (stock !== undefined && oldProduct && oldProduct.stock === 0 && refreshedProduct.stock > 0) {

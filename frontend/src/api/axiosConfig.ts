@@ -57,7 +57,6 @@ api.interceptors.response.use(
           notificationStore.showNotification('Validation error. Please check your input.', 'error')
           break
         case 500:
-          notificationStore.showNotification('Server error. Please try again later.', 'error')
           break
         default:
           notificationStore.showNotification(

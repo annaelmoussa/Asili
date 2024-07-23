@@ -40,6 +40,10 @@
       "notifyWhenPriceChanges": "Notify me when price changes",
       "outOfStock": "Out of stock"
     },
+    "categories": {
+      "unsubscribe": "Unfollow",
+      "subscribe": "Follow"
+    },
     "contact": {
       "cta": "Contact Us",
       "heading": "Contact",

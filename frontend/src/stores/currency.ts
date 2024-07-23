@@ -2,7 +2,7 @@ import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useCurrencyStore = defineStore('currency', () => {
-  const savedCurrency = localStorage.getItem('currency') || 'USD'
+  const savedCurrency = localStorage.getItem('currency') || 'EUR'
   const currency = ref(savedCurrency)
 
   const exchangeRates: { [key: string]: number } = {
