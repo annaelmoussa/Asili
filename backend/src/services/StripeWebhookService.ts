@@ -4,6 +4,7 @@ import { CartService } from './cartService';
 import { OrderService } from './orderService';
 import { ShippingService } from './ShippingService';
 import { PaymentService } from './paymentService';
+import { FakeApiLaPosteService } from "./FakeApiLaPosteService";
 import { MongoOrder } from '../models/MongoOrder';
 import dotenv from 'dotenv';
 
@@ -16,6 +17,7 @@ export class StripeWebhookService {
   private orderService: OrderService = new OrderService();
   private shippingService: ShippingService = new ShippingService();
   private paymentService: PaymentService = new PaymentService();
+  private fakeApiLaPosteService: FakeApiLaPosteService = new FakeApiLaPosteService();
 
   async handleWebhook(rawBody: Buffer, signature: string): Promise<void> {
     try {
@@ -72,7 +74,8 @@ export class StripeWebhookService {
     }
 
     console.log('creating shipping..');
-    const trackingNumber = this.generateTrackingNumber(userId);
+    const trackingNumber = await this.fakeApiLaPosteService.generateTrackingNumber();
+    console.log("trackingNumber => " + trackingNumber);
     const shipping = await this.shippingService.createShipping({
       orderId: order.id!,
       address: shippingAddress,

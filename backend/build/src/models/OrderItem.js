@@ -20,6 +20,7 @@ const Order_1 = __importDefault(require("./Order"));
 const Product_1 = __importDefault(require("./Product"));
 let OrderItem = OrderItem_1 = class OrderItem extends sequelize_typescript_1.Model {
     static async updateMongoOrder(orderItem) {
+        console.log('orderItem @AfterCreate');
         try {
             const itemWithProduct = await OrderItem_1.findByPk(orderItem.id, {
                 include: [{ model: Product_1.default, as: 'product' }]

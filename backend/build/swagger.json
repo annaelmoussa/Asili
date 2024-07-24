@@ -854,6 +854,7 @@
 				"required": [
 					"orderId",
 					"address",
+					"trackingNumber",
 					"status"
 				],
 				"type": "object",
@@ -3575,6 +3576,32 @@
 					{
 						"in": "path",
 						"name": "userId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/orders/tracking/{trackingNumber}": {
+			"get": {
+				"operationId": "GetTrackingInfo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "trackingNumber",
 						"required": true,
 						"schema": {
 							"type": "string"

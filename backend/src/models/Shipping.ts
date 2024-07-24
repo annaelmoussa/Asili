@@ -43,7 +43,7 @@ export default class Shipping extends Model<IShipping> implements IShipping {
     type: DataType.STRING,
     allowNull: true,
   })
-  trackingNumber?: string;
+  trackingNumber!: string;
 
   @Column({
     type: DataType.STRING,
@@ -52,22 +52,25 @@ export default class Shipping extends Model<IShipping> implements IShipping {
   status!: string;
 
   @AfterCreate
-  static async updateMongoOrder(shipping: Shipping): Promise<void> {
+  static async updateMongoOrder(shippingData: Shipping): Promise<void> {
+    console.log('Shipping @AfterCreate triggered');
+    console.log('Shipping data:', JSON.stringify(shippingData, null, 2));
     try {
-      await MongoOrder.findOneAndUpdate(
-        { id: shipping.orderId },
+      const result = await MongoOrder.findOneAndUpdate(
+        { id: shippingData.orderId },
         {
           $set: {
             shipping: {
-              id: shipping.id,
-              address: shipping.address,
-              status: shipping.status,
-              trackingNumber: shipping.trackingNumber
+              id: shippingData.id,
+              address: shippingData.address,
+              status: shippingData.status,
+              trackingNumber: shippingData.trackingNumber
             },
           }
         },
         { new: true }
       );
+      console.log('MongoDB update result:', JSON.stringify(result, null, 2));
     } catch (error) {
       console.error('Error updating MongoOrder with shipping info:', error);
     }

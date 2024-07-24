@@ -46,7 +46,7 @@ const adaptCartItemsToPaymentSessionRequest = (cartItems: any[]): PaymentSession
 const createPaymentSession = async () => {
   try {
     if (!userStore.user || !userStore.user.id) {
-      throw new Error("L'utilisateur n'est pas connecté ou l'ID de l'utilisateur est manquant")
+      throw new Error("Afin de procéder au paiement, veuillez vous connecter")
     }
 
     if (!stripePublicKey) {

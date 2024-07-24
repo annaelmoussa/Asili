@@ -27,7 +27,9 @@ const MongoOrderSchema = new mongoose_1.default.Schema({
     shipping: {
         id: String,
         address: String,
-        status: String
+        status: String,
+        orderId: String,
+        trackingNumber: String
     },
     payment: {
         id: String,

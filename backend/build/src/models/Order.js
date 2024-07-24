@@ -23,6 +23,7 @@ const Shipping_1 = __importDefault(require("./Shipping"));
 const Payment_1 = __importDefault(require("./Payment"));
 let Order = Order_1 = class Order extends sequelize_typescript_1.Model {
     static async createMongoOrder(order, options) {
+        console.log('Order @AfterCreate');
         try {
             console.log('Order created:', order.toJSON());
             const orderWithDetails = await Order_1.findByPk(order.id, {
@@ -51,6 +52,7 @@ let Order = Order_1 = class Order extends sequelize_typescript_1.Model {
                     stripeInvoiceId: orderWithDetails.stripeInvoiceId,
                     amount: orderWithDetails.amount,
                     status: orderWithDetails.status,
+                    createdAt: orderWithDetails.createdAt,
                     items: orderWithDetails.items?.map((item) => ({
                         id: item.id,
                         productId: item.product?.id,

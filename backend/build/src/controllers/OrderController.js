@@ -16,14 +16,19 @@ exports.OrderController = void 0;
 const tsoa_1 = require("tsoa");
 const orderService_1 = require("../services/orderService");
 const mongoOrderService_1 = require("../services/mongoOrderService");
+const ShippingService_1 = require("../services/ShippingService");
 let OrderController = class OrderController extends tsoa_1.Controller {
     constructor() {
         super(...arguments);
         this.orderService = new orderService_1.OrderService();
         this.mongoOrderService = new mongoOrderService_1.MongoOrderService();
+        this.shippingService = new ShippingService_1.ShippingService();
     }
     async getOrders(userId) {
         return this.orderService.getOrdersByUserId(userId);
+    }
+    async getTrackingInfo(trackingNumber) {
+        return this.shippingService.getTrackingInfo(trackingNumber);
     }
     async createOrder(requestBody) {
         this.setStatus(201);
@@ -51,6 +56,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], OrderController.prototype, "getOrders", null);
+__decorate([
+    (0, tsoa_1.Get)("tracking/{trackingNumber}"),
+    __param(0, (0, tsoa_1.Path)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], OrderController.prototype, "getTrackingInfo", null);
 __decorate([
     (0, tsoa_1.SuccessResponse)("201", "Order Created"),
     (0, tsoa_1.Post)("create"),

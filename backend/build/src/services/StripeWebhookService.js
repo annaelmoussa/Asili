@@ -10,6 +10,7 @@ const cartService_1 = require("./cartService");
 const orderService_1 = require("./orderService");
 const ShippingService_1 = require("./ShippingService");
 const paymentService_1 = require("./paymentService");
+const FakeApiLaPosteService_1 = require("./FakeApiLaPosteService");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
@@ -19,6 +20,7 @@ class StripeWebhookService {
         this.orderService = new orderService_1.OrderService();
         this.shippingService = new ShippingService_1.ShippingService();
         this.paymentService = new paymentService_1.PaymentService();
+        this.fakeApiLaPosteService = new FakeApiLaPosteService_1.FakeApiLaPosteService();
     }
     async handleWebhook(rawBody, signature) {
         try {
@@ -69,7 +71,8 @@ class StripeWebhookService {
             throw new Error('Something went wrong.');
         }
         console.log('creating shipping..');
-        const trackingNumber = this.generateTrackingNumber(userId);
+        const trackingNumber = await this.fakeApiLaPosteService.generateTrackingNumber();
+        console.log("trackingNumber => " + trackingNumber);
         const shipping = await this.shippingService.createShipping({
             orderId: order.id,
             address: shippingAddress,

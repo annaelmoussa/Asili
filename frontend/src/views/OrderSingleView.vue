@@ -8,8 +8,8 @@
       <Card class="mb-6">
         <CardHeader class="flex flex-col md:flex-row justify-between items-center">
           <div>
-            <h2 class="text-xl font-semibold">Commande #{{ order._id }}</h2>
-            <p class="text-sm text-gray-500">Commandé le : {{ formatDate(order._id) }}</p>
+            <h2 class="text-xl font-semibold">Commande #{{ order.id }}</h2>
+            <p class="text-sm text-gray-500">Commandé le : {{ formatDate(order.createdAt) }}</p>
           </div>
           <div class="text-right">
             <p class="text-lg font-semibold">Montant total : {{ formattedPrice(order.amount) }}</p>
@@ -22,7 +22,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
             <div>
               <h3 class="text-lg font-semibold mb-2">Adresse de livraison</h3>
-              <p>{{ order.shippingAddress || 'Non spécifiée' }}</p>
+              <p>{{ order.shipping?.address || 'Non spécifiée' }}</p>
             </div>
             <div>
               <h3 class="text-lg font-semibold mb-2">Informations de paiement</h3>
@@ -34,12 +34,31 @@
         </CardContent>
       </Card>
 
+      <Card class="mb-6" v-if="order?.shipping?.trackingNumber">
+        <CardHeader>
+          <h3 class="text-lg font-semibold">Informations de livraison</h3>
+        </CardHeader>
+        <CardContent>
+          <p>Numéro de suivi : {{ order.shipping.trackingNumber }}</p>
+          <div v-if="trackingInfo">
+            <p>Statut : {{ trackingInfo.status }}</p>
+            <p>Emplacement actuel : {{ trackingInfo.location }}</p>
+            <h4 class="mt-4 font-semibold">Historique :</h4>
+            <ul>
+              <li v-for="(event, index) in trackingInfo.history" :key="index">
+                {{ event.status }} - {{ event.location }} ({{ formatDate(event.timestamp.toISOString()) }})
+              </li>
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <h3 class="text-lg font-semibold">Articles commandés</h3>
         </CardHeader>
         <CardContent>
-          <div v-for="item in order.items" :key="item._id" class="flex items-start mb-4">
+          <div v-for="item in order.items" :key="item.id" class="flex items-start mb-4">
             <img
               :src="extractImageUrl(item.productImage)"
               alt="Product Image"
@@ -73,46 +92,82 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { extractImageUrl } from '@/utils/productUtils'
 
-// Define TypeScript interfaces for order and related properties
-interface OrderItem {
-  _id: string
-  productName: string
-  productImage: string
-  quantity: number
-  priceAtPurchase: number
-  productId: string
+interface IMongoOrder {
+  id: string;
+  userId: string;
+  stripeInvoiceId: string;
+  amount: number;
+  status: string;
+  createdAt: string,
+  items: {
+    id: string;
+    productId: string;
+    productName: string;
+    productDescription: string;
+    priceAtPurchase: number;
+    productImage: string;
+    quantity: number;
+  }[];
+  shipping?: {
+    id: string;
+    address: string;
+    status: string;
+    trackingNumber?: string;
+  };
+  payment?: {
+    id: string;
+    stripePaymentId: string;
+    amount: number;
+    status: string;
+  };
 }
 
-interface Payment {
-  stripePaymentId: string
-  status: string
-}
-
-interface Order {
-  _id: string
-  amount: number
-  status: string
-  shippingAddress: string
-  payment: Payment
-  items: OrderItem[]
+interface ITrackingInfo {
+  trackingCode: string;
+  status: string;
+  location: string;
+  timestamp: Date;
+  history: {
+    status: string;
+    location: string;
+    timestamp: Date;
+  }[];
 }
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
-const order = ref<Order | null>(null)
+const order = ref<IMongoOrder | null>(null)
 const isLoading = ref(true)
 const currencyStore = useCurrencyStore()
+const trackingInfo = ref<ITrackingInfo | null>(null);
+
+const fetchTrackingInfo = async () => {
+  if (order.value?.shipping?.trackingNumber) {
+    try {
+      const response = await defaultApi.getTrackingInfo(order.value.shipping.trackingNumber);
+      trackingInfo.value = response.data;
+    } catch (error) {
+      console.error('Failed to fetch tracking info:', error);
+    }
+  }
+};
 
 const formattedPrice = (price: number) => {
   return currencyStore.formattedPrice(price)
 }
 
-const formatDate = (id: string | undefined) => {
-  if (!id) return 'Date inconnue'
-  const timestamp = parseInt(id.substring(0, 8), 16) * 1000
-  return new Date(timestamp).toLocaleDateString()
-}
+const formatDate = (timestamp: string) => {
+  const date = new Date(timestamp);
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  };
+  return date.toLocaleDateString('fr-FR', options);
+};
 
 const handleReorder = (productId: string | undefined) => {
   if (productId === undefined) return
@@ -138,6 +193,7 @@ onMounted(async () => {
     const response = await defaultApi.getMongoOrder(orderId)
     order.value = response.data
     console.log('Order data:', order.value)
+    await fetchTrackingInfo();
   } catch (error) {
     console.error('Failed to fetch order details:', error)
   } finally {

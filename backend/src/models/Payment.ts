@@ -68,6 +68,7 @@ export default class Payment extends Model<IPayment> implements IPayment {
 
   @AfterCreate
   static async updateMongoOrder(payment: Payment): Promise<void> {
+    console.log('payment @AfterCreate');
     try {
       await MongoOrder.findOneAndUpdate(
         { id: payment.orderId },

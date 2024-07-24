@@ -3,6 +3,7 @@ import { OrderService } from "../services/orderService";
 import { IOrder } from "../interfaces/IOrder";
 import { IOrderItem } from "../interfaces/IOrderItem";
 import { MongoOrderService } from "../services/mongoOrderService";
+import { ShippingService } from "../services/ShippingService";
 
 interface OrderCreationRequest {
   userId: string;
@@ -21,10 +22,16 @@ interface OrderCreationRequest {
 export class OrderController extends Controller {
   private orderService: OrderService = new OrderService();
   private mongoOrderService: MongoOrderService = new MongoOrderService();
+  private shippingService: ShippingService = new ShippingService();
 
   @Get("get-orders/{userId}")
   public async getOrders(@Path() userId: string): Promise<IOrder[]> {
     return this.orderService.getOrdersByUserId(userId);
+  }
+
+  @Get("tracking/{trackingNumber}")
+  public async getTrackingInfo(@Path() trackingNumber: string): Promise<any> {
+    return this.shippingService.getTrackingInfo(trackingNumber);
   }
 
   @SuccessResponse("201", "Order Created")

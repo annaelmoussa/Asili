@@ -17,18 +17,21 @@ const sequelize_typescript_1 = require("sequelize-typescript");
 const MongoOrder_1 = require("./MongoOrder");
 const Order_1 = __importDefault(require("./Order"));
 let Shipping = class Shipping extends sequelize_typescript_1.Model {
-    static async updateMongoOrder(shipping) {
+    static async updateMongoOrder(shippingData) {
+        console.log('Shipping @AfterCreate triggered');
+        console.log('Shipping data:', JSON.stringify(shippingData, null, 2));
         try {
-            await MongoOrder_1.MongoOrder.findOneAndUpdate({ id: shipping.orderId }, {
+            const result = await MongoOrder_1.MongoOrder.findOneAndUpdate({ id: shippingData.orderId }, {
                 $set: {
                     shipping: {
-                        id: shipping.id,
-                        address: shipping.address,
-                        status: shipping.status,
-                        trackingNumber: shipping.trackingNumber
+                        id: shippingData.id,
+                        address: shippingData.address,
+                        status: shippingData.status,
+                        trackingNumber: shippingData.trackingNumber
                     },
                 }
             }, { new: true });
+            console.log('MongoDB update result:', JSON.stringify(result, null, 2));
         }
         catch (error) {
             console.error('Error updating MongoOrder with shipping info:', error);

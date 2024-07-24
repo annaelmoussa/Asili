@@ -19,6 +19,7 @@ const Order_1 = __importDefault(require("./Order"));
 const MongoOrder_1 = require("./MongoOrder");
 let Payment = class Payment extends sequelize_typescript_1.Model {
     static async updateMongoOrder(payment) {
+        console.log('payment @AfterCreate');
         try {
             await MongoOrder_1.MongoOrder.findOneAndUpdate({ id: payment.orderId }, {
                 $set: {

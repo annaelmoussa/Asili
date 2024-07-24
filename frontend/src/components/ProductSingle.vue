@@ -20,15 +20,15 @@
         <div class="price-stock-container">
           <span class="product-price-detail">{{ formattedPrice }}</span>
         </div>
-        <div class="flex flex-col gap-y-3.5 w-1/2">
+        <div class="flex flex-col gap-y-3.5 w-1/4">
           <Button @click="addToCart" class="add-to-cart-detail" :disabled="product.stock <= 0">
             <i class="pi pi-shopping-cart"></i>
             <span class="ml-4">{{ $t('app.products.addToCart') }}</span>
           </Button>
-          <Button @click="togglePriceChangeSubscription" :variant="isPriceChangeSubscribed ? 'destructive' : 'default'">
+          <Button v-if="user.isAuthenticated" @click="togglePriceChangeSubscription" :variant="isPriceChangeSubscribed ? 'destructive' : 'default'">
               {{ isPriceChangeSubscribed ? $t('app.products.unsubscribeFromPriceChange') : $t('app.products.notifyWhenPriceChanges') }}
-            </Button>
-            <Button v-if="product.stock <= 0" @click="toggleRestockSubscription" :variant="isSubscribed ? 'destructive' : 'default'">
+          </Button>
+          <Button v-if="user.isAuthenticated && product.stock <= 0" @click="toggleRestockSubscription" :variant="isSubscribed ? 'destructive' : 'default'">
             {{ isSubscribed ? $t('app.products.unsubscribeFromRestock') : $t('app.products.notifyWhenInStock') }}
           </Button>
         </div>
@@ -54,17 +54,18 @@ import { useI18n } from 'vue-i18n'
 import { extractImageUrl } from '@/utils/productUtils'
 import { Button } from '@/components/ui/button'
 import { toast } from '@/components/ui/toast'
+import { useUserStore } from "@/stores/user";
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const user = useUserStore()
 const product = ref<IProduct | null>(null)
 const isLoading = ref(true)
 const currencyStore = useCurrencyStore()
 const messageVisible = ref(false)
 const messageText = ref('')
-const cart = useCartStore()
-
+const cart = useCartStore();
 
 const isSubscribed = ref(false);
 const isPriceChangeSubscribed = ref(false);
@@ -82,10 +83,12 @@ onMounted(async () => {
     const productId = route.params.productId as string;
     const response = await defaultApi.getProduct(productId);
     product.value = response.data;
-    const subscriptionStatus = await defaultApi.checkProductRestockSubscription(productId);
-    isSubscribed.value = subscriptionStatus.data.isSubscribed;
-    const priceChangeSubscriptionStatus = await defaultApi.checkProductPriceChangeSubscription(productId);
-    isPriceChangeSubscribed.value = priceChangeSubscriptionStatus.data.isSubscribed;
+    if (user.isAuthenticated) {
+      const subscriptionStatus = await defaultApi.checkProductRestockSubscription(productId);
+      isSubscribed.value = subscriptionStatus.data.isSubscribed;
+      const priceChangeSubscriptionStatus = await defaultApi.checkProductPriceChangeSubscription(productId);
+      isPriceChangeSubscribed.value = priceChangeSubscriptionStatus.data.isSubscribed;
+    }
   } catch (error) {
     console.error('Failed to fetch product details:', error)
   } finally {

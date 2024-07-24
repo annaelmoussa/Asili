@@ -80,6 +80,7 @@ export default class Order extends Model<IOrder> implements IOrder {
 
   @AfterCreate
   static async createMongoOrder(order: Order, options: any): Promise<void> {
+    console.log('Order @AfterCreate');
     try {
       console.log('Order created:', order.toJSON());
       const orderWithDetails = await Order.findByPk(order.id, {
@@ -110,6 +111,7 @@ export default class Order extends Model<IOrder> implements IOrder {
           stripeInvoiceId: orderWithDetails.stripeInvoiceId,
           amount: orderWithDetails.amount,
           status: orderWithDetails.status,
+          createdAt: orderWithDetails.createdAt,
           items: orderWithDetails.items?.map((item: any) => ({
             id: item.id,
             productId: item.product?.id,

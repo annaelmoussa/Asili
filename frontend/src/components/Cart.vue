@@ -62,7 +62,11 @@
           <span>{{ $t('app.payment.totalAmount') }}</span>
           <span>{{ formattedTotalPrice }}</span>
         </div>
-        <button @click="goToPayment" class="checkout-btn">
+        <button
+            @click="goToPayment"
+            class="checkout-btn"
+            :class="{ 'p-disabled': !user.isAuthenticated }"
+        >
           {{ $t('app.payment.proceedToPayment') }}
         </button>
       </div>
@@ -111,7 +115,9 @@ const showMessage = (key: string) => {
 }
 
 const goToPayment = () => {
-  router.push({ name: 'StripeCheckoutRedirect' })
+  if (user.isAuthenticated) {
+    router.push({ name: 'StripeCheckoutRedirect' })
+  }
 }
 
 const increment = async (itemId: string) => {
@@ -319,7 +325,7 @@ onUnmounted(() => {
 }
 
 .checkout-btn:hover {
-  background-color: #0d9668;
+  background-color: #4b5ecc;
 }
 
 .message {

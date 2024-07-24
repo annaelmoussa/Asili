@@ -361,7 +361,7 @@ const models = {
             "id": { "dataType": "string" },
             "orderId": { "dataType": "string", "required": true },
             "address": { "dataType": "string", "required": true },
-            "trackingNumber": { "dataType": "string" },
+            "trackingNumber": { "dataType": "string", "required": true },
             "status": { "dataType": "string", "required": true },
         },
         "additionalProperties": false,
@@ -2072,6 +2072,29 @@ function RegisterRoutes(app, opts) {
             const controller = new OrderController_1.OrderController();
             await templateService.apiHandler({
                 methodName: 'getOrders',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    app.get('/orders/tracking/:trackingNumber', ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController)), ...((0, runtime_1.fetchMiddlewares)(OrderController_1.OrderController.prototype.getTrackingInfo)), async function OrderController_getTrackingInfo(request, response, next) {
+        const args = {
+            trackingNumber: { "in": "path", "name": "trackingNumber", "required": true, "dataType": "string" },
+        };
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        let validatedArgs = [];
+        try {
+            validatedArgs = templateService.getValidatedArgs({ args, request, response });
+            const controller = new OrderController_1.OrderController();
+            await templateService.apiHandler({
+                methodName: 'getTrackingInfo',
                 controller,
                 response,
                 next,

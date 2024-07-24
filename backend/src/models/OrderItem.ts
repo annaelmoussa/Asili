@@ -58,6 +58,7 @@ export default class OrderItem extends Model<IOrderItem> implements IOrderItem {
 
   @AfterCreate
   static async updateMongoOrder(orderItem: OrderItem): Promise<void> {
+    console.log('orderItem @AfterCreate');
     try {
       const itemWithProduct = await OrderItem.findByPk(orderItem.id, {
         include: [{ model: Product, as: 'product' }]

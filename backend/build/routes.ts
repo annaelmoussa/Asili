@@ -365,7 +365,7 @@ const models: TsoaRoute.Models = {
             "id": {"dataType":"string"},
             "orderId": {"dataType":"string","required":true},
             "address": {"dataType":"string","required":true},
-            "trackingNumber": {"dataType":"string"},
+            "trackingNumber": {"dataType":"string","required":true},
             "status": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
@@ -2629,6 +2629,36 @@ export function RegisterRoutes(app: Router,opts?:{multer?:ReturnType<typeof mult
 
               await templateService.apiHandler({
                 methodName: 'getOrders',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/orders/tracking/:trackingNumber',
+            ...(fetchMiddlewares<RequestHandler>(OrderController)),
+            ...(fetchMiddlewares<RequestHandler>(OrderController.prototype.getTrackingInfo)),
+
+            async function OrderController_getTrackingInfo(request: ExRequest, response: ExResponse, next: any) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                    trackingNumber: {"in":"path","name":"trackingNumber","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+
+                const controller = new OrderController();
+
+              await templateService.apiHandler({
+                methodName: 'getTrackingInfo',
                 controller,
                 response,
                 next,
