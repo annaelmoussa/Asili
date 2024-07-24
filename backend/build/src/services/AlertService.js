@@ -89,7 +89,7 @@ class AlertService {
         });
         for (const subscription of subscriptions) {
             if (subscription.user && subscription.user.alertPreferences) {
-                await (0, emailService_1.default)(subscription.user.email, "Price Change Alert", `The price of "${product.name}" has changed from $${oldPrice} to $${product.price}.`);
+                await (0, emailService_1.default)(subscription.user.email, "Price Change Alert", `The price of "${product.name}" has changed from ${oldPrice}€ to ${product.price}€.`);
             }
         }
     }
