@@ -9,7 +9,7 @@
         <CardHeader class="flex flex-col md:flex-row justify-between items-center">
           <div>
             <h2 class="text-xl font-semibold">Commande #{{ order.id }}</h2>
-            <p class="text-sm text-gray-500">Commandé le : {{ formatDate(order.createdAt) }}</p>
+            <p class="text-sm text-gray-500">Commandé le : {{ order.createdAt }}</p>
           </div>
           <div class="text-right">
             <p class="text-lg font-semibold">Montant total : {{ formattedPrice(order.amount) }}</p>
@@ -46,7 +46,7 @@
             <h4 class="mt-4 font-semibold">Historique :</h4>
             <ul>
               <li v-for="(event, index) in trackingInfo.history" :key="index">
-                {{ event.status }} - {{ event.location }} ({{ formatDate(event.timestamp.toISOString()) }})
+                {{ event.status }} - {{ event.location }} ({{ event.timestamp }})
               </li>
             </ul>
           </div>
@@ -93,45 +93,45 @@ import { Button } from '@/components/ui/button'
 import { extractImageUrl } from '@/utils/productUtils'
 
 interface IMongoOrder {
-  id: string;
-  userId: string;
-  stripeInvoiceId: string;
-  amount: number;
-  status: string;
-  createdAt: string,
+  id: string
+  userId: string
+  stripeInvoiceId: string
+  amount: number
+  status: string
+  createdAt: string
   items: {
-    id: string;
-    productId: string;
-    productName: string;
-    productDescription: string;
-    priceAtPurchase: number;
-    productImage: string;
-    quantity: number;
-  }[];
+    id: string
+    productId: string
+    productName: string
+    productDescription: string
+    priceAtPurchase: number
+    productImage: string
+    quantity: number
+  }[]
   shipping?: {
-    id: string;
-    address: string;
-    status: string;
-    trackingNumber?: string;
-  };
+    id: string
+    address: string
+    status: string
+    trackingNumber?: string
+  }
   payment?: {
-    id: string;
-    stripePaymentId: string;
-    amount: number;
-    status: string;
-  };
+    id: string
+    stripePaymentId: string
+    amount: number
+    status: string
+  }
 }
 
 interface ITrackingInfo {
-  trackingCode: string;
-  status: string;
-  location: string;
-  timestamp: Date;
+  trackingCode: string
+  status: string
+  location: string
+  timestamp: Date
   history: {
-    status: string;
-    location: string;
-    timestamp: Date;
-  }[];
+    status: string
+    location: string
+    timestamp: Date
+  }[]
 }
 
 const { t } = useI18n()
@@ -140,34 +140,22 @@ const router = useRouter()
 const order = ref<IMongoOrder | null>(null)
 const isLoading = ref(true)
 const currencyStore = useCurrencyStore()
-const trackingInfo = ref<ITrackingInfo | null>(null);
+const trackingInfo = ref<ITrackingInfo | null>(null)
 
 const fetchTrackingInfo = async () => {
   if (order.value?.shipping?.trackingNumber) {
     try {
-      const response = await defaultApi.getTrackingInfo(order.value.shipping.trackingNumber);
-      trackingInfo.value = response.data;
+      const response = await defaultApi.getTrackingInfo(order.value.shipping.trackingNumber)
+      trackingInfo.value = response.data
     } catch (error) {
-      console.error('Failed to fetch tracking info:', error);
+      console.error('Failed to fetch tracking info:', error)
     }
   }
-};
+}
 
 const formattedPrice = (price: number) => {
   return currencyStore.formattedPrice(price)
 }
-
-const formatDate = (timestamp: string) => {
-  const date = new Date(timestamp);
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  };
-  return date.toLocaleDateString('fr-FR', options);
-};
 
 const handleReorder = (productId: string | undefined) => {
   if (productId === undefined) return
@@ -193,7 +181,7 @@ onMounted(async () => {
     const response = await defaultApi.getMongoOrder(orderId)
     order.value = response.data
     console.log('Order data:', order.value)
-    await fetchTrackingInfo();
+    await fetchTrackingInfo()
   } catch (error) {
     console.error('Failed to fetch order details:', error)
   } finally {

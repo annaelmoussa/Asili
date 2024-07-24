@@ -11,9 +11,11 @@ const orderService_1 = require("./orderService");
 const ShippingService_1 = require("./ShippingService");
 const paymentService_1 = require("./paymentService");
 const FakeApiLaPosteService_1 = require("./FakeApiLaPosteService");
-const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
-const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
+const stripeSecret = process.env.SECRET_KEY ??
+    "sk_test_51PNYtAHbf3sdXCnMoA4cC38iQtbdGIlNMSnNQzROT5jPbgpZbEb0T9yuH8ckgespAkcA9YIGTpdkerkY5XQFNT5W00tv0XHsXE";
+const stripe = new stripe_1.default(stripeSecret, {
+    apiVersion: "2024-06-20",
+});
 class StripeWebhookService {
     constructor() {
         this.cartService = new cartService_1.CartService();
@@ -24,51 +26,52 @@ class StripeWebhookService {
     }
     async handleWebhook(rawBody, signature) {
         try {
-            const webhookSecret = process.env.STRIPE_WEBHOOK_SIGNING_SECRET_KEY;
+            const webhookSecret = process.env.STRIPE_WEBHOOK_SIGNING_SECRET_KEY ??
+                "whsec_4DtZNQHdfGCtzDpz4tLbJgXE805pjq8H";
             const event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
-            console.log('Received event:', event.type);
-            if (event.type === 'checkout.session.completed') {
-                console.log('Processing checkout.session.completed');
+            console.log("Received event:", event.type);
+            if (event.type === "checkout.session.completed") {
+                console.log("Processing checkout.session.completed");
                 await this.handleSuccessfulPayment(event.data.object);
-                console.log('Payment processed successfully');
+                console.log("Payment processed successfully");
             }
         }
         catch (error) {
-            console.error('Error processing webhook:', error);
+            console.error("Error processing webhook:", error);
             throw error;
         }
     }
     async handleSuccessfulPayment(session) {
         const userId = session.metadata?.userId;
         if (!userId) {
-            throw new Error('User ID not found in session metadata');
+            throw new Error("User ID not found in session metadata");
         }
         const cartId = await this.cartService.getCartIdByUserId(userId);
         if (!cartId) {
-            throw new Error('Création de commande impossible car aucun article dans le panier.');
+            throw new Error("Création de commande impossible car aucun article dans le panier.");
         }
         const cartItems = await this.cartService.getCartItems(cartId);
         console.log(cartItems);
-        const orderItems = cartItems.map(item => ({
+        const orderItems = cartItems.map((item) => ({
             productId: item.product?.id,
             quantity: item.quantity,
-            priceAtPurchase: item.product?.price
+            priceAtPurchase: item.product?.price,
         }));
         console.log(orderItems);
         const shippingAddress = this.formatShippingAddress(session.shipping_details?.address);
-        console.log('creating order..');
+        console.log("creating order..");
         const order = await this.orderService.createOrder({
             userId: userId,
             stripeInvoiceId: session.payment_intent,
             amount: session.amount_total / 100,
-            status: 'paid',
+            status: "paid",
             shippingAddress: shippingAddress,
         }, orderItems);
         if (!order) {
-            throw new Error('Error creating Order.');
+            throw new Error("Error creating Order.");
         }
         else if (!order.id) {
-            throw new Error('Something went wrong.');
+            throw new Error("Something went wrong.");
         }
         console.log('creating shipping..');
         const trackingNumber = await this.fakeApiLaPosteService.generateTrackingNumber();
@@ -76,38 +79,38 @@ class StripeWebhookService {
         const shipping = await this.shippingService.createShipping({
             orderId: order.id,
             address: shippingAddress,
-            status: 'Pending',
-            trackingNumber: trackingNumber
+            status: "Pending",
+            trackingNumber: trackingNumber,
         });
-        console.log('creating payment..');
+        console.log("creating payment..");
         const payment = await this.paymentService.createPayment({
             userId: userId,
             orderId: order.id,
             stripePaymentId: session.payment_intent,
             amount: session.amount_total / 100,
-            status: 'Completed',
-            createdAt: Date()
+            status: "Completed",
+            createdAt: Date(),
         });
-        console.log('Payment successful for session:', session.id);
+        console.log("Payment successful for session:", session.id);
         await this.cartService.clearCart(userId);
     }
     generateTrackingNumber(userId) {
         const timestamp = Date.now();
-        const randomBytes = crypto_1.default.randomBytes(4).toString('hex');
+        const randomBytes = crypto_1.default.randomBytes(4).toString("hex");
         return `TRK-${userId}-${timestamp}-${randomBytes}`;
     }
     formatShippingAddress(address) {
         if (!address)
-            return 'Address not provided';
+            return "Address not provided";
         const parts = [
             address.line1,
             address.line2,
             address.city,
             address.state,
             address.postal_code,
-            address.country
+            address.country,
         ].filter(Boolean);
-        return parts.join(', ');
+        return parts.join(", ");
     }
 }
 exports.StripeWebhookService = StripeWebhookService;
