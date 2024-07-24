@@ -17,9 +17,6 @@ const corsOptions = {
     origin: isProd ? "https://littleyarns.org" : "http://localhost:8080",
     credentials: true,
 };
-exports.app.use("/stripe-webhook", body_parser_1.default.raw({ type: "application/json" }));
-exports.app.use(body_parser_1.default.json());
-exports.app.use(body_parser_1.default.urlencoded({ extended: true }));
 // Middleware Configuration
 exports.app.use((0, helmet_1.default)({
     contentSecurityPolicy: {
@@ -34,10 +31,16 @@ exports.app.use((0, helmet_1.default)({
         },
     },
 }));
+// Special handling for Stripe webhook route
+exports.app.use("/stripe-webhook", express_1.default.raw({ type: "application/json" }), (0, cors_1.default)({ origin: "*" }) // Allow Stripe to call from any origin
+);
+// General CORS for other routes
 exports.app.use((0, cors_1.default)(corsOptions));
+// Body parsing for other routes
+exports.app.use(body_parser_1.default.json());
+exports.app.use(body_parser_1.default.urlencoded({ extended: true }));
 exports.app.use(express_1.default.urlencoded({ extended: true }));
 exports.app.use(express_1.default.json());
-// app.use("/auth/login", loginRateLimiter);
 exports.app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "..", "uploads"), {
     dotfiles: "deny",
     index: false,
