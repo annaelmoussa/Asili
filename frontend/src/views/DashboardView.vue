@@ -186,7 +186,7 @@ const removeWidget = async (id: string) => {
     console.log('Widget removed successfully')
   } catch (error) {
     console.error('Failed to remove widget:', error)
-    throw error // Propager l'erreur pour que DeleteButton puisse la gérer
+    throw error
   }
 }
 

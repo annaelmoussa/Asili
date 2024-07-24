@@ -90,7 +90,7 @@ export class CartController extends Controller {
     const userRole = request.user.role;
 
     if (userRole === "ROLE_ADMIN") {
-      return; // Admins are always authorized
+      return; 
     }
 
     const cartItem = await this.cartService.getCartItemById(itemId);

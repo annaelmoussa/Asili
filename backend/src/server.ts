@@ -1,4 +1,4 @@
-import { app } from "./app"; // Import the Express application
+import { app } from "./app";
 import db from "./models";
 import { runSeeders } from "./seeders";
 import { Umzug, SequelizeStorage } from "umzug";
@@ -81,14 +81,14 @@ startServer().catch((error) => {
   process.exit(1);
 });
 
-// Gestion des erreurs non capturées
+
 process.on("unhandledRejection", (reason, promise) => {
   console.error("Unhandled Rejection at:", promise, "reason:", reason);
-  // Application specific logging, throwing an error, or other logic here
+  
 });
 
 process.on("uncaughtException", (error) => {
   console.error("Uncaught Exception thrown:", error);
-  // Application specific logging, throwing an error, or other logic here
+  
   process.exit(1);
 });

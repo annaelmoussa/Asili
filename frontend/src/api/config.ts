@@ -1,4 +1,3 @@
-// api/config.ts
 import { Configuration, DefaultApi, AuthApi, WidgetsApi, UserApi, RGPDApi } from './index'
 import api from './axiosConfig'
 

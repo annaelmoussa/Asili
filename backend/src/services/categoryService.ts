@@ -1,4 +1,3 @@
-// services/categoryService.ts
 import Category from "../models/Category";
 import { ICategory, CategoryCreationParams } from "../interfaces/ICategory";
 import { Sequelize, Transaction } from "sequelize";
@@ -59,7 +58,6 @@ export class CategoryService {
       options?.transaction || (await this.sequelize.transaction());
 
     try {
-      // Vérifier si des produits sont associés à cette catégorie
       const productsCount = await Product.count({
         where: { categoryId: id },
         transaction,

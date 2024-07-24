@@ -1,5 +1,3 @@
-// src/stores/cart.ts
-
 import { defineStore } from 'pinia'
 import { useUserStore } from './user'
 import { defaultApi } from '@/api/config'
@@ -126,7 +124,7 @@ export const useCartStore = defineStore('cart', {
 
       const userStore = useUserStore()
       if (userStore.isAuthenticated) {
-        console.log(item, item.quantity);
+        console.log(item, item.quantity)
         const newQuantity = item.quantity + 1
         try {
           await defaultApi.updateItemQuantity(itemId, newQuantity)

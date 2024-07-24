@@ -14,7 +14,6 @@ const corsOptions = {
   credentials: true,
 };
 
-// Middleware Configuration
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -31,17 +30,17 @@ app.use(
   })
 );
 
-// Special handling for Stripe webhook route
+
 app.use(
   "/stripe-webhook",
   express.raw({ type: "application/json" }),
-  cors({ origin: "*" }) // Allow Stripe to call from any origin
+  cors({ origin: "*" }) 
 );
 
-// General CORS for other routes
+
 app.use(cors(corsOptions));
 
-// Body parsing for other routes
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -60,8 +59,7 @@ app.use(
   })
 );
 
-// Registering the routes
+
 RegisterRoutes(app);
 
-// Error handling
 app.use(errorHandler);

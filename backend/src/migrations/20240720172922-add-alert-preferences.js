@@ -1,9 +1,8 @@
-'use strict';
+"use strict";
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // Création de la table AlertPreference
-    await queryInterface.createTable('AlertPreference', {
+    await queryInterface.createTable("AlertPreference", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -13,11 +12,11 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'User',
-          key: 'id',
+          model: "User",
+          key: "id",
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
       },
       newProductInCategory: {
         type: Sequelize.BOOLEAN,
@@ -51,7 +50,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    // Suppression de la table AlertPreference
-    await queryInterface.dropTable('AlertPreference');
-  }
+    await queryInterface.dropTable("AlertPreference");
+  },
 };

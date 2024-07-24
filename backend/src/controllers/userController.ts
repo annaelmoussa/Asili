@@ -90,7 +90,7 @@ export class UserController extends Controller {
     const userRole = request.user.role;
 
     if (userRole === "ROLE_ADMIN") {
-      return; // Admins are always authorized
+      return; 
     }
 
     if (requestingUserId !== userId) {

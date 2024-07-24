@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('NewsletterSubscription', {
+    await queryInterface.createTable("NewsletterSubscription", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -29,14 +29,13 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-      }
+      },
     });
 
-    // Optionally, you can add an index on the email column for faster lookups
-    await queryInterface.addIndex('NewsletterSubscription', ['email']);
+    await queryInterface.addIndex("NewsletterSubscription", ["email"]);
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('NewsletterSubscription');
-  }
+    await queryInterface.dropTable("NewsletterSubscription");
+  },
 };

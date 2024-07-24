@@ -12,13 +12,15 @@
             {{ category.name }}
           </option>
         </select>
-        <button 
+        <button
           v-if="selectedCategory"
           @click="toggleCategorySubscription"
           class="subscribe-button"
-          :class="{ 'subscribed': isCategorySubscribed }"
+          :class="{ subscribed: isCategorySubscribed }"
         >
-          {{ isCategorySubscribed ? $t('app.categories.unsubscribe') : $t('app.categories.subscribe') }}
+          {{
+            isCategorySubscribed ? $t('app.categories.unsubscribe') : $t('app.categories.subscribe')
+          }}
         </button>
       </div>
 
@@ -116,7 +118,9 @@ function initializeFilters() {
   } = route.query
 
   searchQuery.value = (query as string) || ''
-  selectedCategory.value = category ? categories.value.find(c => c.name === category) as { id: string; name: string } || null : null
+  selectedCategory.value = category
+    ? (categories.value.find((c) => c.name === category) as { id: string; name: string }) || null
+    : null
   selectedBrand.value = (brand as string) || ''
   minPrice.value = minPriceParam ? Number(minPriceParam) : null
   maxPrice.value = maxPriceParam ? Number(maxPriceParam) : null
@@ -130,7 +134,6 @@ onMounted(() => {
   performSearch()
 })
 
-// Watch for route changes
 watch(
   () => route.query,
   () => {
@@ -143,11 +146,11 @@ watch(
 async function loadCategoriesAndBrands() {
   try {
     const categoriesResponse = await defaultApi.getCategoriesWithId()
-    categories.value = categoriesResponse.data.map(category => ({
+    categories.value = categoriesResponse.data.map((category) => ({
       id: category.id,
       name: category.name
     }))
-    console.log(JSON.stringify(categoriesResponse),"porto")
+    console.log(JSON.stringify(categoriesResponse), 'porto')
 
     const brandsResponse = await defaultApi.getBrands()
     brands.value = brandsResponse.data
@@ -195,7 +198,7 @@ async function updateSearch() {
   } else {
     isCategorySubscribed.value = false
   }
-  // Remove undefined values
+
   Object.keys(query).forEach((key) => query[key] === undefined && delete query[key])
 
   router.push({ name: 'search', query })
@@ -208,10 +211,12 @@ function goToProductPage(productId: string) {
 async function checkCategorySubscription() {
   if (selectedCategory.value) {
     try {
-      const response = await defaultApi.checkCategoryNewProductsSubscription(selectedCategory.value.id)
+      const response = await defaultApi.checkCategoryNewProductsSubscription(
+        selectedCategory.value.id
+      )
       isCategorySubscribed.value = response.data.isSubscribed
     } catch (error) {
-      console.error('Erreur lors de la vérification de l\'abonnement à la catégorie:', error)
+      console.error("Erreur lors de la vérification de l'abonnement à la catégorie:", error)
     }
   } else {
     isCategorySubscribed.value = false
@@ -227,31 +232,35 @@ async function toggleCategorySubscription() {
       isCategorySubscribed.value = false
       toast({
         title: t('app.categories.unsubscribeSuccess'),
-        description: t('app.categories.unsubscribeMessage', { category: selectedCategory.value.name }),
-        duration: 3000,
+        description: t('app.categories.unsubscribeMessage', {
+          category: selectedCategory.value.name
+        }),
+        duration: 3000
       })
     } else {
       await defaultApi.subscribeToCategoryNewProducts(selectedCategory.value.id)
       isCategorySubscribed.value = true
       toast({
         title: t('app.categories.subscribeSuccess'),
-        description: t('app.categories.subscribeMessage', { category: selectedCategory.value.name }),
-        duration: 3000,
+        description: t('app.categories.subscribeMessage', {
+          category: selectedCategory.value.name
+        }),
+        duration: 3000
       })
     }
   } catch (error) {
-    console.error('Erreur lors de la modification de l\'abonnement à la catégorie:', error)
+    console.error("Erreur lors de la modification de l'abonnement à la catégorie:", error)
     toast({
       title: t('app.categories.subscribeError'),
       description: t('app.categories.subscribeErrorMessage'),
-      variant: "destructive",
-      duration: 3000,
+      variant: 'destructive',
+      duration: 3000
     })
   }
 }
 
 function getCategoryName(categoryId: string): string {
-  const category = categories.value.find(c => c.id === categoryId)
+  const category = categories.value.find((c) => c.id === categoryId)
   return category ? category.name : ''
 }
 

@@ -1,22 +1,24 @@
-  import nodemailer from 'nodemailer';
-import SentEmail from '../models/SentEmail';
+import nodemailer from "nodemailer";
+import SentEmail from "../models/SentEmail";
 
-// Create a transporter using your Google account credentials
 const transporter = nodemailer.createTransport({
-    service: "Gmail",
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: "no.reply.sportco@gmail.com",
-      pass: "lvwfpjviseqxuulk",
-    },
-  });
+  service: "Gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "no.reply.sportco@gmail.com",
+    pass: "lvwfpjviseqxuulk",
+  },
+});
 
-// Function to send an email
-async function sendEmail(to: string, subject: string, text: string, html?: string) {
+async function sendEmail(
+  to: string,
+  subject: string,
+  text: string,
+  html?: string
+) {
   try {
-    // Send mail with defined transport object
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to,
@@ -25,7 +27,6 @@ async function sendEmail(to: string, subject: string, text: string, html?: strin
       html,
     });
 
-    // Log the email in the database
     await SentEmail.create({
       to,
       subject,
@@ -34,14 +35,14 @@ async function sendEmail(to: string, subject: string, text: string, html?: strin
       sentAt: new Date(),
     });
 
-    console.log('Email sent and logged successfully');
+    console.log("Email sent and logged successfully");
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error('Error sending email:', error.message);
+      console.error("Error sending email:", error.message);
     } else {
-      console.error('Unknown error sending email');
+      console.error("Unknown error sending email");
     }
   }
-  }
-  
-  export default sendEmail;
+}
+
+export default sendEmail;

@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('ProductSubscription', {
+    await queryInterface.createTable("ProductSubscription", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -12,31 +12,31 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'User',
-          key: 'id',
+          model: "User",
+          key: "id",
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
       },
       productId: {
         type: Sequelize.UUID,
         allowNull: true,
         references: {
-          model: 'Product',
-          key: 'id',
+          model: "Product",
+          key: "id",
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
       },
       categoryId: {
         type: Sequelize.UUID,
         allowNull: true,
         references: {
-          model: 'Category',
-          key: 'id',
+          model: "Category",
+          key: "id",
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
       },
       notifyRestock: {
         type: Sequelize.BOOLEAN,
@@ -63,11 +63,14 @@ module.exports = {
       },
     });
 
-    // Ajout d'un index composite pour améliorer les performances des requêtes
-    await queryInterface.addIndex('ProductSubscription', ['userId', 'productId', 'categoryId']);
+    await queryInterface.addIndex("ProductSubscription", [
+      "userId",
+      "productId",
+      "categoryId",
+    ]);
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('ProductSubscription');
-  }
+    await queryInterface.dropTable("ProductSubscription");
+  },
 };

@@ -54,7 +54,6 @@ const canAccept = computed(() => {
 const acceptAll = () => {
   if (canAccept.value) {
     rgpdStore.acceptAllModules()
-    // Vous pouvez ajouter ici une logique pour fermer la modal ou rediriger l'utilisateur
   }
 }
 

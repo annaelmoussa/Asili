@@ -1,4 +1,3 @@
-// services/brandService.ts
 import Brand from "../models/Brand";
 import { IBrand, BrandCreationParams } from "../interfaces/IBrand";
 import { Sequelize, Transaction } from "sequelize";
@@ -74,7 +73,6 @@ export class BrandService {
 
       if (!options?.transaction) await transaction.commit();
 
-      // Synchroniser avec MongoDB
       const brandMongoService = new BrandMongoService();
       await brandMongoService.syncWithPostgres(updatedBrand.toJSON());
       console.log("Brand synced with MongoDB");
@@ -91,8 +89,7 @@ export class BrandService {
   }
 
   private filterValidUpdates(updates: Partial<IBrand>): Partial<IBrand> {
-    // Liste des champs autorisés pour la mise à jour
-    const allowedFields: (keyof IBrand)[] = ["name"]; // Ajoutez d'autres champs si nécessaire
+    const allowedFields: (keyof IBrand)[] = ["name"];
 
     return Object.entries(updates)
       .filter(([key]) => allowedFields.includes(key as keyof IBrand))
@@ -110,7 +107,6 @@ export class BrandService {
       options?.transaction || (await this.sequelize.transaction());
 
     try {
-      // Vérifier si des produits sont associés à cette marque
       const productsCount = await Product.count({
         where: { brandId: id },
         transaction,

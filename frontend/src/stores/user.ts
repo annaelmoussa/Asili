@@ -157,7 +157,6 @@ export const useUserStore = defineStore('user', () => {
         email: newEmail
       }
 
-      // Ensure that user.value.id is not undefined
       if (!user.value.id) {
         throw new Error('User ID is undefined')
       }

@@ -43,7 +43,7 @@
     "migrate": "sequelize-cli db:migrate",
     "seed": "sequelize-cli db:seed:all",
     "dev": "ts-node-dev src/server.ts",
-    "test": "jest"
+    "test": "jest --coverage --detectOpenHandles --forceExit"
   },
   "name": "backend",
   "version": "1.0.0",
@@ -66,11 +66,13 @@
     "@types/node": "^20.14.5",
     "@types/nodemailer": "^6.4.15",
     "@types/sequelize": "^4.28.20",
+    "@types/supertest": "^6.0.2",
     "@types/uuid": "^9.0.8",
     "jest": "^29.7.0",
     "nodemon": "^3.1.0",
     "sequelize-auto-migrations": "^1.0.3",
     "sequelize-cli": "^6.6.2",
+    "supertest": "^7.0.0",
     "ts-jest": "^29.1.4",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",

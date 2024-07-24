@@ -1,4 +1,3 @@
-// utils/syncPostgresToMongo.ts
 import Product from "../models/Product";
 import Brand from "../models/Brand";
 import Category from "../models/Category";
@@ -12,14 +11,12 @@ const categoryMongoService = new CategoryMongoService();
 
 export async function syncPostgresToMongo() {
   try {
-    // Sync Brands
     const brands = await Brand.findAll();
     console.log(`Syncing ${brands.length} brands from PostgreSQL to MongoDB`);
     for (const brand of brands) {
       await brandMongoService.syncWithPostgres(brand.toJSON());
     }
 
-    // Sync Categories
     const categories = await Category.findAll();
     console.log(
       `Syncing ${categories.length} categories from PostgreSQL to MongoDB`
@@ -28,7 +25,6 @@ export async function syncPostgresToMongo() {
       await categoryMongoService.syncWithPostgres(category.toJSON());
     }
 
-    // Sync Products
     const products = await Product.findAll();
     console.log(
       `Syncing ${products.length} products from PostgreSQL to MongoDB`

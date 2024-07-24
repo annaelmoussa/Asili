@@ -10,10 +10,9 @@ interface ApiErrorData {
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL as string,
   withCredentials: true,
-  timeout: 10000 // 10 seconds timeout
+  timeout: 10000
 })
 
-// Response interceptor
 api.interceptors.response.use(
   (response: AxiosResponse) => {
     console.log('API response:', response)
@@ -27,7 +26,6 @@ api.interceptors.response.use(
     if (error.response) {
       const { status, data } = error.response
 
-      // Handle different error statuses
       switch (status) {
         case 400:
           notificationStore.showNotification(
@@ -40,7 +38,7 @@ api.interceptors.response.use(
             router.push('/change-password')
           } else {
             console.log('Unauthorized. Clearing user data.')
-            // userStore.clearUserData()
+
             router.push('/login')
           }
           break
@@ -73,11 +71,10 @@ api.interceptors.response.use(
       notificationStore.showNotification('Error setting up the request. Please try again.', 'error')
     }
 
-    // If the error was due to an expired token, try to refresh it
     if (error.response?.status === 401 && error.response?.data?.message === 'Token expired') {
       try {
         await userStore.refreshAuthToken()
-        // Retry the original request
+
         const originalRequest = error.config
         if (originalRequest) {
           return api(originalRequest)
@@ -93,7 +90,6 @@ api.interceptors.response.use(
   }
 )
 
-// Request interceptor
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const userStore = useUserStore()

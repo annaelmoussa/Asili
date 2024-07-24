@@ -8,7 +8,7 @@ import db from "../models";
 import { ICartItem } from "../interfaces/ICartItem";
 
 export class CartService {
-  private RESERVATION_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
+  private RESERVATION_DURATION = 15 * 60 * 1000;
 
   async getCartIdByUserId(userId: string): Promise<string | null> {
     const cart = await Cart.findOne({
@@ -84,7 +84,7 @@ export class CartService {
       });
 
       const newQuantity = item.quantity + quantity;
-      const stockReduction = quantity; // Only reduce stock by the new quantity added
+      const stockReduction = quantity;
 
       product.stock -= stockReduction;
       await product.save({ transaction: t });
@@ -126,8 +126,6 @@ export class CartService {
       if (!product) {
         throw new Error("Product not found");
       }
-
-      // We don't modify the stock here, as it will be handled by the stockReleaseQueue
 
       await item.destroy({ transaction: t });
 
@@ -241,7 +239,7 @@ export class CartService {
     }
 
     await CartItem.destroy({
-      where: { cartId }
+      where: { cartId },
     });
   }
 }

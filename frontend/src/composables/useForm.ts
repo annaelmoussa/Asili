@@ -26,7 +26,7 @@ export function useForm<T extends FormData>(
       return transformations[field]!(value)
     }
 
-    // Si le champ est un booléen dans formData, on le convertit en booléen
+  
     if (typeof (formData as any)[field] === 'boolean') {
       return Boolean(value)
     }
@@ -59,7 +59,7 @@ export function useForm<T extends FormData>(
   const reset = () => {
     Object.assign(formData, initialData)
 
-    // Fix for the TypeScript error
+  
     ;(Object.keys(errors) as Array<keyof typeof errors>).forEach((key) => {
       delete errors[key]
     })

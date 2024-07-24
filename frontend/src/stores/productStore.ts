@@ -1,36 +1,31 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { defaultApi } from '@/api/config'
-import type {
-  IProduct,
-  UpdateLowStockThresholdRequest
-} from '@/api'
+import type { IProduct, UpdateLowStockThresholdRequest } from '@/api'
 
-// Define ProductCreationParams type
 interface ProductCreationParams {
-  name: string;
-  description: string;
-  price: string;
-  categoryId: string;
-  brandId: string;
-  stock: string;
-  isPromotion: string;
-  lowStockThreshold: string;
-  image?: File;
+  name: string
+  description: string
+  price: string
+  categoryId: string
+  brandId: string
+  stock: string
+  isPromotion: string
+  lowStockThreshold: string
+  image?: File
 }
 
-// Define ProductUpdateParams type
 interface ProductUpdateParams {
-  name?: string;
-  description?: string;
-  price?: string;
-  categoryId?: string;
-  brandId?: string;
-  stock?: string;
-  isPromotion?: string;
-  lowStockThreshold?: string;
-  image?: File;
-  existingImageUrl?: string;
+  name?: string
+  description?: string
+  price?: string
+  categoryId?: string
+  brandId?: string
+  stock?: string
+  isPromotion?: string
+  lowStockThreshold?: string
+  image?: File
+  existingImageUrl?: string
 }
 
 export const useProductStore = defineStore('product', () => {

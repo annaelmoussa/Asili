@@ -60,9 +60,9 @@ export class CategoryController extends Controller {
   ): Promise<string | void> {
     const result = await this.categoryService.delete(categoryId);
     if (!result.success) {
-      this.setStatus(400); // Bad Request
+      this.setStatus(400); 
       return result.message;
     }
-    this.setStatus(204); // No Content
+    this.setStatus(204); 
   }
 }

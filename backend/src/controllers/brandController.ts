@@ -73,9 +73,9 @@ export class BrandController extends Controller {
   public async deleteBrand(@Path() brandId: string): Promise<string | void> {
     const result = await this.brandService.delete(brandId);
     if (!result.success) {
-      this.setStatus(400); // Bad Request
+      this.setStatus(400); 
       return result.message;
     }
-    this.setStatus(204); // No Content
+    this.setStatus(204); 
   }
 }

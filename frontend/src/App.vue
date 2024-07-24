@@ -41,7 +41,6 @@ async function loadRGPDModules() {
   } catch (error) {
     console.error('Error fetching RGPD modules:', error)
     notificationStore.showNotification('Failed to load RGPD modules', 'error')
-    // Set a default or empty state for RGPD modules
     rgpdStore.setModules([])
     isRGPDLoaded.value = true
   }

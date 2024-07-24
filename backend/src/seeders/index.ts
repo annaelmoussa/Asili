@@ -83,7 +83,6 @@ export async function runSeeders(sequelize: Sequelize) {
     }
   }
 
-  // Execute ordered seeders
   for (const orderedSeeder of orderedSeeders) {
     if (seederFiles.includes(orderedSeeder)) {
       await executeSeeder(orderedSeeder);
@@ -94,7 +93,6 @@ export async function runSeeders(sequelize: Sequelize) {
     }
   }
 
-  // Execute any remaining seeders that weren't in the orderedSeeders list
   for (const file of seederFiles) {
     if (!orderedSeeders.includes(file)) {
       await executeSeeder(file);

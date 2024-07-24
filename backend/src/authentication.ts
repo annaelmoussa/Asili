@@ -47,10 +47,10 @@ export function expressAuthentication(
           if (typeof decoded !== "string") {
             const jwtPayload = decoded as IJwtPayload;
 
-            // Create a user object that satisfies both IUser and IJwtPayload
+            
             const user: IUser & IJwtPayload = {
               ...jwtPayload,
-              password: "", // Set a default value or fetch from database if needed
+              password: "",
             };
 
             (request as Request & { user: IUser & IJwtPayload }).user = user;

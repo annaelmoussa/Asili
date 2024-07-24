@@ -41,7 +41,6 @@ interface TableItem {
   [key: string]: any
 }
 
-// Define the product schema
 const productSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, 'Le nom est requis'),

@@ -1,4 +1,4 @@
-// errors/UnauthorizedError.ts
+
 export class UnauthorizedError extends Error {
   status: number;
 

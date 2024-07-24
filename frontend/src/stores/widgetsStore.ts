@@ -91,7 +91,7 @@ export const useWidgetsStore = defineStore('widgets', () => {
         id: widget.id ?? '',
         title: widget.name,
         type: widget.type as 'Area' | 'Line' | 'Bar' | 'Donut',
-        data: widget.settings, // Store raw data
+        data: widget.settings,
         grid: { x: widget.x, y: widget.y, w: widget.w, h: widget.h },
         modelType: widget.modelType as 'Products' | 'Users' | 'Orders'
       }))

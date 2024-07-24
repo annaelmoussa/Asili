@@ -171,23 +171,23 @@ export default defineComponent({
         const response = await rgpdApi.exportRGPDModules()
         const modules = response.data
 
-        // Create a Blob with the JSON data
+        
         const blob = new Blob([JSON.stringify(modules, null, 2)], { type: 'application/json' })
 
-        // Create a URL for the Blob
+        
         const url = window.URL.createObjectURL(blob)
 
-        // Create a temporary anchor element to trigger the download
+        
         const a = document.createElement('a')
         a.href = url
         a.download = 'rgpd_modules_export.json'
 
-        // Append the anchor to the body, click it, and remove it
+        
         document.body.appendChild(a)
         a.click()
         document.body.removeChild(a)
 
-        // Revoke the URL to free up memory
+      
         window.URL.revokeObjectURL(url)
 
         console.log('Modules exported successfully')

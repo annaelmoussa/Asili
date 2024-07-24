@@ -283,7 +283,6 @@ export default defineComponent({
     const filteredData = computed(() => {
       let result = props.data
 
-      // Apply global search
       if (globalSearch.value) {
         const searchTerm = globalSearch.value.toLowerCase()
         result = result.filter((item) =>
@@ -293,7 +292,6 @@ export default defineComponent({
         )
       }
 
-      // Apply column filters
       Object.entries(columnFilters.value).forEach(([key, value]) => {
         if (value) {
           const column = props.columns.find((col) => col.key === key)
