@@ -9,4 +9,3 @@ Dockerfile
 README.md
 LICENSE
 .vscode
-*.env

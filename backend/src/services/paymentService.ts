@@ -1,17 +1,17 @@
 import Stripe from "stripe";
 import { IProduct } from "../interfaces/IProduct";
-import dotenv from "dotenv";
 import Payment from "../models/Payment";
 import { IPayment } from "../interfaces/IPayment";
+const stripeSecret =
+  process.env.SECRET_KEY ??
+  "sk_test_51PNYtAHbf3sdXCnMoA4cC38iQtbdGIlNMSnNQzROT5jPbgpZbEb0T9yuH8ckgespAkcA9YIGTpdkerkY5XQFNT5W00tv0XHsXE";
 
-dotenv.config();
-
-if (!process.env.STRIPE_SECRET_KEY) {
+if (!stripeSecret) {
   throw new Error(
     "STRIPE_SECRET_KEY is not defined in the environment variables"
   );
 }
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(stripeSecret, {
   apiVersion: "2024-06-20",
 });
 

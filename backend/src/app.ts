@@ -4,7 +4,6 @@ import cors from "cors";
 import { RegisterRoutes } from "../build/routes";
 import { errorHandler } from "./middlewares/errorHandler";
 import bodyParser from "body-parser";
-import { loginRateLimiter } from "./middlewares/rateLimiter";
 import path from "path";
 
 export const app = express();
@@ -14,9 +13,6 @@ const corsOptions = {
   origin: isProd ? "https://littleyarns.org" : "http://localhost:8080",
   credentials: true,
 };
-app.use("/stripe-webhook", bodyParser.raw({ type: "application/json" }));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // Middleware Configuration
 app.use(
@@ -34,10 +30,23 @@ app.use(
     },
   })
 );
+
+// Special handling for Stripe webhook route
+app.use(
+  "/stripe-webhook",
+  express.raw({ type: "application/json" }),
+  cors({ origin: "*" }) // Allow Stripe to call from any origin
+);
+
+// General CORS for other routes
 app.use(cors(corsOptions));
+
+// Body parsing for other routes
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-// app.use("/auth/login", loginRateLimiter);
 
 app.use(
   "/uploads",
