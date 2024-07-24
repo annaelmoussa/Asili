@@ -1,76 +1,307 @@
 <template>
-  <div class="search-view">
-    <div class="search-filters">
-      <h2>Filtres</h2>
-      <input v-model="searchQuery" @input="updateSearch" placeholder="Rechercher un produit" />
-
-      <div class="filter-section">
-        <h3>Catégorie</h3>
-        <select v-model="selectedCategory" @change="updateSearch">
-          <option :value="null">Toutes les catégories</option>
-          <option v-for="category in categories" :key="category.id" :value="category">
-            {{ category.name }}
-          </option>
-        </select>
-        <button 
-          v-if="selectedCategory"
-          @click="toggleCategorySubscription"
-          class="subscribe-button"
-          :class="{ 'subscribed': isCategorySubscribed }"
+  <section>
+    <div class="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <header>
+        <h2 class="text-xl font-bold text-gray-900 sm:text-3xl">Nos produits</h2>
+  
+        <p class="mt-4  text-gray-500">
+          Explorez notre sélection de protéines et compléments alimentaires de haute qualité, spécialement formulés pour soutenir votre santé et vos performances. Atteignez vos objectifs avec nos produits fiables et efficaces.
+        </p>
+      </header>
+  
+      <div class="mt-8 block lg:hidden">
+        <button
+          class="flex cursor-pointer items-center gap-2 border-b border-gray-400 pb-1 text-gray-900 transition hover:border-gray-600"
         >
-          {{ isCategorySubscribed ? $t('app.categories.unsubscribe') : $t('app.categories.subscribe') }}
+          <span class="text-sm font-medium"> Filters & Sorting </span>
+  
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="size-4 rtl:rotate-180"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
         </button>
       </div>
-
-      <div class="filter-section">
-        <h3>Marque</h3>
-        <select v-model="selectedBrand" @change="updateSearch">
-          <option value="">Toutes les marques</option>
-          <option v-for="brand in brands" :key="brand" :value="brand">{{ brand }}</option>
-        </select>
+  
+      <div class="mt-4 lg:mt-8 lg:grid lg:grid-cols-4 lg:items-start lg:gap-8">
+        <div class="hidden space-y-4 lg:block">
+          <div>
+            <p class="block text-xs font-medium text-gray-700">Filtre</p>
+            <Label for="globalSearch">Recherche Globale</Label>
+            <Input v-model="searchQuery" @input="updateSearch" placeholder="Rechercher un produit" />
+            <div class="mt-1 space-y-2">
+              <details
+                class="overflow-hidden rounded border border-gray-300 [&_summary::-webkit-details-marker]:hidden"
+              >
+                <summary
+                  class="flex cursor-pointer items-center justify-between gap-2 p-4 text-gray-900 transition"
+                >
+                  <span class="text-sm font-medium"> Disponibilité </span>
+  
+                  <span class="transition group-open:-rotate-180">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="h-4 w-4"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                      />
+                    </svg>
+                  </span>
+                </summary>
+  
+                <div class="border-t border-gray-200 bg-white">
+                  <ul class="space-y-1 border-t border-gray-200 p-4">
+                    <li>
+                      <label for="FilterInStock" class="inline-flex items-center gap-2">
+                        <input
+                          v-model="inStock" 
+                          @change="updateSearch"
+                          type="checkbox"
+                          id="inStock"
+                          class="size-5 rounded border-gray-300"
+                        />
+                        <span class="text-sm font-medium text-gray-700"> En stock </span>
+                      </label>
+                    </li>                    
+                  </ul>
+                </div>
+              </details>
+              <details
+                class="overflow-hidden rounded border border-gray-300 [&_summary::-webkit-details-marker]:hidden"
+              >
+                <summary
+                  class="flex cursor-pointer items-center justify-between gap-2 p-4 text-gray-900 transition"
+                >
+                  <span class="text-sm font-medium"> Promotion </span>
+  
+                  <span class="transition group-open:-rotate-180">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="h-4 w-4"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                      />
+                    </svg>
+                  </span>
+                </summary>
+  
+                <div class="border-t border-gray-200 bg-white">
+                  <ul class="space-y-1 border-t border-gray-200 p-4">
+                    <li>
+                      <label for="FilterInStock" class="inline-flex items-center gap-2">
+                        <input
+                          v-model="isPromotion" @change="updateSearch"
+                          type="checkbox"
+                          id="inStock"
+                          class="size-5 rounded border-gray-300"
+                        />
+                        <span class="text-sm font-medium text-gray-700"> En promotion </span>
+                      </label>
+                    </li>                    
+                  </ul>
+                </div>
+              </details>
+              <details
+                class="overflow-hidden rounded border border-gray-300 [&_summary::-webkit-details-marker]:hidden"
+              >
+                <summary
+                  class="flex cursor-pointer items-center justify-between gap-2 p-4 text-gray-900 transition"
+                >
+                  <span class="text-sm font-medium"> Marques </span>
+  
+                  <span class="transition group-open:-rotate-180">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="h-4 w-4"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                      />
+                    </svg>
+                  </span>
+                </summary>
+  
+                <div class="border-t border-gray-200 bg-white">
+                  <ul class="space-y-1 border-t border-gray-200 p-4">
+                    <li>
+                      <label for="FilterInStock" class="inline-flex items-center gap-2">
+                        <Select v-model="selectedBrand" @update:modelValue="updateSearch">
+          <SelectTrigger class="w-[180px]">
+            <SelectValue placeholder="Sélectionnez une marque" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem :value="null">Toutes les marques</SelectItem>
+            <SelectItem v-for="brand in brands" :key="brand" :value="brand">
+              {{ brand }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+                        
+                      </label>
+                    </li>                    
+                  </ul>
+                </div>
+              </details>
+              <details
+                class="overflow-hidden rounded border border-gray-300 [&_summary::-webkit-details-marker]:hidden"
+              >
+                <summary
+                  class="flex cursor-pointer items-center justify-between gap-2 p-4 text-gray-900 transition"
+                >
+                  <span class="text-sm font-medium"> Categories </span>
+  
+                  <span class="transition group-open:-rotate-180">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="h-4 w-4"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                      />
+                    </svg>
+                  </span>
+                </summary>
+  
+                <div class="border-t border-gray-200 bg-white">
+                  <ul class="space-y-1 border-t border-gray-200 p-4">
+                    <li>
+                      <label for="FilterInStock" class="inline-flex items-center gap-2">
+                        <Select v-model="selectedCategory" @update:modelValue="updateSearch">
+                          <SelectTrigger class="w-[180px]">
+                            <SelectValue placeholder="Sélectionnez une catégorie" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem :value="null">Toutes les catégories</SelectItem>
+                            <SelectItem v-for="category in categories" :key="category.id" :value="category">
+                              {{ category.name }}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </label>
+                    </li>                    
+                  </ul>
+                </div>
+              </details>
+  
+              <details
+                class="overflow-hidden rounded border border-gray-300 [&_summary::-webkit-details-marker]:hidden"
+              >
+                <summary
+                  class="flex cursor-pointer items-center justify-between gap-2 p-4 text-gray-900 transition"
+                >
+                  <span class="text-sm font-medium"> Price </span>
+  
+                  <span class="transition group-open:-rotate-180">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="h-4 w-4"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                      />
+                    </svg>
+                  </span>
+                </summary>
+  
+                <div class="border-t border-gray-200 bg-white">
+                  <div class="border-t border-gray-200 p-4">
+                    <div class="flex justify-between gap-4">
+                      <label for="FilterPriceFrom" class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">$</span>
+  
+                        <Input
+                          v-model.number="minPrice" @input="updateSearch" type="number" placeholder="Min"
+                          id="FilterPriceFrom"
+                          class="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                        />
+                      </label>
+  
+                      <label for="FilterPriceTo" class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">$</span>
+  
+                        <Input
+                          v-model.number="maxPrice" @input="updateSearch" type="number" placeholder="Max"
+                          id="FilterPriceTo"
+                          class="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </details>
+  
+              
+            </div>
+          </div>
+        </div>
+  
+        <div class="lg:col-span-3">
+          <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <li v-for="product in products" :key="product.id" @click="goToProductPage(product.id)">
+              <a href="#" class="group block">
+    <img
+      :src="extractImageUrl(product.image)" :alt="product.name"
+      class="h-[200px] w-full object-cover sm:h-[350px]"
+    />
+  
+    <div class="mt-3 flex justify-between text-sm">
+      <div>
+        <h3 class="text-gray-900 group-hover:underline group-hover:underline-offset-4">
+          {{ product.name }}
+        </h3>
+  
+        <p class="mt-1.5 text-pretty text-xs text-gray-500">
+          {{ product.description }}
+        </p>
       </div>
-
-      <div class="filter-section">
-        <h3>Prix</h3>
-        <input v-model.number="minPrice" @input="updateSearch" type="number" placeholder="Min" />
-        <input v-model.number="maxPrice" @input="updateSearch" type="number" placeholder="Max" />
-      </div>
-
-      <div class="filter-section">
-        <label>
-          <input v-model="isPromotion" @change="updateSearch" type="checkbox" />
-          En promotion
-        </label>
-      </div>
-
-      <div class="filter-section">
-        <label>
-          <input v-model="inStock" @change="updateSearch" type="checkbox" />
-          En stock
-        </label>
-      </div>
+  
+      <p class="text-gray-900">{{ product.price.toFixed(2) }}€</p>
     </div>
-
-    <div class="search-results">
-      <h2>Résultats de recherche</h2>
-      <div v-if="loading">Chargement...</div>
-      <div v-else-if="error">Une erreur est survenue: {{ error }}</div>
-      <div v-else-if="products.length === 0">Aucun produit trouvé</div>
-      <div v-else class="product-list">
-        <div
-          v-for="product in products"
-          :key="product.id"
-          class="product-item"
-          @click="goToProductPage(product.id)"
-        >
-          <img :src="extractImageUrl(product.image)" :alt="product.name" />
-          <h3>{{ product.name }}</h3>
-          <p>{{ product.price.toFixed(2) }} €</p>
-          <p>{{ product.description }}</p>
+  </a>
+            </li>
+            
+          </ul>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
@@ -82,6 +313,19 @@ import { extractImageUrl } from '@/utils/productUtils'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { Toaster } from '@/components/ui/toast'
 import { useI18n } from 'vue-i18n'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 
 const { t } = useI18n()
 const { toast } = useToast()
@@ -262,50 +506,3 @@ watch(
   }
 )
 </script>
-
-<style scoped>
-.search-view {
-  display: flex;
-  gap: 20px;
-  padding: 20px;
-}
-
-.search-filters {
-  width: 250px;
-  padding: 20px;
-  background-color: #f5f5f5;
-  border-radius: 5px;
-}
-
-.filter-section {
-  margin-bottom: 20px;
-}
-
-.search-results {
-  flex-grow: 1;
-}
-
-.product-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-.product-item {
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 10px;
-  text-align: center;
-  cursor: pointer;
-  transition: box-shadow 0.3s ease;
-}
-
-.product-item:hover {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.product-item img {
-  max-width: 100%;
-  height: auto;
-}
-</style>
