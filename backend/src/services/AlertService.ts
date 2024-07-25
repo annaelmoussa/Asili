@@ -2,9 +2,16 @@ import AlertPreference from "../models/AlertPreference";
 import User from "../models/User";
 import Product from "../models/Product";
 import sendEmail from "./emailService";
+import { DataTypes, Op, Sequelize, Transaction } from "sequelize";
+import { sequelize as defaultSequelize } from "../config/dbConfigPostgres";
 import { IAlertPreference } from "../interfaces/IAlertPreference";
 
 export class AlertService {
+  private sequelize: Sequelize;
+
+  constructor(sequelize?: Sequelize) {
+    this.sequelize = sequelize || defaultSequelize;
+  }
   public async createAlertPreference(userId: string): Promise<AlertPreference> {
     return AlertPreference.create({
       userId,

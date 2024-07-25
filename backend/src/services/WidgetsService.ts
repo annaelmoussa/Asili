@@ -1,7 +1,14 @@
 import { IWidget, WidgetCreationParams } from "../interfaces/IWidget";
 import Widget from "../models/Widget";
+import { DataTypes, Op, Sequelize, Transaction } from "sequelize";
+import { sequelize as defaultSequelize } from "../config/dbConfigPostgres";
 
 export class WidgetsService {
+  private sequelize: Sequelize;
+
+  constructor(sequelize?: Sequelize) {
+    this.sequelize = sequelize || defaultSequelize;
+  }
   public async getAllByUser(userId: string): Promise<IWidget[]> {
     return Widget.findAll({ where: { userId } });
   }

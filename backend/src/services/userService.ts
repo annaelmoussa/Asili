@@ -1,13 +1,19 @@
 import User from "../models/User";
 import { IUser } from "../interfaces/IUser";
-import { Transaction } from "sequelize";
 import { ALL_SCOPES } from "../config/scopes";
 import { v4 as uuidv4 } from "uuid";
+import { DataTypes, Op, Sequelize, Transaction } from "sequelize";
+import { sequelize as defaultSequelize } from "../config/dbConfigPostgres";
 import bcrypt from "bcrypt";
 import Widget from "../models/Widget";
 import { differenceInDays } from "date-fns";
 
 export class UserService {
+
+  private sequelize: Sequelize;
+  constructor(sequelize?: Sequelize) {
+    this.sequelize = sequelize || defaultSequelize;
+  }
   public async get(
     userId: string,
     options?: { transaction?: Transaction }
@@ -40,6 +46,7 @@ export class UserService {
   }
 
   public async create(
+    userCreationParams: userCreationParams,
     user: IUser,
     options?: { transaction?: Transaction }
   ): Promise<IUser> {
@@ -70,7 +77,7 @@ export class UserService {
           user.scopes = ALL_SCOPES;
         }
 
-        const newUser = await User.create(user, { transaction: t });
+        const newUser = await User.create(user, { transaction: t, userCreationParams });
 
         if (!options?.transaction) {
           await t.commit();

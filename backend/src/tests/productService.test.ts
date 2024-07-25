@@ -19,7 +19,7 @@ describe("ProductService", () => {
         commit: jest.fn(),
         rollback: jest.fn(),
       })),
-    };
+    };  
     productService = new ProductService(mockSequelize);
   });
 

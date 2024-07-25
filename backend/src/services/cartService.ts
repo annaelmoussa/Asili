@@ -2,12 +2,18 @@ import Cart from "../models/Cart";
 import CartItem from "../models/CartItem";
 import Product from "../models/Product";
 import User from "../models/User";
-import { Op, Transaction } from "sequelize";
 import { reservationExpirationQueue, stockReleaseQueue } from "../queues";
+import { DataTypes, Op, Sequelize, Transaction } from "sequelize";
+import { sequelize as defaultSequelize } from "../config/dbConfigPostgres";
 import db from "../models";
 import { ICartItem } from "../interfaces/ICartItem";
 
 export class CartService {
+  private sequelize: Sequelize;
+  
+  constructor(sequelize?: Sequelize) {
+    this.sequelize = sequelize || defaultSequelize;
+  }
   private RESERVATION_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
 
   async getCartIdByUserId(userId: string): Promise<string | null> {
