@@ -6,8 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaymentService = void 0;
 const stripe_1 = __importDefault(require("stripe"));
 const Payment_1 = __importDefault(require("../models/Payment"));
-const stripeSecret = process.env.SECRET_KEY ??
-    "sk_test_51PNYtAHbf3sdXCnMoA4cC38iQtbdGIlNMSnNQzROT5jPbgpZbEb0T9yuH8ckgespAkcA9YIGTpdkerkY5XQFNT5W00tv0XHsXE";
+const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
+dotenv_1.default.config({ path: path_1.default.resolve(__dirname, "../../../.env") });
+const stripeSecret = process.env.STRIPE_SECRET_KEY;
 if (!stripeSecret) {
     throw new Error("STRIPE_SECRET_KEY is not defined in the environment variables");
 }

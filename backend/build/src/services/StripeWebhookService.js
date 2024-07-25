@@ -11,8 +11,14 @@ const orderService_1 = require("./orderService");
 const ShippingService_1 = require("./ShippingService");
 const paymentService_1 = require("./paymentService");
 const FakeApiLaPosteService_1 = require("./FakeApiLaPosteService");
-const stripeSecret = process.env.SECRET_KEY ??
-    "sk_test_51PNYtAHbf3sdXCnMoA4cC38iQtbdGIlNMSnNQzROT5jPbgpZbEb0T9yuH8ckgespAkcA9YIGTpdkerkY5XQFNT5W00tv0XHsXE";
+const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
+// Charger les variables d'environnement depuis le fichier .env à la racine du dossier backend
+dotenv_1.default.config({ path: path_1.default.resolve(__dirname, "../../../.env") });
+const stripeSecret = process.env.STRIPE_SECRET_KEY;
+if (!stripeSecret) {
+    throw new Error("STRIPE_SECRET_KEY is not defined in the environment variables");
+}
 const stripe = new stripe_1.default(stripeSecret, {
     apiVersion: "2024-06-20",
 });
@@ -26,8 +32,10 @@ class StripeWebhookService {
     }
     async handleWebhook(rawBody, signature) {
         try {
-            const webhookSecret = process.env.STRIPE_WEBHOOK_SIGNING_SECRET_KEY ??
-                "whsec_4DtZNQHdfGCtzDpz4tLbJgXE805pjq8H";
+            const webhookSecret = process.env.STRIPE_WEBHOOK_SIGNING_SECRET_KEY;
+            if (!webhookSecret) {
+                throw new Error("STRIPE_WEBHOOK_SIGNING_SECRET_KEY is not defined in the environment variables");
+            }
             const event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
             console.log("Received event:", event.type);
             if (event.type === "checkout.session.completed") {
@@ -73,7 +81,7 @@ class StripeWebhookService {
         else if (!order.id) {
             throw new Error("Something went wrong.");
         }
-        console.log('creating shipping..');
+        console.log("creating shipping..");
         const trackingNumber = await this.fakeApiLaPosteService.generateTrackingNumber();
         console.log("trackingNumber => " + trackingNumber);
         const shipping = await this.shippingService.createShipping({

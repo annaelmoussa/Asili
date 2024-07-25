@@ -35,10 +35,9 @@ function expressAuthentication(request, securityName, scopes) {
                     }
                     if (typeof decoded !== "string") {
                         const jwtPayload = decoded;
-                        // Create a user object that satisfies both IUser and IJwtPayload
                         const user = {
                             ...jwtPayload,
-                            password: "", // Set a default value or fetch from database if needed
+                            password: "",
                         };
                         request.user = user;
                         if (scopes && scopes.length > 0) {

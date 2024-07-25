@@ -70,7 +70,6 @@ async function runSeeders(sequelize) {
             }
         }
     }
-    // Execute ordered seeders
     for (const orderedSeeder of orderedSeeders) {
         if (seederFiles.includes(orderedSeeder)) {
             await executeSeeder(orderedSeeder);
@@ -79,7 +78,6 @@ async function runSeeders(sequelize) {
             console.warn(`Ordered seeder ${orderedSeeder} not found in seeders directory`);
         }
     }
-    // Execute any remaining seeders that weren't in the orderedSeeders list
     for (const file of seederFiles) {
         if (!orderedSeeders.includes(file)) {
             await executeSeeder(file);

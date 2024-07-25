@@ -20,7 +20,7 @@ index_1.reservationExpirationQueue.process(async (job) => {
                 lock: true,
             });
             if (product) {
-                product.stock += quantity; // Only release the reserved quantity
+                product.stock += quantity;
                 await product.save({ transaction: t });
             }
             await cartItem.destroy({ transaction: t });

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const app_1 = require("./app"); // Import the Express application
+const app_1 = require("./app");
 const models_1 = __importDefault(require("./models"));
 const seeders_1 = require("./seeders");
 const umzug_1 = require("umzug");
@@ -76,13 +76,10 @@ startServer().catch((error) => {
     console.error("Unhandled error during server startup:", error);
     process.exit(1);
 });
-// Gestion des erreurs non capturées
 process.on("unhandledRejection", (reason, promise) => {
     console.error("Unhandled Rejection at:", promise, "reason:", reason);
-    // Application specific logging, throwing an error, or other logic here
 });
 process.on("uncaughtException", (error) => {
     console.error("Uncaught Exception thrown:", error);
-    // Application specific logging, throwing an error, or other logic here
     process.exit(1);
 });
