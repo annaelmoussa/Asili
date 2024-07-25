@@ -13,7 +13,7 @@ const queues_1 = require("../queues");
 const models_1 = __importDefault(require("../models"));
 class CartService {
     constructor() {
-        this.RESERVATION_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
+        this.RESERVATION_DURATION = 15 * 60 * 1000;
     }
     async getCartIdByUserId(userId) {
         const cart = await Cart_1.default.findOne({
@@ -79,7 +79,7 @@ class CartService {
                 transaction: t,
             });
             const newQuantity = item.quantity + quantity;
-            const stockReduction = quantity; // Only reduce stock by the new quantity added
+            const stockReduction = quantity;
             product.stock -= stockReduction;
             await product.save({ transaction: t });
             item.quantity = newQuantity;
@@ -110,7 +110,6 @@ class CartService {
             if (!product) {
                 throw new Error("Product not found");
             }
-            // We don't modify the stock here, as it will be handled by the stockReleaseQueue
             await item.destroy({ transaction: t });
             try {
                 await queues_1.reservationExpirationQueue.removeJobs(itemId);
@@ -199,7 +198,7 @@ class CartService {
             throw new Error("Cart not found");
         }
         await CartItem_1.default.destroy({
-            where: { cartId }
+            where: { cartId },
         });
     }
 }

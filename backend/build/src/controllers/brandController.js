@@ -49,10 +49,10 @@ let BrandController = class BrandController extends tsoa_1.Controller {
     async deleteBrand(brandId) {
         const result = await this.brandService.delete(brandId);
         if (!result.success) {
-            this.setStatus(400); // Bad Request
+            this.setStatus(400);
             return result.message;
         }
-        this.setStatus(204); // No Content
+        this.setStatus(204);
     }
 };
 exports.BrandController = BrandController;

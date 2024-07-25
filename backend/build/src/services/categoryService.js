@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CategoryService = void 0;
-// services/categoryService.ts
 const Category_1 = __importDefault(require("../models/Category"));
 const dbConfigPostgres_1 = require("../config/dbConfigPostgres");
 const Product_1 = __importDefault(require("../models/Product"));
@@ -35,7 +34,6 @@ class CategoryService {
     async delete(id, options) {
         const transaction = options?.transaction || (await this.sequelize.transaction());
         try {
-            // Vérifier si des produits sont associés à cette catégorie
             const productsCount = await Product_1.default.count({
                 where: { categoryId: id },
                 transaction,
