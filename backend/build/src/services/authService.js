@@ -78,7 +78,7 @@ class AuthService {
                 throw new Error("User not found");
             }
             user.isConfirmed = true;
-            user.confirmationToken = ""; // Clear the token
+            user.confirmationToken = "";
             await user.save();
             return user.toJSON();
         }
@@ -106,7 +106,6 @@ class AuthService {
     async sendPasswordResetEmail(email) {
         const user = await User_1.default.findOne({ where: { email } });
         if (!user) {
-            // If the user doesn't exist, do nothing to avoid information leaks
             return;
         }
         const token = jsonwebtoken_1.default.sign({ email: user.email, id: user.id }, this.secret, {
@@ -194,8 +193,6 @@ class AuthService {
         user.password = hashedPassword;
         user.lastPasswordChange = new Date();
         await user.save();
-        // Optionally, you might want to invalidate all existing tokens for this user
-        // This would require additional implementation in your token management system
     }
 }
 exports.AuthService = AuthService;

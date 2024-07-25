@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const SentEmail_1 = __importDefault(require("../models/SentEmail"));
-// Create a transporter using your Google account credentials
 const transporter = nodemailer_1.default.createTransport({
     service: "Gmail",
     host: "smtp.gmail.com",
@@ -16,10 +15,8 @@ const transporter = nodemailer_1.default.createTransport({
         pass: "lvwfpjviseqxuulk",
     },
 });
-// Function to send an email
 async function sendEmail(to, subject, text, html) {
     try {
-        // Send mail with defined transport object
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to,
@@ -27,7 +24,6 @@ async function sendEmail(to, subject, text, html) {
             text,
             html,
         });
-        // Log the email in the database
         await SentEmail_1.default.create({
             to,
             subject,
@@ -35,14 +31,14 @@ async function sendEmail(to, subject, text, html) {
             html,
             sentAt: new Date(),
         });
-        console.log('Email sent and logged successfully');
+        console.log("Email sent and logged successfully");
     }
     catch (error) {
         if (error instanceof Error) {
-            console.error('Error sending email:', error.message);
+            console.error("Error sending email:", error.message);
         }
         else {
-            console.error('Unknown error sending email');
+            console.error("Unknown error sending email");
         }
     }
 }

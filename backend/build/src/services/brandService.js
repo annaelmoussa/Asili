@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BrandService = void 0;
-// services/brandService.ts
 const Brand_1 = __importDefault(require("../models/Brand"));
 const dbConfigPostgres_1 = require("../config/dbConfigPostgres");
 const Product_1 = __importDefault(require("../models/Product"));
@@ -44,7 +43,6 @@ class BrandService {
             console.log("Updated brand:", JSON.stringify(updatedBrand));
             if (!options?.transaction)
                 await transaction.commit();
-            // Synchroniser avec MongoDB
             const brandMongoService = new brandMongoService_1.BrandMongoService();
             await brandMongoService.syncWithPostgres(updatedBrand.toJSON());
             console.log("Brand synced with MongoDB");
@@ -61,8 +59,7 @@ class BrandService {
         }
     }
     filterValidUpdates(updates) {
-        // Liste des champs autorisés pour la mise à jour
-        const allowedFields = ["name"]; // Ajoutez d'autres champs si nécessaire
+        const allowedFields = ["name"];
         return Object.entries(updates)
             .filter(([key]) => allowedFields.includes(key))
             .reduce((obj, [key, value]) => {
@@ -73,7 +70,6 @@ class BrandService {
     async delete(id, options) {
         const transaction = options?.transaction || (await this.sequelize.transaction());
         try {
-            // Vérifier si des produits sont associés à cette marque
             const productsCount = await Product_1.default.count({
                 where: { brandId: id },
                 transaction,

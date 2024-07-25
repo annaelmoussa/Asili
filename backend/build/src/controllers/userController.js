@@ -54,7 +54,7 @@ let UserController = class UserController extends tsoa_1.Controller {
         const requestingUserId = request.user.id;
         const userRole = request.user.role;
         if (userRole === "ROLE_ADMIN") {
-            return; // Admins are always authorized
+            return;
         }
         if (requestingUserId !== userId) {
             throw new UnauthorizedError_1.UnauthorizedError("You are not authorized to perform this action on another user's account");

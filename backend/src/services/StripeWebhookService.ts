@@ -1,16 +1,25 @@
-import Stripe from 'stripe';
-import crypto from 'crypto';
-import { CartService } from './cartService';
-import { OrderService } from './orderService';
-import { ShippingService } from './ShippingService';
-import { PaymentService } from './paymentService';
+import Stripe from "stripe";
+import crypto from "crypto";
+import { CartService } from "./cartService";
+import { OrderService } from "./orderService";
+import { ShippingService } from "./ShippingService";
+import { PaymentService } from "./paymentService";
 import { FakeApiLaPosteService } from "./FakeApiLaPosteService";
-import { MongoOrder } from '../models/MongoOrder';
-import dotenv from 'dotenv';
+import { MongoOrder } from "../models/MongoOrder";
+import dotenv from "dotenv";
+import path from "path";
 
-const stripeSecret =
-  process.env.SECRET_KEY ??
-  "sk_test_51PNYtAHbf3sdXCnMoA4cC38iQtbdGIlNMSnNQzROT5jPbgpZbEb0T9yuH8ckgespAkcA9YIGTpdkerkY5XQFNT5W00tv0XHsXE";
+// Charger les variables d'environnement depuis le fichier .env à la racine du dossier backend
+dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
+
+const stripeSecret = process.env.STRIPE_SECRET_KEY;
+
+if (!stripeSecret) {
+  throw new Error(
+    "STRIPE_SECRET_KEY is not defined in the environment variables"
+  );
+}
+
 const stripe = new Stripe(stripeSecret, {
   apiVersion: "2024-06-20",
 });
@@ -20,13 +29,19 @@ export class StripeWebhookService {
   private orderService: OrderService = new OrderService();
   private shippingService: ShippingService = new ShippingService();
   private paymentService: PaymentService = new PaymentService();
-  private fakeApiLaPosteService: FakeApiLaPosteService = new FakeApiLaPosteService();
+  private fakeApiLaPosteService: FakeApiLaPosteService =
+    new FakeApiLaPosteService();
 
   async handleWebhook(rawBody: Buffer, signature: string): Promise<void> {
     try {
-      const webhookSecret =
-        process.env.STRIPE_WEBHOOK_SIGNING_SECRET_KEY ??
-        "whsec_4DtZNQHdfGCtzDpz4tLbJgXE805pjq8H";
+      const webhookSecret = process.env.STRIPE_WEBHOOK_SIGNING_SECRET_KEY;
+
+      if (!webhookSecret) {
+        throw new Error(
+          "STRIPE_WEBHOOK_SIGNING_SECRET_KEY is not defined in the environment variables"
+        );
+      }
+
       const event = stripe.webhooks.constructEvent(
         rawBody,
         signature,
@@ -93,8 +108,9 @@ export class StripeWebhookService {
       throw new Error("Something went wrong.");
     }
 
-    console.log('creating shipping..');
-    const trackingNumber = await this.fakeApiLaPosteService.generateTrackingNumber();
+    console.log("creating shipping..");
+    const trackingNumber =
+      await this.fakeApiLaPosteService.generateTrackingNumber();
     console.log("trackingNumber => " + trackingNumber);
     const shipping = await this.shippingService.createShipping({
       orderId: order.id!,
